@@ -2,3 +2,4 @@
 
 export(DefineNetwork)
 export(MultipartiteBM)
+export(plot_GBM)
