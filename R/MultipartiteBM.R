@@ -1,3 +1,5 @@
+#' Model selection and estimation of multipartite blockmodels
+#'
 #' Select the number of blocks per functional group using a stepwise search and estimate parameters
 #'
 #' @param listNet A list of network (defined via the function DefineNetwork)
@@ -21,7 +23,7 @@
 #' n2 <- npc2 * Q2 # nodes
 #' Z2 <- diag(Q2)%x%matrix(1,npc2,1)
 #' P2 <- matrix(runif(Q1*Q2),Q1,Q2)
-#' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## adjacency matrix
+#' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## incidence matrix
 #' Bgr <- DefineNetwork(B,"inc","FG1","FG2")
 #' res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
 #' @export

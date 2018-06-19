@@ -2,7 +2,7 @@
 % Please edit documentation in R/MultipartiteBM.R
 \name{MultipartiteBM}
 \alias{MultipartiteBM}
-\title{Select the number of blocks per functional group using a stepwise search and estimate parameters}
+\title{Model selection and estimation of multipartite blockmodels}
 \usage{
 MultipartiteBM(listNet, namesFG = NULL, vKmin = 1, vKmax = 10,
   vKinit = NULL, verbose = TRUE, save = FALSE)

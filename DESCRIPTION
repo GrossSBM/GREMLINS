@@ -22,7 +22,7 @@ Collate:
       'DefineNetwork.R'
       'MultipartiteBM.R'
       'VEM_POO_version.R'
-      'estim_multi_init.R'
+      'MultipartiteBMfixedmodel.R'
       'initialize.R'
       'plot_MBM.R'
       'search_VK_POO_version.R'

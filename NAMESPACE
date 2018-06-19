@@ -2,6 +2,7 @@
 
 export(DefineNetwork)
 export(MultipartiteBM)
+export(MultipartiteBMfixedmodel)
 export(plot_MBM)
 import(igraph)
 import(parallel)
