@@ -10,3 +10,20 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+Imports: 
+      R6, 
+      parallel,
+      gtools, 
+      gdata,
+      igraph
+Collate: 
+      'GREMLIN_package.R'
+      'BM_POO.R'
+      'DefineNetwork.R'
+      'MultipartiteBM.R'
+      'VEM_POO_version.R'
+      'estim_multi_init.R'
+      'initialize.R'
+      'plot_GBM.R'
+      'search_VK_POO_version.R'
+      'utils.R'

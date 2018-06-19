@@ -89,6 +89,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   R = dataR6$search_nb_clusters(vKinit_list[[1]],Kmin = vKmin,Kmax = vKmax,verbose = verbose)
   if (length(vKinit_list) > 1) {R <- c(R,dataR6$search_nb_clusters(vKinit_list[[2]],Kmin = vKmin,Kmax = vKmax,verbose = verbose))}
 
+
   #-------------------- cleaning the results
   ICL_seq <- sapply(R,function(u){u$ICL})
   o <- order(ICL_seq,decreasing = TRUE)
