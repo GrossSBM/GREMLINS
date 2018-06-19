@@ -4,10 +4,10 @@
 \alias{plot_GBM}
 \title{Plot the summary of the estimated generalized blockmodel}
 \usage{
-plot_GBM(data, fitted_GBM, mycol = NULL, thres = 0.01)
+plot_GBM(listNet, fitted_GBM, mycol = NULL, thres = 0.01)
 }
 \arguments{
-\item{data}{A list of network (defined via the function DefineNetwork)}
+\item{listNet}{A list of network (defined via the function DefineNetwork)}
 
 \item{fitted_GBM}{A fitted Generalized BlockModel}
 
@@ -34,5 +34,5 @@ P2 <- matrix(runif(Q1*Q2),Q1,Q2)
 B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1\%*\%P2\%*\%t(Z2)) ## adjacency matrix
 Bgr <- DefineNetwork(B,"inc","FG1","FG2")
 res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
-plot(list(Agr,Bgr),res)
+plot_GBM(list(Agr,Bgr),res$param_estim)
 }

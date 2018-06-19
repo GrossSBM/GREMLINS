@@ -1,6 +1,6 @@
 #' Plot the summary of the estimated generalized blockmodel
 #'
-#' @param data A list of network (defined via the function DefineNetwork)
+#' @param listNet A list of network (defined via the function DefineNetwork)
 #' @param fitted_GBM A fitted Generalized BlockModel
 #' @param mycol A list of colors for the functional groups
 #' @param thres A threshold under which edges correponding to probability of connections are not plotted
@@ -20,33 +20,33 @@
 #' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## adjacency matrix
 #' Bgr <- DefineNetwork(B,"inc","FG1","FG2")
 #' res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
-#' plot(list(Agr,Bgr),res)
+#' plot_GBM(list(Agr,Bgr),res$param_estim)
 #' @export
 
+plot_GBM = function(listNet,fitted_GBM,mycol=NULL,thres=0.01){
 
-plot_GBM = function(data,fitted_GBM,mycol=NULL,thres=0.01){
-
-  Q <-  data$Q
-  vK_estim <- param_estim$vK
-  type_node <- lapply(1:Q,function(q){rep(data$namesfg[q],vK_estim[q])})
+  dataR6 = FormattingData(listNet)
+  Q <-  dataR6$Q
+  vK_estim <- fitted_GBM$vK
+  type_node <- lapply(1:Q,function(q){rep(dataR6$namesfg[q],vK_estim[q])})
   label_node <- lapply(1:Q,function(q){1:vK_estim[q]})
   if(is.null(mycol)){mycol <-  palette("default"); mycol <- mycol[-1]}
   col_node <- lapply(1:Q,function(q){rep(mycol[q],vK_estim[q])})
-  size_node <- lapply(1:Q,function(q){param_estim$lpi[[q]]})
+  size_node <- lapply(1:Q,function(q){fitted_GBM$lpi[[q]]})
   cum_vK =c(0,cumsum(vK_estim))
   code_node <- lapply(2:(Q+1),function(q){seq(cum_vK[q-1]+1,cum_vK[q],1)})
 
 
   N = sum(vK_estim)
-  list_edges <- lapply(1:nrow(data$E),function(i){
-    q.row = data$E[i,1]
-    q.col = data$E[i,2]
-    ltheta_i <- param_estim$ltheta[[i]]
+  list_edges <- lapply(1:nrow(dataR6$E),function(i){
+    q.row = dataR6$E[i,1]
+    q.col = dataR6$E[i,2]
+    ltheta_i <- fitted_GBM$ltheta[[i]]
     c1 <- rep(code_node[[q.row]],times=vK_estim[q.col])
     c2 <- rep(code_node[[q.col]],each = vK_estim[q.row])
     edges_i <- cbind(c1,c2,c(ltheta_i))
     edges_i <- as.data.frame(edges_i)
-    edges_i$type <- rep(data$type_inter[i],length(c1))
+    edges_i$type <- rep(dataR6$type_inter[i],length(c1))
     return(edges_i)})
   all_edges <- do.call("rbind", list_edges)
 
@@ -60,7 +60,7 @@ plot_GBM = function(data,fitted_GBM,mycol=NULL,thres=0.01){
 
 
 
-  if(sum(data$type_inter=="diradj")==0){
+  if(sum(dataR6$type_inter=="diradj")==0){
     G<- make_empty_graph() + vertices(unlist(code_node))
     G <- G %>%set_vertex_attr("label",value=unlist(label_node)) %>%set_vertex_attr("color",value=unlist(col_node))
     G <- G%>%set_vertex_attr("size",value=sqrt(unlist(size_node))*20+4)
@@ -69,7 +69,7 @@ plot_GBM = function(data,fitted_GBM,mycol=NULL,thres=0.01){
     G <- as.undirected(G)
 
   }
-  if(sum(data$type_inter=="diradj")>0){
+  if(sum(dataR6$type_inter=="diradj")>0){
     G<- make_empty_graph() + vertices(unlist(code_node))
     G <- G %>%set_vertex_attr("label",value=unlist(label_node)) %>%set_vertex_attr("color",value=unlist(col_node))
     G <- G%>%set_vertex_attr("size",value=sqrt(unlist(size_node))*20+4)
@@ -86,6 +86,6 @@ plot_GBM = function(data,fitted_GBM,mycol=NULL,thres=0.01){
 
   #coords <- layout_in_circle(G)
 
-  legend("left", c(data$namesfg), col=mycol[1:Q], border = "black", lty=1, lwd=4)
+  legend("left", c(dataR6$namesfg), col=mycol[1:Q], border = "black", lty=1, lwd=4)
 }
 
