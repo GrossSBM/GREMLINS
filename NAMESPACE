@@ -2,8 +2,7 @@
 
 export(DefineNetwork)
 export(MultipartiteBM)
-export(plot_GBM)
-import(gdata)
+export(plot_MBM)
 import(igraph)
 import(parallel)
-useDynLib(GREMLIN)
+importFrom(R6,R6Class)

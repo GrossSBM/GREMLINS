@@ -1,4 +1,4 @@
-coll_interaction=R6::R6Class("coll_interaction", ### classe objet pour décrire les données
+coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les données
       public=list(
             mats=NULL,    #list of mats of interaction
             E=NULL, # 2-column table giving which fgs (functional groups) interact in corresponding mat
@@ -55,7 +55,7 @@ coll_interaction=R6::R6Class("coll_interaction", ### classe objet pour décrire 
 
 )
 
-genBMfit=R6::R6Class("genBMfit",
+genBMfit=R6Class("genBMfit",
               public=list(
                 vK=NULL, #vector of number of blocks in each functional group
                 vdistrib=NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli...)

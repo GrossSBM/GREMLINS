@@ -76,12 +76,28 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
 
 
 
+  #------------------------  Bounds of the numer of clusters
+  if (is.null(vKmin)) {vKmin = 1; print("The minimum number of clusters has been set to 1")}
+  if (is.null(vKmax)) {vKmax = 10; print("The maximum number of clusters has been set to 10")}
+
+  if (length(vKmin) == 1) {vKmin = rep(vKmin,dataR6$Q)} else {if (length(vKmin) != dataR6$Q) {stop("Lower bounds on vK are not of the adequate size")}}
+  if (length(vKmax) == 1) {vKmax = rep(vKmax,dataR6$Q)} else {if (length(vKmax) != dataR6$Q) {stop("Upper bounds on vK are not of the adequate size")}}
+
+  for (q in 1:dataR6$Q)
+  {
+    if (vKmax[q]>dataR6$v_NQ[q])
+    {
+      vKmax[q] = dataR6$v_NQ[q]
+      print(paste("Kmax[",q,"]  was set to ",dataR6$v_NQ[q],sep=""))
+    }
+  }
+
+
   if (is.null(vKinit)) {
     vKinit_list <- list(vKmin)
     vKmean <- floor((vKmax + vKmin)/2)
     if (sum(vKmean != vKmin) > 0) { vKinit_list[[2]] <- vKmean }
   }else{vKinit_list <- list(vKinit)}
-
 
 
 
@@ -108,7 +124,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   }
 
   ############# RESULTATS #############################"
-  if (save) {return(res)}else{return(res[[1]])}
+  if (save) {return(list(list(fitted.model = res ,listNet = listNet)))}else{return(list(fitted.model = list(res[[1]]) ,listNet = listNet))}
 
 }
 

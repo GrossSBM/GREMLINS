@@ -24,6 +24,6 @@ Collate:
       'VEM_POO_version.R'
       'estim_multi_init.R'
       'initialize.R'
-      'plot_GBM.R'
+      'plot_MBM.R'
       'search_VK_POO_version.R'
       'utils.R'

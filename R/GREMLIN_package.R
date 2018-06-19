@@ -1,8 +1,8 @@
 #' Loading packages
 #'
 #' All required packages
-#' @useDynLib GREMLIN
-#' @import parallel gdata igraph
+#' @importFrom R6 R6Class
+#' @import parallel igraph
 #' @docType package
 #' @name GREMLIN
 NULL
