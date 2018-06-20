@@ -112,8 +112,12 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   ICL_seq <- sapply(R,function(u){u$ICL})
   o <- order(ICL_seq,decreasing = TRUE)
   R.ordered <- lapply(o,function(i){R[[i]]})
+
   seq_nb_clust <- cbind(t(sapply(R.ordered,function(u){u$param_estim$vK})),ICL_seq[o],1:length(R))
+  if (length(R)>1)
+  {
   seq_nb_clust <- seq_nb_clust[!duplicated(seq_nb_clust[,1:dataR6$Q]),]
+  }
   res  <- R.ordered[seq_nb_clust[,dataR6$Q + 2]]
 
 

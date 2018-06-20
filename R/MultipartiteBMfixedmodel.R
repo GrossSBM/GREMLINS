@@ -5,6 +5,7 @@
 #' @param listNet A list of network (defined via the function DefineNetwork)
 #' @param namesFG Names of functional groups (must correspond to names in listNet)
 #' @param vK A vector with the numbers of blocks per functional group
+#' @param nb_cores Number of cores used for estimation
 #' @return Estimated parameters and a classification
 #' @examples
 #' npc1 <- 20 # nodes per class
@@ -21,19 +22,34 @@
 #' P2 <- matrix(runif(Q1*Q2),Q1,Q2)
 #' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## incidence matrix
 #' Bgr <- DefineNetwork(B,"inc","FG1","FG2")
-#' res <- MultipartiteBMfixedmodel(list(Agr,Bgr),vK=c(3,2))
+#' res <- MultipartiteBMfixedmodel(list(Agr,Bgr),namesFG=c("FG1","FG2"),vK=c(3,2))
 #' @export
 
 
-MultipartiteBMfixedmodel <- function(listNet,vK,nb_cores=NULL){
+MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK,nb_cores=NULL){
   #
+
   dataR6 = FormattingData(listNet)
+
+  if ( dataR6$Q == 1 ) {namesFG <- dataR6$namefg}
 
   os <- Sys.info()["sysname"]
   if ((os != 'Windows') & (is.null(nb_cores))) {nb_cores = detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
 
   Q <- dataR6$Q
   vdistrib <- dataR6$vdistrib
+
+
+  # Check names FG and permute ----------------------------------------------
+
+  if ((is.null(namesFG)==FALSE)  & (setequal(namesFG,dataR6$namesfg)==FALSE)) {stop("Unmatching names of Functional Groups")}
+  vK_permut <- vK
+  for (q in 1:dataR6$Q) {
+    wq <- which(dataR6$namesfg == namesFG[q])
+    vK_permut[q] <- vK[wq]
+  }
+  vK <- vK_permut
+
 
 
 
