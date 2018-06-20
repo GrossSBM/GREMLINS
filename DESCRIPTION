@@ -15,7 +15,8 @@ Imports:
       parallel,
       gtools, 
       gdata,
-      igraph
+      igraph,
+      blockmodels
 Collate: 
       'GREMLIN_package.R'
       'BM_POO.R'

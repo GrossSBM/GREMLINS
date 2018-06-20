@@ -11,26 +11,30 @@ search_KQ <- function(data,vKinit,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbose = TR
   #------
 
 
-  if (length(vKinit) == 1)
-  {
-    vKinit_temp <- switch(vKinit,
-           min =  {Kmin},
-           mean = {floor((Kmax + Kmin)/2)})
-    if  (is.numeric(vKinit))
-      vKinit=rep(vKinit,data$Q)
-    else vKinit = vKinit_temp
+  # if (length(vKinit) == 1)
+  # {
+  #   vKinit_temp <- switch(vKinit,
+  #          min =  {Kmin},
+  #          mean = {floor((Kmax + Kmin)/2)})
+  #   if  (is.numeric(vKinit))
+  #     vKinit=rep(vKinit,data$Q)
+  #   else vKinit = vKinit_temp
+  # }
+
+
+  if (is.numeric(vKinit)) {
+    if (length(vKinit) != data$Q){ stop('Length of vKinit incorrect') }
+
+    if (verbose) { print(paste("Searching the numbers of blocks starting from",paste(as.character(vKinit),collapse = " "),"clusters",sep = " "))}
+    #------------------------  Initialisation of the number of clusters and the classification.
+
+    param.init <- genBMfit$new(vK = vKinit,vdistrib = vdistrib)
+
+    #if (is.null(vKinit)) {if(length(Kmin == 1)){param.init$vK = rep(Kmin,data$Q)} else {param.init$vK = Kmin}} else{param.init$vK = vKinit}
+    classif.init = initialize(data,param.init,method="CAH")$groups
   }
 
 
-  if (length(vKinit) != data$Q) { stop('Length of vKinit incorrect') }
-
-  if (verbose) { print(paste("Searching the numbers of blocks starting from",paste(as.character(vKinit),collapse = " "),"clusters",sep = " "))}
-  #------------------------  Initialisation of the number of clusters and the classification.
-
-  param.init <- genBMfit$new(vK = vKinit,vdistrib = vdistrib)
-
-  #if (is.null(vKinit)) {if(length(Kmin == 1)){param.init$vK = rep(Kmin,data$Q)} else {param.init$vK = Kmin}} else{param.init$vK = vKinit}
-  classif.init = initialize(data,param.init,method="CAH")$groups
 
   #----------------------   Initialisation of the algorithm
 

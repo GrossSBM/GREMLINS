@@ -28,7 +28,7 @@
 #' res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
 #' @export
 
-MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
+MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE,init.BM=FALSE)
 {
 
 
@@ -87,12 +87,13 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
 
   for (q in 1:dataR6$Q)
   {
-    if (vKmax[q]>dataR6$v_NQ[q])
+    if (vKmax[q] > dataR6$v_NQ[q])
     {
       vKmax[q] = dataR6$v_NQ[q]
-      print(paste("Kmax[",q,"]  was set to ",dataR6$v_NQ[q],sep=""))
+      print(paste("Kmax[",q,"]  was set to ",dataR6$v_NQ[q],sep = ""))
     }
   }
+
 
 
   if (is.null(vKinit)) {
@@ -100,10 +101,10 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
     vKmean <- floor((vKmax + vKmin)/2)
     if (sum(vKmean != vKmin) > 0) { vKinit_list[[2]] <- vKmean }
   }else{vKinit_list <- list(vKinit)}
+  if (init.BM == TRUE){ vKinit_list <-  c(vKinit_list,'BM')}
 
 
-
-  ################ ESTIMATION starting from one our two initialisation
+  ################ ESTIMATION starting from one or two initialisation
   R = dataR6$search_nb_clusters(vKinit_list[[1]],Kmin = vKmin,Kmax = vKmax,verbose = verbose)
   if (length(vKinit_list) > 1) {R <- c(R,dataR6$search_nb_clusters(vKinit_list[[2]],Kmin = vKmin,Kmax = vKmax,verbose = verbose))}
 
