@@ -45,7 +45,7 @@ coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les 
 
                 },
             estime = function(classif){VEM_gen_BM(self,classif)},
-            search_nb_clusters = function(vKinit,Kmin,Kmax,nb_cores=NULL,verbose=TRUE){search_KQ(data = self,vKinit = vKinit,Kmin = Kmin,Kmax = Kmax,nb_cores = nb_cores,verbose = verbose)}),
+            search_nb_clusters = function(classif.init,Kmin,Kmax,nb_cores=NULL,verbose=TRUE){search_KQ(data = self,classif.init = classif.init,Kmin = Kmin,Kmax = Kmax,nb_cores = nb_cores,verbose = verbose)}),
       private=list(
                  #version de E interne au code
                   check=function()

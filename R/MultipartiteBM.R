@@ -101,13 +101,59 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
     vKmean <- floor((vKmax + vKmin)/2)
     if (sum(vKmean != vKmin) > 0) { vKinit_list[[2]] <- vKmean }
   }else{vKinit_list <- list(vKinit)}
-  if (init.BM == TRUE){ vKinit_list <-  c(vKinit_list,'BM')}
 
+
+#  browser()
 
   ################ ESTIMATION starting from one or two initialisation
-  R = dataR6$search_nb_clusters(vKinit_list[[1]],Kmin = vKmin,Kmax = vKmax,verbose = verbose)
-  if (length(vKinit_list) > 1) {R <- c(R,dataR6$search_nb_clusters(vKinit_list[[2]],Kmin = vKmin,Kmax = vKmax,verbose = verbose))}
+  # classif CAH
+  param.init <- genBMfit$new(vK = vKinit_list[[1]],vdistrib = dataR6$vdistrib)
+  classif.init = initialize(dataR6,param.init,method="CAH")$groups
+  R = dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose)
+  if (length(vKinit_list) > 1) {
+    param.init <- genBMfit$new(vK = vKinit_list[[2]],vdistrib = dataR6$vdistrib)
+    classif.init = initialize(dataR6,param.init,method="CAH")$groups
+    R <- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose))}
 
+
+  if (init.BM)
+  {
+    list_classif.initBM = lapply(1:dataR6$Q,function(q){list()})
+    names(list_classif.initBM) = dataR6$namesfg
+
+    resBM = lapply(1:dataR6$card_E, function(e){
+      estim =  switch(dataR6$type_inter[e],
+             "inc" = BM_bernoulli("LBM",dataR6$mats[[e]],verbosity=0,plotting=""),
+             "diradj" = BM_bernoulli("SBM",dataR6$mats[[e]],verbosity=0,plotting=""),
+             "adj" = BM_bernoulli("SBM_sym",dataR6$mats[[e]],verbosity=0,plotting=""))
+
+      estim$estimate()
+      k = which.max(estim$ICL)
+      best_clust = estim$memberships[[k]]
+
+      if (dataR6$type_inter[e]=="inc")
+      {
+          list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z1,1,which.max)))
+          list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(apply(best_clust$Z2,1,which.max)))
+      } else {
+        list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z,1,which.max)))
+      }
+    })
+    Nb_classif.initBM = lapply(list_classif.initBM,function(l) 1:length(l))
+    combin_classif.initBM = as.matrix(expand.grid(Nb_classif.initBM))
+
+    R.initBM = lapply(1:nrow(combin_classif.initBM),function(i)
+    {
+         rowcombin = as.vector(combin_classif.initBM[i,])
+         classif.init = lapply(1:dataR6$Q, function(q) list_classif.initBM[[q]][[rowcombin[q]]])
+          R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose))
+    }
+   )
+  }
+
+
+
+  #browser()
 
   #-------------------- cleaning the results
   ICL_seq <- sapply(R,function(u){u$ICL})

@@ -1,4 +1,4 @@
-search_KQ <- function(data,vKinit,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbose = TRUE){
+search_KQ <- function(data,classif.init,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbose = TRUE){
   #
 
 
@@ -21,18 +21,12 @@ search_KQ <- function(data,vKinit,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbose = TR
   #   else vKinit = vKinit_temp
   # }
 
+  vKinit = calc_vK(classif.init)
 
-  if (is.numeric(vKinit)) {
     if (length(vKinit) != data$Q){ stop('Length of vKinit incorrect') }
 
     if (verbose) { print(paste("Searching the numbers of blocks starting from",paste(as.character(vKinit),collapse = " "),"clusters",sep = " "))}
-    #------------------------  Initialisation of the number of clusters and the classification.
 
-    param.init <- genBMfit$new(vK = vKinit,vdistrib = vdistrib)
-
-    #if (is.null(vKinit)) {if(length(Kmin == 1)){param.init$vK = rep(Kmin,data$Q)} else {param.init$vK = Kmin}} else{param.init$vK = vKinit}
-    classif.init = initialize(data,param.init,method="CAH")$groups
-  }
 
 
 
