@@ -5,6 +5,7 @@
 #' @param listNet A list of network (defined via the function DefineNetwork)
 #' @param namesFG Names of functional groups (must correspond to names in listNet)
 #' @param vK A vector with the numbers of blocks per functional group
+#' @param classif.init A list of initial classification for each functional group in the same order as in namesFG
 #' @param nb_cores Number of cores used for estimation
 #' @return Estimated parameters and a classification
 #' @examples
@@ -26,7 +27,7 @@
 #' @export
 
 
-MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK,nb_cores=NULL){
+MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,nb_cores=NULL){
   #
 
   dataR6 = FormattingData(listNet)
@@ -43,26 +44,42 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK,nb_cores=NULL){
   # Check names FG and permute ----------------------------------------------
 
   if ((is.null(namesFG)==FALSE)  & (setequal(namesFG,dataR6$namesfg)==FALSE)) {stop("Unmatching names of Functional Groups")}
-  vK_permut <- vK
-  for (q in 1:dataR6$Q) {
-    wq <- which(dataR6$namesfg == namesFG[q])
-    vK_permut[q] <- vK[wq]
+
+  if ((is.null(vK))&is.null(classif.init)) {stop("one of vK and classif.init have to be defined")}
+
+
+
+  if (!is.null(classif.init))
+  {
+    vKprov = calc_vK(classif.init)
+    if (is.null(vK)) {vK=vKprov}
+    else {if (sum(vK!=vKprov)>0) {stop("unconsistent initial classification and vK")}}
   }
-  vK <- vK_permut
 
 
+  #vK_permut <- vK
+  permut_vector = numeric(length(vK))
+  for (q in 1:dataR6$Q) {
+    permut_vector[q] = which(dataR6$namesfg == namesFG[q])
+    #wq <- which(dataR6$namesfg == namesFG[q])
+    #vK_permut[q] <- vK[wq]
+  }
+  vK <- vK[permut_vector]
+
+  if (!is.null(classif.init)) {classif.init = classif.init[permut_vector]}
 
 
   #------------------------  Initialisation of the number of clusters and the classification.
 
-  param.init <- genBMfit$new(vK = vK,vdistrib = vdistrib)
+  if (is.null(classif.init))
+  {
+    param.init <- genBMfit$new(vK = vK,vdistrib = vdistrib)
+    classif.init <- initialize(dataR6,param.init,method = "CAH")$groups
+  }
 
-  classif.CAH <- initialize(dataR6,param.init,method = "CAH")$groups
 
   #----------------------   Initialisation of the algorithm
-
-
-  estim.0 <- dataR6$estime(classif.CAH);
+  estim.0 <- dataR6$estime(classif.init);
   param.0 <- estim.0$param_estim
   classif.0 <- lapply(1:Q,function(q){max.col(param.0$tau[[q]])})
 
