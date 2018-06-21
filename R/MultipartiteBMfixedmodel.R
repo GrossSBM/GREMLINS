@@ -43,7 +43,7 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
 
   # Check names FG and permute ----------------------------------------------
 
-  if ((is.null(namesFG)==FALSE)  & (setequal(namesFG,dataR6$namesfg)==FALSE)) {stop("Unmatching names of Functional Groups")}
+  if ((is.null(namesFG)==FALSE)  & (setequal(namesFG,dataR6$namesfg) == FALSE)) {stop("Unmatching names of Functional Groups")}
 
   if ((is.null(vK))&is.null(classif.init)) {stop("one of vK and classif.init have to be defined")}
 
@@ -52,8 +52,8 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
   if (!is.null(classif.init))
   {
     vKprov = calc_vK(classif.init)
-    if (is.null(vK)) {vK=vKprov}
-    else {if (sum(vK!=vKprov)>0) {stop("unconsistent initial classification and vK")}}
+    if (is.null(vK)) {vK <-  vKprov}
+    else {if (sum(vK != vKprov) > 0) {stop("unconsistent initial classification and vK")}}
   }
 
 
@@ -184,6 +184,7 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
   names(Z_q) <- dataR6$names_ind[[q]]; return(Z_q)})
 
   res$classif <- lapply(res$param_estim$Z,function(z){sort(z)})
+
   return(res)
 }
 

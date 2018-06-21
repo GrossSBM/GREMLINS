@@ -101,7 +101,7 @@ readjust_theta=function(theta,eps)
 
 
 #computing ICL and likelihood
-comp_lik_ICL=function(tau,pi,alpha,mat_E,list_Mat,n_q,vK)
+comp_lik_ICL = function(tau,pi,alpha,mat_E,list_Mat,n_q,vK)
 {
   cardE=nrow(mat_E)
   Q=length(alpha)

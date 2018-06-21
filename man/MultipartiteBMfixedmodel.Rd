@@ -4,7 +4,8 @@
 \alias{MultipartiteBMfixedmodel}
 \title{Model selection and estimation of multipartite blockmodels}
 \usage{
-MultipartiteBMfixedmodel(listNet, namesFG, vK, nb_cores = NULL)
+MultipartiteBMfixedmodel(listNet, namesFG, vK = NULL, classif.init = NULL,
+  nb_cores = NULL)
 }
 \arguments{
 \item{listNet}{A list of network (defined via the function DefineNetwork)}
@@ -12,6 +13,8 @@ MultipartiteBMfixedmodel(listNet, namesFG, vK, nb_cores = NULL)
 \item{namesFG}{Names of functional groups (must correspond to names in listNet)}
 
 \item{vK}{A vector with the numbers of blocks per functional group}
+
+\item{classif.init}{A list of initial classification for each functional group in the same order as in namesFG}
 
 \item{nb_cores}{Number of cores used for estimation}
 }

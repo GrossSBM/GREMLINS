@@ -28,3 +28,4 @@ Collate:
       'plot_MBM.R'
       'search_VK_POO_version.R'
       'utils.R'
+      'comp_lik_ICL_export.R'
