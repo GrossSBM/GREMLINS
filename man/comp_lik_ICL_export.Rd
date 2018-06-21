@@ -4,7 +4,7 @@
 \alias{comp_lik_ICL_export}
 \title{compute the Integrated likeilhood and the ICL criteria for the MBM}
 \usage{
-comp_lik_ICL_export(tau, pi, alpha, dataR6)
+comp_lik_ICL_export(param_estim, listNet)
 }
 \arguments{
 \item{tau}{Posterior probabilities of clustering}

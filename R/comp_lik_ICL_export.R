@@ -15,7 +15,7 @@
 
 
 #computing ICL and likelihood
-comp_lik_ICL_export  <- function(res_estim,listNet)
+comp_lik_ICL_export  <- function(param_estim,listNet)
 {
 
 
@@ -30,11 +30,11 @@ comp_lik_ICL_export  <- function(res_estim,listNet)
 
   list_Mat <- dataR6$mats
 
-
-  vK <- res_estim$param_estim$vK
-  tau <- res_estim$param_estim$tau
-  pi_estim <- res_estim$param_estim$lpi
-  theta_estim <- res_estim$param_estim$ltheta
+  #browser()
+  vK <- param_estim$vK
+  tau <- param_estim$tau
+  pi_estim <- param_estim$lpi
+  theta_estim <- param_estim$ltheta
 
   #  E_Y[log l(X | Z)]
   condliks = sapply(1:cardE,function(e)
@@ -105,5 +105,4 @@ comp_lik_ICL_export  <- function(res_estim,listNet)
 
 
   return(list(condlik=condlik,marglik=likmarg,entr=entro,pen=penICL))
-
 }

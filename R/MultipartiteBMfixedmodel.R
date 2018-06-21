@@ -27,7 +27,7 @@
 #' @export
 
 
-MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,nb_cores=NULL){
+MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,tau.init = NULL,nb_cores=NULL){
   #
 
   dataR6 = FormattingData(listNet)
@@ -79,9 +79,11 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
 
 
   #----------------------   Initialisation of the algorithm
-  estim.0 <- dataR6$estime(classif.init);
+
+
+  estim.0 <- dataR6$estime(classif.init,tau.init);
   param.0 <- estim.0$param_estim
-  classif.0 <- lapply(1:Q,function(q){max.col(param.0$tau[[q]])})
+  #classif.0 <- lapply(1:Q,function(q){max.col(param.0$tau[[q]])})
 
   classif.0 <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(param.0$tau[[q]]);
   Z_q = match(Z_q, unique(sort(Z_q)))
@@ -89,6 +91,7 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
 
   ICL.0 <- estim.0$ICL
 
+  table(classif.init[[2]],classif.0[[2]])
 
 
   #----------------------------------------------  ALGORITHM
@@ -112,12 +115,13 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
   }
 
   ### step 2 -> M(-1)
+
   F_backward_q <-  function(q){
     classif_backward_q <- merge_classif(classif.0,q,1)
     res <- do.call(c, list(classif_backward_q))
     return(res)}
   list_classif_init_backward = list()
-  for (q in 1:dataR6$Q) { list_classif_init_backward <- do.call(c,list(list_classif_init_backward,F_backward_q(q)))}
+  for (q in 1:Q) { list_classif_init_backward <- do.call(c,list(list_classif_init_backward,F_backward_q(q)))}
 
 
   if (os == "Windows") {

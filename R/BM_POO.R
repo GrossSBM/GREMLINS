@@ -44,7 +44,7 @@ coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les 
                 else{self$names_ind <-  lapply(1:self$Q,function(q){names_ind[[q]]})}
 
                 },
-            estime = function(classif){VEM_gen_BM(self,classif)},
+            estime = function(classif,tau=NULL){VEM_gen_BM(self,classif,tau)},
             search_nb_clusters = function(classif.init,Kmin,Kmax,nb_cores=NULL,verbose=TRUE){search_KQ(data = self,classif.init = classif.init,Kmin = Kmin,Kmax = Kmax,nb_cores = nb_cores,verbose = verbose)}),
       private=list(
                  #version de E interne au code

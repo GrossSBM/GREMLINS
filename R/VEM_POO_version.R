@@ -3,7 +3,7 @@
 #method can be random, CAH, given in which case add given classif
 
 
-VEM_gen_BM <- function(dataR6,classif.init)
+VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   #data :  coll_interaction type object
   #classif  : liste de classifications (Z) au sein des groupes fonctionnels fg (de longueur Q )
 
@@ -11,7 +11,7 @@ VEM_gen_BM <- function(dataR6,classif.init)
   #checking the dimensions of matrices and extracting number of indiviuals
   #for a given q functional groups, gives the list of matrix in row or in columns where it plays a role
 
-
+ browser()
   where_q <- dataR6$where
   Q <- dataR6$Q
   n_q <- dataR6$v_NQ
@@ -22,18 +22,24 @@ VEM_gen_BM <- function(dataR6,classif.init)
 
   #some constants
   eps <- 2*.Machine$double.eps
+  #eps <- 0.001
   val_stopcrit <- 1e-6
+  val_stopcrit <- 1e-8
+
 
 
   ##  initialisation
   vK <- calc_vK(classif.init)
-  tau <-  lapply(1:Q,function(j){
-    mat <- matrix(eps,n_q[j],vK[j],byrow = TRUE)
-    mat[cbind(1:n_q[j],classif.init[[j]])] <- 1 - eps
-    #normalize tau
-    mat <- mat/rowSums(mat)
-    return(mat)
-  })
+  tau <- tau.init
+  if (is.null(tau)) {
+    tau <-  lapply(1:Q,function(j){
+      mat <- matrix(eps,n_q[j],vK[j],byrow = TRUE)
+      mat[cbind(1:n_q[j],classif.init[[j]])] <- 1 - eps
+      #normalize tau
+      mat <- mat/rowSums(mat)
+      return(mat)
+    })
+
 
 
 
@@ -69,8 +75,8 @@ VEM_gen_BM <- function(dataR6,classif.init)
     #--------------------------------   M step
     ltheta_old=ltheta
 
-    lpi=lapply(tau,colMeans)
-    ltheta = lapply(1:cardE,function(j){
+    lpi = lapply(tau,colMeans)
+    ltheta  = lapply(1:cardE,function(j){
       gr=mat_E[j,1]
       gc=mat_E[j,2]
 
@@ -140,49 +146,49 @@ VEM_gen_BM <- function(dataR6,classif.init)
 
 
 
-        if (second_index<0)#sbm but non sym
+        if (second_index < 0)#sbm but non sym
         {
-          don=t(don)
-          Unmdon=t(Unmdon)
-          matltheta=t(matltheta)
+          don <- t(don)
+          Unmdon <- t(Unmdon)
+          matltheta <- t(matltheta)
           switch(vdistrib[l[1]],
-                 bernoulli={lik = lik+don%*%tau[[qprime]]%*%t(log(matltheta))+Unmdon%*%tau[[qprime]]%*%t(log(1-matltheta))},
-                 poisson={stop("Codes non ecrits pour les lois de poisson")})
+                 bernoulli = {lik = lik + don %*% tau[[qprime]] %*% t(log(matltheta)) + Unmdon %*% tau[[qprime]] %*% t(log(1 - matltheta))},
+                 poisson = {stop("Codes non ecrits pour les lois de poisson")})
         }
       return(lik)
       })
-      L=(Reduce('+',der))
+      L <- (Reduce('+',der))
 
-      B=L+matrix(log(lpi[[q]]),nrow=nrow(tau[[q]]),ncol=vK[q],byrow=TRUE)
-      B=B-max(B)
+      B <- L + matrix(log(lpi[[q]]),nrow = nrow(tau[[q]]),ncol = vK[q],byrow = TRUE)
+      B <- B - max(B)
 
-      temp=exp(B)
-      temp2=temp/rowSums(temp)
-      temp2[temp2<eps]=eps
-      temp2[temp2>1-eps]=1-eps
-      temp2=temp2/rowSums(temp2)
-      tau[[q]]=temp2
+      temp <- exp(B)
+      temp2 <- temp/rowSums(temp)
+      temp2[temp2 < eps] <- eps
+      temp2[temp2 > 1 - eps] <- 1 - eps
+      temp2 = temp2/rowSums(temp2)
+      tau[[q]] = temp2
     }
 
     #boucle VE
-    iterVE=iterVE+1
-    if (disttau(tau,tau_old)<val_stopcrit)   stopVE=1
+    iterVE = iterVE + 1
+    if (disttau(tau,tau_old) < val_stopcrit)   stopVE <- 1
     }
     #
 
     #computing lik
-    pseudolik=comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
-    vJ[iter_VEM]=pseudolik$condlik+pseudolik$marglik+pseudolik$entr
+    pseudolik <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
+    vJ[iter_VEM] <- pseudolik$condlik + pseudolik$marglik + pseudolik$entr
   }
 
   #computing ICL
-  likicl = comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
+  likicl <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
 
-  icl = likicl$condlik+likicl$marglik-1/2*likicl$pen
+  icl <-  likicl$condlik + likicl$marglik - 1/2*likicl$pen
 
-  param_estim   <- genBMfit$new(vK=vK, vdistrib=vdistrib, lpi=lpi,ltheta = ltheta);
+  param_estim   <- genBMfit$new(vK = vK, vdistrib = vdistrib, lpi = lpi,ltheta = ltheta);
   param_estim$tau <- tau
   vJ <- vJ[1:iter_VEM]
-  return(list(param_estim = param_estim,ICL=icl,vJ=vJ))
+  return(list(param_estim = param_estim,ICL = icl,vJ = vJ))
 }
 
