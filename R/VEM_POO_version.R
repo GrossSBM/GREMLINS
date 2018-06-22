@@ -11,9 +11,8 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   #checking the dimensions of matrices and extracting number of indiviuals
   #for a given q functional groups, gives the list of matrix in row or in columns where it plays a role
 
- browser()
+ #browser()
   where_q <- dataR6$where
-  Q <- dataR6$Q
   n_q <- dataR6$v_NQ
   cardE <- dataR6$card_E
   mat_E <- dataR6$Ecode ### a remettre en public?????
@@ -24,7 +23,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   eps <- 2*.Machine$double.eps
   #eps <- 0.001
   val_stopcrit <- 1e-6
-  val_stopcrit <- 1e-8
+  val_stopcrit <- 1e-10
 
 
 
@@ -32,13 +31,14 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   vK <- calc_vK(classif.init)
   tau <- tau.init
   if (is.null(tau)) {
-    tau <-  lapply(1:Q,function(j){
+    tau <-  lapply(1:dataR6$Q,function(j){
       mat <- matrix(eps,n_q[j],vK[j],byrow = TRUE)
       mat[cbind(1:n_q[j],classif.init[[j]])] <- 1 - eps
       #normalize tau
       mat <- mat/rowSums(mat)
       return(mat)
     })
+  }
 
 
 
@@ -63,55 +63,58 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
               if (gc < 1) gc <- gr
               return(matrix(Inf,vK[gr],vK[gc]))
             })
+
+
   ######################
   # Algo begins
   #####################
-  while(iter_VEM < maxiter & stopcrit == 0)
+  while (iter_VEM < maxiter & stopcrit == 0)
   {
     iter_VEM <- iter_VEM + 1
     #if(iter_VEM%%100==0){print(paste("Iteration of VEM",iter_VEM,sep=' : '))}
 
 
     #--------------------------------   M step
-    ltheta_old=ltheta
+    ltheta_old <- ltheta
 
     lpi = lapply(tau,colMeans)
     ltheta  = lapply(1:cardE,function(j){
-      gr=mat_E[j,1]
-      gc=mat_E[j,2]
+      gr <- mat_E[j,1]
+      gc <- mat_E[j,2]
 
 
-      if (gc<1) {  #for sbm sym or notsym
-        gc=gr
+      if (gc < 1) {  #for sbm sym or notsym
+        gc <- gr
         #useful matrix
-        Unitmdiag=matrix(1,nrow=n_q[gr],ncol=n_q[gc])
-        diag(Unitmdiag)=0
+        Unitmdiag <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
+        diag(Unitmdiag) <- 0
         #bernoulli or poisson distribution same expression for M step
-        lthetac=t(tau[[gr]])%*%list_Mat[[j]]%*%tau[[gc]] /t(tau[[gr]])%*%(Unitmdiag)%*%tau[[gc]]
+        lthetac = t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unitmdiag) %*% tau[[gc]])
       }
       else #for lbm
       {
-        Unit=matrix(1,nrow=n_q[gr],ncol=n_q[gc])
-        lthetac= t(tau[[gr]])%*%list_Mat[[j]]%*%tau[[gc]] /t(tau[[gr]])%*%(Unit)%*%tau[[gc]]
+        Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
+        lthetac <-  t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unit) %*% tau[[gc]])
       }
       return(lthetac)})
 
     #prevent the values from being too close from 0 or 1
-    lpi=lapply(lpi,readjust_pi,eps)
-    ltheta=lapply(ltheta,readjust_theta,eps)
+    lpi <- lapply(lpi,readjust_pi,eps)
+    ltheta <- lapply(ltheta,readjust_theta,eps)
+
 
     #stop criterion
-    if (distltheta(ltheta,ltheta_old)<val_stopcrit) stopcrit=1
+    if (distltheta(ltheta,ltheta_old) < val_stopcrit) stopcrit <- 1
 
 
     #--------------------------------   VE step : boucle
     iterVE=0
     stopVE=0
-    while(iterVE<maxiter&stopVE==0)
+    while (iterVE < maxiter&stopVE == 0)
     {
     #VE step
     tau_old=tau #useful ?
-    for (q in 1:Q)
+    for (q in 1:dataR6$Q)
     {
       w_q=where_q[[q]]
       der=lapply(as.list(as.data.frame(t(w_q))),function(l)

@@ -22,12 +22,11 @@ comp_lik_ICL_export  <- function(param_estim,listNet)
 
   dataR6 = FormattingData(listNet)
 
-  #dataR6 <-  FormattingData(listNet)
+
 
   mat_E <- dataR6$Ecode
   n_q <- dataR6$v_NQ
   cardE <- dataR6$card_E
-
   list_Mat <- dataR6$mats
 
   #browser()
@@ -35,6 +34,29 @@ comp_lik_ICL_export  <- function(param_estim,listNet)
   tau <- param_estim$tau
   pi_estim <- param_estim$lpi
   theta_estim <- param_estim$ltheta
+
+  if (is.null(pi_estim)) { pi_estim <- lapply(tau,colMeans) }
+  if (is.null(theta_estim)) {
+    theta_estim  <- lapply(1:cardE,function(j){
+      gr <- mat_E[j,1]
+      gc <- mat_E[j,2]
+
+
+      if (gc < 1) {  #for sbm sym or notsym
+        gc <- gr
+        #useful matrix
+        Unitmdiag <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
+        diag(Unitmdiag) <- 0
+        #bernoulli or poisson distribution same expression for M step
+        lthetac <- t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unitmdiag) %*% tau[[gc]])
+      }
+      else #for lbm
+      {
+        Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
+        lthetac <-  t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unit) %*% tau[[gc]])
+      }
+      return(lthetac)})
+  }
 
   #  E_Y[log l(X | Z)]
   condliks = sapply(1:cardE,function(e)

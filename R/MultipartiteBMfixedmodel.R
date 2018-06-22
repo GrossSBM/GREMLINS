@@ -78,20 +78,24 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
   }
 
 
+
   #----------------------   Initialisation of the algorithm
+
+  #log.lik.init <- comp_lik_ICL_export(list(vK = vK,tau = tau.init),listNet)
 
 
   estim.0 <- dataR6$estime(classif.init,tau.init);
   param.0 <- estim.0$param_estim
-  #classif.0 <- lapply(1:Q,function(q){max.col(param.0$tau[[q]])})
-
   classif.0 <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(param.0$tau[[q]]);
   Z_q = match(Z_q, unique(sort(Z_q)))
   names(Z_q) <- dataR6$names_ind[[q]]; return(Z_q)})
 
+  #log.lik.0 <- comp_lik_ICL_export(param.0,listNet)
+
+  #table(classif.0[[1]],classif.init[[1]])
+
   ICL.0 <- estim.0$ICL
 
-  table(classif.init[[2]],classif.0[[2]])
 
 
   #----------------------------------------------  ALGORITHM
