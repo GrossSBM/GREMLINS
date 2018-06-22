@@ -1,10 +1,8 @@
 #' compute the Integrated likeilhood and the ICL criteria for the MBM
 #'
-#' @param tau Posterior probabilities of clustering
-#' @param pi Type of the matrix, choice between "inc", "adj" and "diradj"
-#' @param alpha Name of the functional group in row
-#' @param colFG Name of the function group in column
-#' @return a list object formatted for the GREMLIN package
+#' @param param_est Estimated parameters of MBM
+#' @param listNet A list of network
+#' @return Pseudo-Likelihood, penalty
 #' @examples
 #' A <- matrix(rbinom(100,1,.2),10,10)
 #' type <- "diradj"
@@ -12,9 +10,6 @@
 #' @export
 
 
-
-
-#computing ICL and likelihood
 comp_lik_ICL_export  <- function(param_estim,listNet)
 {
 
@@ -102,7 +97,6 @@ comp_lik_ICL_export  <- function(param_estim,listNet)
 
 
   penICL=sum((vK-1)*log(n_q))  + sum(pen_mats[1,])*log(sum(pen_mats[2,]))
-
 
   return(list(condlik=condlik,marglik=likmarg,entr=entro,pen=penICL))
 }
