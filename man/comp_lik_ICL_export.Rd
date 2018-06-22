@@ -7,16 +7,12 @@
 comp_lik_ICL_export(param_estim, listNet)
 }
 \arguments{
-\item{tau}{Posterior probabilities of clustering}
+\item{listNet}{A list of network}
 
-\item{pi}{Type of the matrix, choice between "inc", "adj" and "diradj"}
-
-\item{alpha}{Name of the functional group in row}
-
-\item{colFG}{Name of the function group in column}
+\item{param_est}{Estimated parameters of MBM}
 }
 \value{
-a list object formatted for the GREMLIN package
+Pseudo-Likelihood, penalty
 }
 \description{
 compute the Integrated likeilhood and the ICL criteria for the MBM
