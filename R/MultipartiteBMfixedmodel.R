@@ -27,7 +27,7 @@
 #' @export
 
 
-MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,tau.init = NULL,nb_cores=NULL){
+MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,nb_cores=NULL){
   #
 
   dataR6 = FormattingData(listNet)
@@ -84,7 +84,8 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
   #log.lik.init <- comp_lik_ICL_export(list(vK = vK,tau = tau.init),listNet)
 
 
-  estim.0 <- dataR6$estime(classif.init,tau.init);
+  #estim.0 <- dataR6$estime(classif.init,tau.init);
+  estim.0 <- dataR6$estime(classif.init);
   param.0 <- estim.0$param_estim
   classif.0 <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(param.0$tau[[q]]);
   Z_q = match(Z_q, unique(sort(Z_q)))
@@ -187,12 +188,14 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
          "1" = {estim.0},
          "2" = {last_estim_forward[[w.star.1]]},
          "3" = {last_estim_backward[[w.star.2]]})
+
+  #garde t on Z ?
   res$param_estim$Z <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(res$param_estim$tau[[q]]);
   Z_q <- match(Z_q, unique(sort(Z_q)))
   names(Z_q) <- dataR6$names_ind[[q]]; return(Z_q)})
 
-  res$classif <- lapply(res$param_estim$Z,function(z){sort(z)})
-
+  #res$classif <- lapply(res$param_estim$Z,function(z){sort(z)})
+  res$classif <- res$param_estim$Z
   return(res)
 }
 

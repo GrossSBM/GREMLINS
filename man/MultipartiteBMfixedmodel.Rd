@@ -5,7 +5,7 @@
 \title{Model selection and estimation of multipartite blockmodels}
 \usage{
 MultipartiteBMfixedmodel(listNet, namesFG, vK = NULL, classif.init = NULL,
-  tau.init = NULL, nb_cores = NULL)
+  nb_cores = NULL)
 }
 \arguments{
 \item{listNet}{A list of network (defined via the function DefineNetwork)}

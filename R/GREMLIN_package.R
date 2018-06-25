@@ -2,8 +2,7 @@
 #'
 #' All required packages
 #' @importFrom R6 R6Class
-#' @import parallel igraph
+#' @import parallel igraph blockmodels
 #' @docType package
 #' @name GREMLIN
 NULL
-

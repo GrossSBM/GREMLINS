@@ -41,13 +41,15 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
 
 
 
-  #------------------- Check the order of names_FG
-  if ( dataR6$Q == 1 ) {namesFG <- dataR6$namefg}
 
+  #------------------- Check the order of names_FG
+  if (dataR6$Q == 1) {namesFG <- dataR6$namefg}
+
+  if (dataR6$Q>1){
   if ( (length(vKmin) == dataR6$Q) & is.null(namesFG))  {stop("Please specify the names of the Functional Groups")}
   if ( (length(vKmax) == dataR6$Q) & is.null(namesFG))  {stop("Please specify the names of the Functional Groups")}
   if ( (length(vKinit) == dataR6$Q) & is.null(namesFG)) {stop("Please specify the names of the Functional Groups")}
-
+  }
 
   if ((is.null(namesFG)==FALSE)  & (setequal(namesFG,dataR6$namesfg)==FALSE)) {stop("Unmatching names of Functional Groups")}
 
@@ -60,6 +62,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
 
 
 
+
   vKmin_permut <- vKmin
   vKmax_permut <- vKmax
   vKinit_permut <- vKinit
@@ -67,7 +70,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
     wq <- which(dataR6$namesfg == namesFG[q])
     vKmin_permut[wq] <- vKmin[q]
     vKmax_permut[wq] <- vKmax[q]
-    if (length(vKinit) == dataR6$Q) {vKinit_permut[q] <- vKinit[wq]}
+    if ((length(vKinit) == dataR6$Q) &  length(vKinit)>1) {vKinit_permut[q] <- vKinit[wq]}
   }
 
 
@@ -103,7 +106,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   }else{vKinit_list <- list(vKinit)}
 
 
-#  browser()
+ #browser()
 
   ################ ESTIMATION starting from one or two initialisation
   # classif CAH
@@ -122,23 +125,38 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
     names(list_classif.initBM) = dataR6$namesfg
 
     resBM = lapply(1:dataR6$card_E, function(e){
-      estim =  switch(dataR6$type_inter[e],
-             "inc" = BM_bernoulli("LBM",dataR6$mats[[e]],verbosity=0,plotting=""),
-             "diradj" = BM_bernoulli("SBM",dataR6$mats[[e]],verbosity=0,plotting=""),
-             "adj" = BM_bernoulli("SBM_sym",dataR6$mats[[e]],verbosity=0,plotting=""))
-
-      estim$estimate()
-      k = which.max(estim$ICL)
-      best_clust = estim$memberships[[k]]
-
-      if (dataR6$type_inter[e]=="inc")
+      #version GREMLIN
+      if (dataR6$type_inter[e]=="inc"){
+        indFG = dataR6$E[e,]
+      } else {indFG = dataR6$E[e,1]}
+      estim = MultipartiteBM(list(listNet[[e]]),namesFG = dataR6$namesfg[indFG] , vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG], verbose = FALSE)
+     if (dataR6$type_inter[e]=="inc")
       {
-          list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z1,1,which.max)))
-          list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(apply(best_clust$Z2,1,which.max)))
+        list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
+        list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(estim$fitted.model[[1]]$param_estim$Z[[2]]))
       } else {
-        list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z,1,which.max)))
+        list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
       }
-    })
+      #version blockmodels
+    #   estim =  switch(dataR6$type_inter[e],
+    #          "inc" = BM_bernoulli("LBM",dataR6$mats[[e]],verbosity=0,plotting=""),
+    #          "diradj" = BM_bernoulli("SBM",dataR6$mats[[e]],verbosity=0,plotting=""),
+    #          "adj" = BM_bernoulli("SBM_sym",dataR6$mats[[e]],verbosity=0,plotting=""))
+    #
+    #   estim$estimate()
+    #   k = which.max(estim$ICL)
+    #   best_clust = estim$memberships[[k]]
+    #
+    #   if (dataR6$type_inter[e]=="inc")
+    #   {
+    #       list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z1,1,which.max)))
+    #       list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(apply(best_clust$Z2,1,which.max)))
+    #   } else {
+    #     list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z,1,which.max)))
+    #   }
+     })
+
+
     Nb_classif.initBM = lapply(list_classif.initBM,function(l) 1:length(l))
     combin_classif.initBM = as.matrix(expand.grid(Nb_classif.initBM))
 
@@ -160,7 +178,11 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   o <- order(ICL_seq,decreasing = TRUE)
   R.ordered <- lapply(o,function(i){R[[i]]})
 
-  seq_nb_clust <- cbind(t(sapply(R.ordered,function(u){u$param_estim$vK})),ICL_seq[o],1:length(R))
+  if (dataR6$Q==1)
+    seq_nb_clust <- cbind((sapply(R.ordered,function(u){u$param_estim$vK})),ICL_seq[o],1:length(R))
+    else seq_nb_clust <- cbind(t(sapply(R.ordered,function(u){u$param_estim$vK})),ICL_seq[o],1:length(R))
+
+
   if (length(R)>1)
   {
   seq_nb_clust <- seq_nb_clust[!duplicated(seq_nb_clust[,1:dataR6$Q]),]

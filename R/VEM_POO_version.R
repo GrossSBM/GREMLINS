@@ -21,7 +21,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
 
   #some constants
   eps <- 2*.Machine$double.eps
-  #eps <- 0.001
+  #veps <- 1e-1 / n_q
   val_stopcrit <- 1e-6
   val_stopcrit <- 1e-10
 
@@ -65,6 +65,8 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   })
 
 
+
+
   ######################
   # Algo begins
   #####################
@@ -102,6 +104,10 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
     lpi <- lapply(lpi,readjust_pi,eps)
     ltheta <- lapply(ltheta,readjust_theta,eps)
 
+
+    # pseudolik <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
+    # vJ <- pseudolik$condlik + pseudolik$marglik + pseudolik$entr
+    # print(vJ)
 
     #stop criterion
     if (distltheta(ltheta,ltheta_old) < val_stopcrit) stopcrit <- 1
@@ -175,6 +181,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
 
       #boucle VE
       iterVE = iterVE + 1
+      #iterVE = maxiter + 1
       if (disttau(tau,tau_old) < val_stopcrit)   stopVE <- 1
     }
     #
