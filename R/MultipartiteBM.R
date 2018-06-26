@@ -28,15 +28,20 @@
 #' res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
 #' @export
 
-MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE,init.BM=FALSE)
+MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE,init.BM=FALSE,silent = FALSE)
 {
 
 
 
   dataR6 = FormattingData(listNet)
+
+  if (!silent)
   print("------------Nb of entities in each functional group--------------")
+
   Nb.entities <- dataR6$v_NQ;
   names(Nb.entities) <- dataR6$namesfg;
+
+  if (!silent)
   print(Nb.entities)
 
 
@@ -121,6 +126,8 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
 
   if (init.BM)
   {
+    if (dataR6$card_E==1) {print("initialisation based on each network is not relevant")}
+    else {
     list_classif.initBM = lapply(1:dataR6$Q,function(q){list()})
     names(list_classif.initBM) = dataR6$namesfg
 
@@ -168,7 +175,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
     }
    )
   }
-
+  }
 
 
   #browser()
