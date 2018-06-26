@@ -136,7 +136,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
       if (dataR6$type_inter[e]=="inc"){
         indFG = dataR6$E[e,]
       } else {indFG = dataR6$E[e,1]}
-      estim = MultipartiteBM(list(listNet[[e]]),namesFG = dataR6$namesfg[indFG] , vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG], verbose = FALSE)
+      estim = MultipartiteBM(list(listNet[[e]]),namesFG = dataR6$namesfg[indFG] , vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG], verbose = FALSE,silent = TRUE)
      if (dataR6$type_inter[e]=="inc")
       {
         list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
