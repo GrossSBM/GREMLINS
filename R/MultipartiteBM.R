@@ -111,7 +111,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   }else{vKinit_list <- list(vKinit)}
 
 
- #browser()
+   #browser()
 
   ################ ESTIMATION starting from one or two initialisation
   # classif CAH
@@ -206,7 +206,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   }
 
   ############# RESULTATS #############################"
-  if (save) {return(list(list(fitted.model = res ,listNet = listNet)))}else{return(list(fitted.model = list(res[[1]]) ,listNet = listNet))}
+  if (save) {return(list(fitted.model = res ,listNet = listNet))}else{return(list(fitted.model = list(res[[1]]) ,listNet = listNet))}
 
 }
 

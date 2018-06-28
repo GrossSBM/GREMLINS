@@ -83,7 +83,7 @@ search_KQ <- function(data,classif.init,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbos
    #  }
    #
    #  print(ibadclus)
-   # # browser()
+   # browser()
 
     if (os == "Windows") {
       all_estim <- lapply(1:L,function(l){
