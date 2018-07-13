@@ -1,17 +1,17 @@
 coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les données
-      public=list(
-            mats=NULL,    #list of mats of interaction
-            E=NULL, # 2-column table giving which fgs (functional groups) interact in corresponding mat
-            namesfg=NULL, #vector of names of fgs
+      public = list(
+            mats = NULL,    #list of mats of interaction
+            E = NULL, # 2-column table giving which fgs (functional groups) interact in corresponding mat
+            namesfg = NULL, #vector of names of fgs
             names_ind = NULL,
-            type_inter=NULL, #vector of type of matrices (diradj=directed adjacency, adj, inc=incidence)
-            vdistrib=NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli...)
-            Q=NULL,     #number of functional groups
-            card_E=NULL, #number of mats
-            v_NQ=NULL, #number of individuals in fgs
-            where=NULL, #useful
-            Ecode=NULL,
-            initialize=function(MATS,E_FG,type,distrib=NULL,names_ind=NULL)
+            type_inter = NULL, #vector of type of matrices (diradj=directed adjacency, adj, inc=incidence)
+            vdistrib = NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli...)
+            Q = NULL,     #number of functional groups
+            card_E = NULL, #number of mats
+            v_NQ = NULL, #number of individuals in fgs
+            where = NULL, #useful
+            Ecode = NULL,
+            initialize = function(MATS,E_FG,type,distrib=NULL,names_ind=NULL)
               {
                 self$card_E=length(MATS)
                 self$mats=MATS
@@ -39,13 +39,15 @@ coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les 
                 self$where <- prov$where_q
                 if (is.null(names_ind)) { self$names_ind <- lapply(1:self$Q, function(q){
                   where_q <- self$where[[q]][1,];
-                  if(where_q[2] == 1) {names_ind_q = rownames(self$mats[[where_q[1]]])}else{names_ind_q = colnames(self$mats[[where_q[1]]])}
+                  if (where_q[2] == 1) {names_ind_q = rownames(self$mats[[where_q[1]]])}else{names_ind_q = colnames(self$mats[[where_q[1]]])}
                   return(names_ind_q)})}
                 else{self$names_ind <-  lapply(1:self$Q,function(q){names_ind[[q]]})}
 
                 },
             estime = function(classif,tau=NULL){VEM_gen_BM(self,classif,tau)},
-            search_nb_clusters = function(classif.init,Kmin,Kmax,nb_cores=NULL,verbose=TRUE){search_KQ(data = self,classif.init = classif.init,Kmin = Kmin,Kmax = Kmax,nb_cores = nb_cores,verbose = verbose)}),
+            clean_results = function(R){Cleaning_estim(self,R)},
+            search_nb_clusters = function(classif.init,Kmin,Kmax,nb_cores=NULL,verbose=TRUE){search_KQ(data = self,classif.init = classif.init,Kmin = Kmin,Kmax = Kmax,nb_cores = nb_cores,verbose = verbose)}
+        ),
       private=list(
                  #version de E interne au code
                   check=function()
@@ -106,5 +108,6 @@ genBMfit$set("public",'sim',
                return(res)}
 
 )
+
 
 

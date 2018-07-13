@@ -1,15 +1,21 @@
-#' Model selection and estimation of multipartite blockmodels
+#' Model selection and estimation of MBM
 #'
 #' Select the number of blocks per functional group using a stepwise search and estimate parameters
 #'
-#' @param listNet A list of network (defined via the function DefineNetwork)
-#' @param namesFG Names of functional groups (must correspond to names in listNet)
-#' @param vKmin A vector of minimal number of blocks per functional group provided in the same order as in namesFG
-#' @param vKmax A vector of maximal number of blocks per functional group provided in the same order as in namesFG
-#' @param vKinit A vector of initial number of blocks per functional group provided in the same order as in namesFG
+#' @param listNet A list of networks (defined via the function DefineNetwork) i.e. multipartite networks
+#' @param namesFG Names of functional groups (FG) (must correspond to names in listNet)
+#' @param vKmin A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
+#'              vKmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
+#'              If vKmin is not specified,  vKmin = 1.
+#' @param vKmax A vector of maximal number of blocks per functional group provided in the same order as in namesFG.
+#'              vKmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
+#'              If vKmin is not specified,  vKmin = 1.
+#' @param vKinit A vector of initial number of blocks per functional group provided in the same order as in namesFG.
+#'               if vKinit is not specified, then several initialisations will be used :  vKinit = vKmin, and vKinit = floor((vKmax + vKmin)/2)
+#' @param init.BM If init.BM   =  TRUE, then an aditional initialisation is done using simple LBM or SBM on each network separatly. The default value is FALSE
+#' @param save Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput
 #' @param verbose Set to TRUE to display the current step of the search algorithm
-#' @param save Set to TRUE to save the estimated parameters for intermediate visited models
-#' @return a list of estimated parameters for the different models
+#' @return a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1
 #' @examples
 #' npc1 <- 20 # nodes per class
 #' Q1 <- 3 # classes
@@ -26,22 +32,23 @@
 #' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## incidence matrix
 #' Bgr <- DefineNetwork(B,"inc","FG1","FG2")
 #' res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
+#' res2 <- MultipartiteBM(list(Agr,Bgr),namesFG = c("1","2"),vKmin = c(1,1),vKmax = c(10,10),vKinit = NULL,init.BM = TRUE, save=FALSE, verbose = TRUE)
 #' @export
 
-MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE,init.BM=FALSE,silent = FALSE)
+MultipartiteBM = function(listNet, namesFG = NULL , vKmin = 1 , vKmax = 10 , vKinit = NULL , init.BM = FALSE , save=FALSE , verbose = TRUE)
 {
 
 
 
   dataR6 = FormattingData(listNet)
 
-  if (!silent)
+  if (verbose)
   print("------------Nb of entities in each functional group--------------")
 
   Nb.entities <- dataR6$v_NQ;
   names(Nb.entities) <- dataR6$namesfg;
 
-  if (!silent)
+  if (verbose)
   print(Nb.entities)
 
 
@@ -50,13 +57,13 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   #------------------- Check the order of names_FG
   if (dataR6$Q == 1) {namesFG <- dataR6$namefg}
 
-  if (dataR6$Q>1){
+  if (dataR6$Q > 1) {
   if ( (length(vKmin) == dataR6$Q) & is.null(namesFG))  {stop("Please specify the names of the Functional Groups")}
   if ( (length(vKmax) == dataR6$Q) & is.null(namesFG))  {stop("Please specify the names of the Functional Groups")}
   if ( (length(vKinit) == dataR6$Q) & is.null(namesFG)) {stop("Please specify the names of the Functional Groups")}
   }
 
-  if ((is.null(namesFG)==FALSE)  & (setequal(namesFG,dataR6$namesfg)==FALSE)) {stop("Unmatching names of Functional Groups")}
+  if ((is.null(namesFG) == FALSE)  & (setequal(namesFG,dataR6$namesfg) == FALSE)) {stop("Unmatching names of Functional Groups")}
 
 
 
@@ -75,7 +82,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
     wq <- which(dataR6$namesfg == namesFG[q])
     vKmin_permut[wq] <- vKmin[q]
     vKmax_permut[wq] <- vKmax[q]
-    if ((length(vKinit) == dataR6$Q) &  length(vKinit)>1) {vKinit_permut[q] <- vKinit[wq]}
+    if ((length(vKinit) == dataR6$Q) &  length(vKinit) > 1) {vKinit_permut[q] <- vKinit[wq]}
   }
 
 
@@ -116,28 +123,26 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   ################ ESTIMATION starting from one or two initialisation
   # classif CAH
   param.init <- genBMfit$new(vK = vKinit_list[[1]],vdistrib = dataR6$vdistrib)
-  classif.init = initialize(dataR6,param.init,method="CAH")$groups
+  classif.init = initialize(dataR6,param.init,method = "CAH")$groups
   R = dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose)
   if (length(vKinit_list) > 1) {
     param.init <- genBMfit$new(vK = vKinit_list[[2]],vdistrib = dataR6$vdistrib)
-    classif.init = initialize(dataR6,param.init,method="CAH")$groups
+    classif.init = initialize(dataR6,param.init,method = "CAH")$groups
     R <- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose))}
 
 
   if (init.BM)
   {
-    if (dataR6$card_E==1) {print("initialisation based on each network is not relevant")}
+    if (dataR6$card_E == 1) {print("initialisation based on each network is not relevant")}
     else {
     list_classif.initBM = lapply(1:dataR6$Q,function(q){list()})
     names(list_classif.initBM) = dataR6$namesfg
 
-    resBM = lapply(1:dataR6$card_E, function(e){
+    lapply(1:dataR6$card_E, function(e){
       #version GREMLIN
-      if (dataR6$type_inter[e]=="inc"){
-        indFG = dataR6$E[e,]
-      } else {indFG = dataR6$E[e,1]}
-      estim = MultipartiteBM(list(listNet[[e]]),namesFG = dataR6$namesfg[indFG] , vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG], verbose = FALSE,silent = TRUE)
-     if (dataR6$type_inter[e]=="inc")
+      if (dataR6$type_inter[e] == "inc") { indFG = dataR6$E[e,]} else {indFG = dataR6$E[e,1]}
+      estim = MultipartiteBM(list(listNet[[e]]),namesFG = dataR6$namesfg[indFG] , vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG], verbose = FALSE)
+      if (dataR6$type_inter[e] == "inc")
       {
         list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
         list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(estim$fitted.model[[1]]$param_estim$Z[[2]]))
@@ -167,7 +172,7 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
     Nb_classif.initBM = lapply(list_classif.initBM,function(l) 1:length(l))
     combin_classif.initBM = as.matrix(expand.grid(Nb_classif.initBM))
 
-    R.initBM = lapply(1:nrow(combin_classif.initBM),function(i)
+    lapply(1:nrow(combin_classif.initBM),function(i)
     {
          rowcombin = as.vector(combin_classif.initBM[i,])
          classif.init = lapply(1:dataR6$Q, function(q) list_classif.initBM[[q]][[rowcombin[q]]])
@@ -178,23 +183,12 @@ MultipartiteBM = function(listNet,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = N
   }
 
 
-  #browser()
+
 
   #-------------------- cleaning the results
-  ICL_seq <- sapply(R,function(u){u$ICL})
-  o <- order(ICL_seq,decreasing = TRUE)
-  R.ordered <- lapply(o,function(i){R[[i]]})
-
-  if (dataR6$Q==1)
-    seq_nb_clust <- cbind((sapply(R.ordered,function(u){u$param_estim$vK})),ICL_seq[o],1:length(R))
-    else seq_nb_clust <- cbind(t(sapply(R.ordered,function(u){u$param_estim$vK})),ICL_seq[o],1:length(R))
+  res <- dataR6$clean_results(R) # remove models that have been estimated twice or more to keep the estimation with the better J
 
 
-  if (length(R)>1)
-  {
-  seq_nb_clust <- seq_nb_clust[!duplicated(seq_nb_clust[,1:dataR6$Q]),]
-  }
-  res  <- R.ordered[seq_nb_clust[,dataR6$Q + 2]]
 
 
   ############### PRINT RESULT#######################

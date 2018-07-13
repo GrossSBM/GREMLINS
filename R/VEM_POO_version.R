@@ -23,7 +23,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   eps <- 2*.Machine$double.eps
   #veps <- 1e-1 / n_q
   val_stopcrit <- 1e-6
-  val_stopcrit <- 1e-10
+  #val_stopcrit <- 1e-10
 
 
 

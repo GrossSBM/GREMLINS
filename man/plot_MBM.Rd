@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_MBM.R
 \name{plot_MBM}
 \alias{plot_MBM}
-\title{Plot the summary of the estimated multipartite blockmodel}
+\title{Plot the mesoscopic view  of the estimated MBM}
 \usage{
 plot_MBM(fitted_MBM, which.model = 1, mycol = NULL, thres = 0.01)
 }
@@ -16,23 +16,23 @@ plot_MBM(fitted_MBM, which.model = 1, mycol = NULL, thres = 0.01)
 \item{thres}{A threshold under which edges correponding to probability of connections are not plotted}
 }
 \description{
-Plot the summary of the estimated multipartite blockmodel
+#'
 }
 \examples{
-npc1 <- 20 # nodes per class
-Q1 <- 3 # classes
-n1 <- npc1 * Q1 # nodes
+npc1 <- 20 # number of nodes per block for functional group 1
+Q1 <- 3 # blocks   for functional group 1
+n1 <- npc1 * Q1 # number of nodes for functional group 1
 Z1 <- diag(Q1)\%x\%matrix(1,npc1,1)
 P1 <- matrix(runif(Q1*Q1),Q1,Q1)
 A <- 1*(matrix(runif(n1*n1),n1,n1)<Z1\%*\%P1\%*\%t(Z1)) ## adjacency matrix
-Agr <- DefineNetwork(A,"diradj","FG1","FG1")
-npc2 <- 40 # nodes per class
-Q2 <- 2 # classes
-n2 <- npc2 * Q2 # nodes
+Agr <- DefineNetwork(A,"diradj","FG1","FG1")  # First network
+npc2 <- 40 #  number of nodes per block for functional group 2
+Q2 <- 2 # blocks   for functional group 2
+n2 <- npc2 * Q2 #  number of nodes for functional group 2
 Z2 <- diag(Q2)\%x\%matrix(1,npc2,1)
 P2 <- matrix(runif(Q1*Q2),Q1,Q2)
 B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1\%*\%P2\%*\%t(Z2)) ## incidence matrix
 Bgr <- DefineNetwork(B,"inc","FG1","FG2")
 res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
-plot_MBM(res)
+plot_MBM(res,mycol=c('blue','red'))
 }

@@ -1,7 +1,7 @@
 #' Define a network
 #'
-#' @param mat An adjacency (symmetric or not) or an incidence matrix
-#' @param type Type of the matrix, choice between "inc", "adj" and "diradj"
+#' @param mat An adjacency matrix (symmetric or not) or an incidence matrix
+#' @param type Type of the matrix, choice between "inc" (incidence), "adj" (adjacency) and "diradj" (directed adjacency)
 #' @param rowFG Name of the functional group in row
 #' @param colFG Name of the function group in column
 #' @return a list object formatted for the GREMLIN package

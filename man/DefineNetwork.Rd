@@ -7,9 +7,9 @@
 DefineNetwork(mat, type, rowFG, colFG)
 }
 \arguments{
-\item{mat}{An adjacency (symmetric or not) or an incidence matrix}
+\item{mat}{An adjacency matrix (symmetric or not) or an incidence matrix}
 
-\item{type}{Type of the matrix, choice between "inc", "adj" and "diradj"}
+\item{type}{Type of the matrix, choice between "inc" (incidence), "adj" (adjacency) and "diradj" (directed adjacency)}
 
 \item{rowFG}{Name of the functional group in row}
 

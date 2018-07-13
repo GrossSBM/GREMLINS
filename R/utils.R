@@ -274,4 +274,38 @@ FormattingData = function(listNetwork)
 }
 
 
+# ------------------ Cleaning a list of estimations
+
+Cleaning_estim <- function(dataR6,R){
+
+  ### first  : for equal model keep the estimate wit the highest J
+  J_seq <- sapply(R ,function(u){max(u$vJ)})
+  o <- order(J_seq,decreasing = TRUE)
+  R.ordered.1 <- lapply(o,function(i){R[[i]]})
+
+  if (dataR6$Q == 1) {
+  seq_nb_clust <- cbind((sapply(R.ordered.1,function(u){u$param_estim$vK})),J_seq[o],1:length(R))
+  } else {
+  seq_nb_clust <- cbind(t(sapply(R.ordered.1,function(u){u$param_estim$vK})),J_seq[o],1:length(R))
+  }
+
+
+  if (length(R) > 1)
+  {
+    seq_nb_clust <- seq_nb_clust[!duplicated(seq_nb_clust[,1:dataR6$Q]),]
+    if (is.null(nrow(seq_nb_clust))) {seq_nb_clust=matrix(seq_nb_clust,nrow=1)}
+    R <-  R.ordered.1[seq_nb_clust[,dataR6$Q + 2]]
+  }
+
+  ### Order the results by ICL
+  ICL_seq <- sapply(R,function(u){u$ICL})
+  o <- order(ICL_seq,decreasing = TRUE)
+  res <- lapply(o,function(i){R[[i]]})
+  return(res)
+}
+
+
+
+  #
+
 

@@ -32,12 +32,13 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
 
   dataR6 = FormattingData(listNet)
 
+
   if ( dataR6$Q == 1 ) {namesFG <- dataR6$namefg}
 
   os <- Sys.info()["sysname"]
   if ((os != 'Windows') & (is.null(nb_cores))) {nb_cores = detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
 
-  Q <- dataR6$Q
+
   vdistrib <- dataR6$vdistrib
 
 
@@ -85,6 +86,7 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
 
 
   #estim.0 <- dataR6$estime(classif.init,tau.init);
+
   estim.0 <- dataR6$estime(classif.init);
   param.0 <- estim.0$param_estim
   classif.0 <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(param.0$tau[[q]]);
@@ -119,6 +121,8 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
     all_estim_forward <- mclapply(list_classif_init_forward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nb_cores)
   }
 
+
+  all_estim_forward = dataR6$clean_results(all_estim_forward)
   ### step 2 -> M(-1)
 
   F_backward_q <-  function(q){
@@ -126,7 +130,7 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
     res <- do.call(c, list(classif_backward_q))
     return(res)}
   list_classif_init_backward = list()
-  for (q in 1:Q) { list_classif_init_backward <- do.call(c,list(list_classif_init_backward,F_backward_q(q)))}
+  for (q in 1:dataR6$Q) { list_classif_init_backward <- do.call(c,list(list_classif_init_backward,F_backward_q(q)))}
 
 
   if (os == "Windows") {
@@ -136,11 +140,10 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
     all_estim_backward <- mclapply(list_classif_init_backward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nb_cores)
   }
 
-  ICL.vec.forward <- vapply(all_estim_forward,function(u){u$ICL},1)
-  ICL.vec.backward <- vapply(all_estim_backward,function(u){u$ICL},1)
+  all_estim_backward = dataR6$clean_results(all_estim_backward)
 
-  w.forward <- which.max(ICL.vec.forward)
-  estim.new.forward <- all_estim_forward[[w.forward]]
+
+  estim.new.forward <- all_estim_forward[[1]]
   param.new.forward <- estim.new.forward$param_estim
   classif.new.forward <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(param.new.forward$tau[[q]]);
     Z_q <- match(Z_q, unique(sort(Z_q)))
@@ -157,9 +160,9 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
   }
 
 
+
   ###########################""
-  w.backward = which.max(ICL.vec.backward)
-  estim.new.backward <- all_estim_backward[[w.backward]]
+  estim.new.backward <- all_estim_backward[[1]]
   param.new.backward <- estim.new.backward$param_estim
   classif.new.backward <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(param.new.backward$tau[[q]]);
   Z_q <- match(Z_q, unique(sort(Z_q)))
@@ -167,27 +170,22 @@ MultipartiteBMfixedmodel <- function(listNet,namesFG ,vK=NULL,classif.init=NULL,
 
   q_backward <- which(param.new.backward$vK != vK)
   init_backward <- split_classif(classif.new.backward,q_backward,dataR6,100)
-  if(os=="Windows"){
+  if (os == "Windows") {
     last_estim_backward <- lapply(init_backward,function(init){estim.c.l <- dataR6$estime(init)})
   }else{
     last_estim_backward <- mclapply(init_backward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nb_cores)
   }
 
 
-  ICL.vec.forward <- vapply(last_estim_forward,function(u){u$ICL},1)
-  ICL.vec.backward <- vapply(last_estim_backward,function(u){u$ICL},1)
+  all_estim <- vector("list", length =  1 + length(last_estim_forward) + length(last_estim_backward))
+  all_estim[[1]] <- estim.0
+  for (j in 1:length(last_estim_forward)) {all_estim[[j + 1]] =  last_estim_forward[[j]]}
+  for (j in 1:length(last_estim_backward)) {all_estim[[j + length(last_estim_forward)  + 1  ]] = last_estim_backward[[j]]}
 
 
-  ### now we have find the best of the bests!!!!!
-  w.star.1 = which.max(ICL.vec.forward)
-  w.star.2 = which.max(ICL.vec.backward)
-
-  best = as.character(which.max(c(ICL.0,ICL.vec.forward[w.star.1],ICL.vec.backward[w.star.2])))
-
-  res <- switch(best,
-         "1" = {estim.0},
-         "2" = {last_estim_forward[[w.star.1]]},
-         "3" = {last_estim_backward[[w.star.2]]})
+  #browser()
+  all_estim <- dataR6$clean_results(all_estim)
+  res <- all_estim[[1]]
 
   #garde t on Z ?
   res$param_estim$Z <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(res$param_estim$tau[[q]]);

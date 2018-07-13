@@ -2,29 +2,35 @@
 % Please edit documentation in R/MultipartiteBM.R
 \name{MultipartiteBM}
 \alias{MultipartiteBM}
-\title{Model selection and estimation of multipartite blockmodels}
+\title{Model selection and estimation of MBM}
 \usage{
 MultipartiteBM(listNet, namesFG = NULL, vKmin = 1, vKmax = 10,
-  vKinit = NULL, verbose = TRUE, save = FALSE, init.BM = FALSE,
-  silent = FALSE)
+  vKinit = NULL, init.BM = FALSE, save = FALSE, verbose = TRUE)
 }
 \arguments{
-\item{listNet}{A list of network (defined via the function DefineNetwork)}
+\item{listNet}{A list of networks (defined via the function DefineNetwork) i.e. multipartite networks}
 
-\item{namesFG}{Names of functional groups (must correspond to names in listNet)}
+\item{namesFG}{Names of functional groups (FG) (must correspond to names in listNet)}
 
-\item{vKmin}{A vector of minimal number of blocks per functional group provided in the same order as in namesFG}
+\item{vKmin}{A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
+vKmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
+If vKmin is not specified,  vKmin = 1.}
 
-\item{vKmax}{A vector of maximal number of blocks per functional group provided in the same order as in namesFG}
+\item{vKmax}{A vector of maximal number of blocks per functional group provided in the same order as in namesFG.
+vKmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
+If vKmin is not specified,  vKmin = 1.}
 
-\item{vKinit}{A vector of initial number of blocks per functional group provided in the same order as in namesFG}
+\item{vKinit}{A vector of initial number of blocks per functional group provided in the same order as in namesFG.
+if vKinit is not specified, then several initialisations will be used :  vKinit = vKmin, and vKinit = floor((vKmax + vKmin)/2)}
+
+\item{init.BM}{If init.BM   =  TRUE, then an aditional initialisation is done using simple LBM or SBM on each network separatly. The default value is FALSE}
+
+\item{save}{Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput}
 
 \item{verbose}{Set to TRUE to display the current step of the search algorithm}
-
-\item{save}{Set to TRUE to save the estimated parameters for intermediate visited models}
 }
 \value{
-a list of estimated parameters for the different models
+a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1
 }
 \description{
 Select the number of blocks per functional group using a stepwise search and estimate parameters
@@ -45,4 +51,5 @@ P2 <- matrix(runif(Q1*Q2),Q1,Q2)
 B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1\%*\%P2\%*\%t(Z2)) ## incidence matrix
 Bgr <- DefineNetwork(B,"inc","FG1","FG2")
 res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
+res2 <- MultipartiteBM(list(Agr,Bgr),namesFG = c("1","2"),vKmin = c(1,1),vKmax = c(10,10),vKinit = NULL,init.BM = TRUE, save=FALSE, verbose = TRUE)
 }

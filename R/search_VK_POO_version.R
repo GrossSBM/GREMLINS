@@ -37,12 +37,15 @@ search_KQ <- function(data,classif.init,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbos
   classif.c <- classif.init;
   classif.new <- classif.c
   estim.new <- data$estime(classif.init);
+
+
   param.new <- estim.new$param_estim
-  classif.new <- lapply(1:data$Q,function(q){Z_q=max.col(param.new$tau[[q]])
+  classif.new <- lapply(1:data$Q,function(q){Z_q = max.col(param.new$tau[[q]])
   Z_q = match(Z_q, unique(sort(Z_q)))
   names(Z_q) <- data$names_ind[[q]]; return(Z_q)})
 
-    ICL.new <- estim.new$ICL
+  estim.new$param_estim$Z = classif.new
+  ICL.new <- estim.new$ICL
 
   if (verbose) {
     mess <- paste(round(c(calc_vK(classif.new))),collapse = " " )
@@ -66,7 +69,7 @@ search_KQ <- function(data,classif.init,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbos
     list_classif_init <- sequential_initialize(classif.c ,data,Kmin,Kmax,os);
     L = length(list_classif_init)
 
-    vK.c = calc_vK(classif.c)
+    #vK.c = calc_vK(classif.c)
 
 
    #  diff_vK = sapply(list_classif_init,function(cl){
@@ -93,13 +96,15 @@ search_KQ <- function(data,classif.init,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbos
       all_estim <- mclapply(1:L,function(l){estim.c.l <- data$estime(list_classif_init[[l]])},mc.cores = nb_cores)
     }
 
-    ICL.vec <- vapply(1:L,function(l){all_estim[[l]]$ICL},1)
-    ICL.new <- max(ICL.vec)
+
+
+    all_estim <- data$clean_results(all_estim)
+    ICL.new <- all_estim[[1]]$ICL
     vec.ICL <- c(vec.ICL,ICL.new)
 
     if (ICL.new > ICL.c) {
-      w = which.max(ICL.vec)
-      estim.new <- all_estim[[w]]
+
+      estim.new <- all_estim[[1]]
       estim.new$param_estim$Z <- lapply(1:data$Q,function(q){Z_q <- max.col(estim.new$param_estim$tau[[q]]);
       Z_q = match(Z_q, unique(sort(Z_q)))
       names(Z_q) <- data$names_ind[[q]]; return(Z_q)})
