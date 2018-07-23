@@ -24,7 +24,7 @@
 #' plot_MBM(res,mycol=c('blue','red'))
 #' @export
 
-plot_MBM = function(fitted_MBM,which.model = 1, mycol = NULL,thres = 0.01){
+plot_MBM = function(fitted_MBM,which.model = 1, mycol = NULL,thres = 0.01,leg.cex=1,max.curved=3){
 
   dataR6 <- FormattingData(fitted_MBM$listNet)
   Q <-  dataR6$Q
@@ -55,7 +55,7 @@ plot_MBM = function(fitted_MBM,which.model = 1, mycol = NULL,thres = 0.01){
 
 
   all_edges$arrow_mode <- rep(0,nrow(all_edges))  # directed or nont directed
-  all_edges$arrow_mode[all_edges$type == "diradj"]=1
+  all_edges$arrow_mode[all_edges$type == "diradj"]=2
 
   # all_edges <- rbind(all_edges,c(2,2,10))
   # all_edges$type[nrow(all_edges)] = "diradj"
@@ -63,7 +63,7 @@ plot_MBM = function(fitted_MBM,which.model = 1, mycol = NULL,thres = 0.01){
   edges <- all_edges[w,c(1,2)]
   curved <- 0 * (all_edges[w,4] == "diradj")
 
-  curved <- runif(length(all_edges[w,4] == "diradj"),0,3)*(all_edges[w,4] == "diradj")
+  curved <- runif(length(all_edges[w,4] == "diradj"),0,max.curved)*(all_edges[w,4] == "diradj")
 
 
   G <- make_empty_graph() + vertices(unlist(code_node))
@@ -74,7 +74,7 @@ plot_MBM = function(fitted_MBM,which.model = 1, mycol = NULL,thres = 0.01){
 
   m <- max(all_edges[,3])
   plot(G,edge.width = all_edges[all_edges[,3] > thres,3] / m * 5 ,edge.curved = curved, edge.arrow.mode = all_edges$arrow_mode[w])
-  legend("left", c(dataR6$namesfg), col = mycol[1:Q], border = "black", lty = 1, lwd = 4)
+  legend("topleft", c(dataR6$namesfg), col = mycol[1:Q], border = "black", lty = 1, lwd = 4,cex=leg.cex)
 
 
 }
