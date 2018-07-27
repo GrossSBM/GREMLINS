@@ -27,3 +27,4 @@ Collate:
       'search_VK_POO_version.R'
       'utils.R'
       'comp_lik_ICL_export.R'
+      'extract_clusters_MBM.R'

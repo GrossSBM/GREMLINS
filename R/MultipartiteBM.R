@@ -42,6 +42,7 @@ MultipartiteBM = function(listNet, namesFG = NULL , vKmin = 1 , vKmax = 10 , vKi
 
   dataR6 = FormattingData(listNet)
 
+  #browser()
   if (verbose)
   print("------------Nb of entities in each functional group--------------")
 
@@ -131,6 +132,8 @@ MultipartiteBM = function(listNet, namesFG = NULL , vKmin = 1 , vKmax = 10 , vKi
     R <- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose))}
 
 
+
+
   if (init.BM)
   {
     if (dataR6$card_E == 1) {print("initialisation based on each network is not relevant")}
@@ -169,8 +172,10 @@ MultipartiteBM = function(listNet, namesFG = NULL , vKmin = 1 , vKmax = 10 , vKi
      })
 
 
+
     Nb_classif.initBM = lapply(list_classif.initBM,function(l) 1:length(l))
     combin_classif.initBM = as.matrix(expand.grid(Nb_classif.initBM))
+
 
     lapply(1:nrow(combin_classif.initBM),function(i)
     {
@@ -188,6 +193,7 @@ MultipartiteBM = function(listNet, namesFG = NULL , vKmin = 1 , vKmax = 10 , vKi
   #-------------------- cleaning the results
   res <- dataR6$clean_results(R) # remove models that have been estimated twice or more to keep the estimation with the better J
 
+  lapply(1:length(res),function(k){names(res[[k]]$param_estim$vK) <<- namesFG})
 
 
 
