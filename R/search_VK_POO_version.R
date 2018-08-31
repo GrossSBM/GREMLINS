@@ -90,7 +90,7 @@ search_KQ <- function(data,classif.init,Kmin=NULL,Kmax=NULL,nb_cores=NULL,verbos
 
     if (os == "Windows") {
       all_estim <- lapply(1:L,function(l){
-        print(l);
+        #print(l);
         estim.c.l <- data$estime(list_classif_init[[l]])})
     }else{
       all_estim <- mclapply(1:L,function(l){estim.c.l <- data$estime(list_classif_init[[l]])},mc.cores = nb_cores)

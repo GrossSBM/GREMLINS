@@ -91,12 +91,16 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
         Unitmdiag <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
         diag(Unitmdiag) <- 0
         #bernoulli or poisson distribution same expression for M step
-        lthetac = t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unitmdiag) %*% tau[[gc]])
+        #lthetac = t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unitmdiag) %*% tau[[gc]])
+        #   passage en crossprod
+        lthetac <- crossprod(crossprod(list_Mat[[j]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unitmdiag, tau[[gr]]), tau[[gc]])
       }
       else #for lbm
       {
         Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
-        lthetac <-  t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unit) %*% tau[[gc]])
+        #lthetac <-  t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unit) %*% tau[[gc]])
+        lthetac <- crossprod(crossprod(list_Mat[[j]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+
       }
       return(lthetac)})
 
@@ -114,43 +118,45 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
 
 
     #--------------------------------   VE step : boucle
-    iterVE=0
-    stopVE=0
-    while (iterVE < maxiter&stopVE == 0)
+    iterVE <- 0
+    stopVE <- 0
+    while ((iterVE < maxiter) & (stopVE == 0))
     {
       #VE step
-      tau_old=tau #useful ?
+      tau_old <- tau #useful ?
       for (q in 1:dataR6$Q)
       {
-        w_q=where_q[[q]]
-        der=lapply(as.list(as.data.frame(t(w_q))),function(l)
+        w_q <- where_q[[q]]
+        der <- lapply(as.list(as.data.frame(t(w_q))),function(l)
         {
-          second_index=mat_E[l[1],ifelse(l[2]==1,2,1)]
-          qprime=second_index
+          second_index <- mat_E[l[1],ifelse(l[2] == 1,2,1)]
+          qprime <- second_index
 
-          don=list_Mat[[l[1]]] #pb a regler ligne ou colonne et si sbm enlever de 1-don la diag
-          Unmdon=1-don
-          matltheta=ltheta[[l[1]]]
+          don <- list_Mat[[l[1]]] #pb a regler ligne ou colonne et si sbm enlever de 1-don la diag
+          Unmdon <- 1 - don
+          matltheta <- ltheta[[l[1]]]
 
-          if (qprime<1)   #if sbm
+          if (qprime < 1)   #if sbm
           {
-            diag(Unmdon)=0
-            qprime=q
+            diag(Unmdon) <- 0
+            qprime <- q
           }
           else  # if lbm
           {
-            if (l[2]==2) #functional group q at stake in rows
+            if (l[2] == 2) #functional group q at stake in rows
             {
-              don=t(don)
-              Unmdon=t(Unmdon)
-              matltheta=t(matltheta)
+              don <- t(don)
+              Unmdon <- t(Unmdon)
+              matltheta <- t(matltheta)
             }
           }
 
           #poisson or bernoulli likelihood
           switch(vdistrib[l[1]],
-            bernoulli={lik=don%*%tau[[qprime]]%*%t(log(matltheta))+Unmdon%*%tau[[qprime]]%*%t(log(1-matltheta))},
-            poisson={stop("Codes non ecrits pour les lois de poisson")}
+            bernoulli = {
+              #lik = don%*%tau[[qprime]]%*%t(log(matltheta))+Unmdon%*%tau[[qprime]]%*%t(log(1-matltheta))},
+              lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
+            poisson = {stop("Codes non ecrits pour les lois de poisson")}
           )
 
 
@@ -161,7 +167,8 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
             Unmdon <- t(Unmdon)
             matltheta <- t(matltheta)
             switch(vdistrib[l[1]],
-              bernoulli = {lik = lik + don %*% tau[[qprime]] %*% t(log(matltheta)) + Unmdon %*% tau[[qprime]] %*% t(log(1 - matltheta))},
+              #bernoulli = {lik = lik + don %*% tau[[qprime]] %*% t(log(matltheta)) + Unmdon %*% tau[[qprime]] %*% t(log(1 - matltheta))},
+              bernoulli = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
               poisson = {stop("Codes non ecrits pour les lois de poisson")})
           }
           return(lik)
@@ -175,13 +182,12 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
         temp2 <- temp/rowSums(temp)
         temp2[temp2 < eps] <- eps
         temp2[temp2 > 1 - eps] <- 1 - eps
-        temp2 = temp2/rowSums(temp2)
-        tau[[q]] = temp2
+        temp2 <- temp2/rowSums(temp2)
+        tau[[q]] <- temp2
       }
 
       #boucle VE
-      iterVE = iterVE + 1
-      #iterVE = maxiter + 1
+      iterVE <- iterVE + 1
       if (disttau(tau,tau_old) < val_stopcrit)   stopVE <- 1
     }
     #
@@ -194,7 +200,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   #computing ICL
   likicl <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
 
-  icl <-  likicl$condlik + likicl$marglik - 1/2*likicl$pen
+  icl <-  likicl$condlik + likicl$marglik - 1/2 * likicl$pen
 
   param_estim   <- genBMfit$new(vK = vK, vdistrib = vdistrib, lpi = lpi,ltheta = ltheta);
   param_estim$tau <- tau
