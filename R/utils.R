@@ -261,16 +261,17 @@ erparam=function(res,param_vrai)
 
 # internal function -------------------------------------------------------
 
-FormattingData = function(listNetwork)
+FormattingData = function(listNetwork,vdistrib = NULL)
 #listNet
 {
-  nNet = length(listNetwork)
+
   mats = lapply(listNetwork,function(net){return(net$mat)})
   intFG = lapply(listNetwork,function(net){return(c(net$rowFG,net$colFG))})
   intFG = do.call(rbind,intFG)
   types = sapply(listNetwork,function(net){return(net$type)})
 
-  return(coll_interaction$new(mats,intFG,type = types))
+
+  return(coll_interaction$new(mats,intFG,type = types,distrib = vdistrib))
 }
 
 
@@ -293,7 +294,7 @@ Cleaning_estim <- function(dataR6,R){
   if (length(R) > 1)
   {
     seq_nb_clust <- seq_nb_clust[!duplicated(seq_nb_clust[,1:dataR6$Q]),]
-    if (is.null(nrow(seq_nb_clust))) {seq_nb_clust=matrix(seq_nb_clust,nrow=1)}
+    if (is.null(nrow(seq_nb_clust))) {seq_nb_clust = matrix(seq_nb_clust,nrow=1)}
     R <-  R.ordered.1[seq_nb_clust[,dataR6$Q + 2]]
   }
 
@@ -304,6 +305,10 @@ Cleaning_estim <- function(dataR6,R){
   return(res)
 }
 
+
+
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {abs(x - round(x)) < tol}
+is.poswholenumber <- function(x, tol = .Machine$double.eps^0.5)  {is.wholenumber(x) & (x >= 0)}
 
 
   #

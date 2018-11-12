@@ -11,24 +11,39 @@ coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les 
             v_NQ = NULL, #number of individuals in fgs
             where = NULL, #useful
             Ecode = NULL,
-            initialize = function(MATS,E_FG,type,distrib=NULL,names_ind=NULL)
+            initialize = function(MATS, E_FG , type,distrib = NULL, names_ind = NULL)
               {
-                self$card_E=length(MATS)
-                self$mats=MATS
+                self$card_E = length(MATS)
+                self$mats = MATS
                 #if (is.null(namesFG)){self$namesfg=unique(as.vector(E_FG))}else {self$namesfg=namesFG}
-                self$namesfg = unique(as.vector(E_FG))# les fonctional groups names sont toujours ceux dans l'ordre d'apparition dans les matrices
+                self$namesfg <- unique(as.vector(E_FG))# les fonctional groups names sont toujours ceux dans l'ordre d'apparition dans les matrices
 
-                self$Q=length(self$namesfg)
-                self$type_inter=type
-                self$E=matrix(sapply(E_FG,function(a){which(self$namesfg==a)}),self$card_E,2,byrow=FALSE)
+                self$Q <- length(self$namesfg)
+                self$type_inter <- type
+                self$E <- matrix(sapply(E_FG,function(a){which(self$namesfg == a)}),self$card_E,2,byrow = FALSE)
+
+
+
+                vdistrib_guessed <- unlist(lapply(MATS,function(Net){
+                   support <- sort(unique(as.vector(Net)))
+                   if (all(is.poswholenumber(support))) {
+                     if (support == c(0,1)) {return('bernoulli')} else{return('poisson')}
+                   }
+                } ))
+
+
+
 
                 #init vdistrib, default Bernoulli
-                if (is.null(distrib)) self$vdistrib=rep("bernoulli",self$card_E)
-                else
-                  {
-                    if (length(distrib)!=self$card_E) stop("number of distributions not consistent with number of interaction matrices")
-                    self$vdistrib=distrib
+                if (is.null(distrib)) {self$vdistrib = rep("bernoulli",self$card_E)}
+                else{
+                    if (length(distrib) != self$card_E) stop("number of distributions not consistent with number of interaction matrices")
+                    self$vdistrib = distrib
                   }
+
+                if (any(vdistrib_guessed != self$vdistrib)) {stop('Non adequate distributions')}
+
+
 
                 # creating Ecode
                 self$Ecode = transfo_E(self$E, self$type_inter)
@@ -46,30 +61,30 @@ coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les 
                 },
             estime = function(classif,tau=NULL){VEM_gen_BM(self,classif,tau)},
             clean_results = function(R){Cleaning_estim(self,R)},
-            search_nb_clusters = function(classif.init,Kmin,Kmax,nb_cores=NULL,verbose=TRUE){search_KQ(data = self,classif.init = classif.init,Kmin = Kmin,Kmax = Kmax,nb_cores = nb_cores,verbose = verbose)}
+            search_nb_clusters = function(classif.init,Kmin,Kmax, nb_cores = NULL, verbose = TRUE){search_KQ(data = self,classif.init = classif.init,Kmin = Kmin,Kmax = Kmax,nb_cores = nb_cores,verbose = verbose)}
         ),
-      private=list(
+      private = list(
                  #version de E interne au code
-                  check=function()
+                  check = function()
                   {check_extract(self$mats,self$Ecode)
                     }
                 )
 
 )
 
-genBMfit=R6Class("genBMfit",
-              public=list(
-                vK=NULL, #vector of number of blocks in each functional group
-                vdistrib=NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli...)
-                lpi=NULL, #list of vectors (length given in vK) for mixture distribution of Z
+genBMfit = R6Class("genBMfit",
+              public = list(
+                vK = NULL, #vector of number of blocks in each functional group
+                vdistrib = NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli...)
+                lpi = NULL, #list of vectors (length given in vK) for mixture distribution of Z
                 ltheta = NULL,
-                v_NQ=NULL, # number of individuas by functional groups.
-                E=NULL,
-                type_inter=NULL,
-                Q=NULL,
-                Z=NULL,
+                v_NQ = NULL, # number of individuas by functional groups.
+                E = NULL,
+                type_inter = NULL,
+                Q = NULL,
+                Z = NULL,
                 tau = NULL,
-                initialize=function(vK,vdistrib,lpi=NULL,ltheta=NULL)
+                initialize = function(vK,vdistrib,lpi = NULL, ltheta = NULL)
                   {
                     self$vK <- vK
                     self$vdistrib <- vdistrib

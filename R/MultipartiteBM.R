@@ -35,14 +35,14 @@
 #' res2 <- MultipartiteBM(list(Agr,Bgr),namesFG = c("1","2"),vKmin = c(1,1),vKmax = c(10,10),vKinit = NULL,init.BM = TRUE, save=FALSE, verbose = TRUE)
 #' @export
 
-MultipartiteBM = function(listNet, namesFG = NULL , vKmin = 1 , vKmax = 10 , vKinit = NULL , init.BM = FALSE , save=FALSE , verbose = TRUE)
+MultipartiteBM = function(listNet, namesFG = NULL, vdistrib = NULL , vKmin = 1 , vKmax = 10 , vKinit = NULL , init.BM = FALSE , save=FALSE , verbose = TRUE)
 {
 
 
 
-  dataR6 = FormattingData(listNet)
+  dataR6 = FormattingData(listNet,vdistrib)
+  browser()
 
-  #browser()
   if (verbose)
   print("------------Nb of entities in each functional group--------------")
 
@@ -51,6 +51,10 @@ MultipartiteBM = function(listNet, namesFG = NULL , vKmin = 1 , vKmax = 10 , vKi
 
   if (verbose)
   print(Nb.entities)
+
+
+
+
 
 
 

@@ -4,8 +4,9 @@
 \alias{MultipartiteBM}
 \title{Model selection and estimation of MBM}
 \usage{
-MultipartiteBM(listNet, namesFG = NULL, vKmin = 1, vKmax = 10,
-  vKinit = NULL, init.BM = FALSE, save = FALSE, verbose = TRUE)
+MultipartiteBM(listNet, namesFG = NULL, vdistrib = NULL, vKmin = 1,
+  vKmax = 10, vKinit = NULL, init.BM = FALSE, save = FALSE,
+  verbose = TRUE)
 }
 \arguments{
 \item{listNet}{A list of networks (defined via the function DefineNetwork) i.e. multipartite networks}
