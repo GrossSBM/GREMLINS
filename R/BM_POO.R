@@ -1,4 +1,4 @@
-coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les données
+coll_interaction = R6Class("coll_interaction", ### classe objet pour décrire les données
       public = list(
             mats = NULL,    #list of mats of interaction
             E = NULL, # 2-column table giving which fgs (functional groups) interact in corresponding mat
@@ -23,11 +23,15 @@ coll_interaction=R6Class("coll_interaction", ### classe objet pour décrire les 
                 self$E <- matrix(sapply(E_FG,function(a){which(self$namesfg == a)}),self$card_E,2,byrow = FALSE)
 
 
+                #browser()
 
                 vdistrib_guessed <- unlist(lapply(MATS,function(Net){
                    support <- sort(unique(as.vector(Net)))
                    if (all(is.poswholenumber(support))) {
-                     if (support == c(0,1)) {return('bernoulli')} else{return('poisson')}
+                     if (length(support) > 2) {return('poisson')}
+                     if ((length(support) == 2) & all(support == c(0,1))) {return('bernoulli')}
+                     if ((length(support) == 2) & any(support != c(0,1))) {return('poisson')}
+                     if ((length(support) < 2) & (support == 0 | support == 1)) {return('bernoulli')}
                    }
                 } ))
 

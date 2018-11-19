@@ -1,4 +1,15 @@
-###------------------------------------------------------------#####
+# ------------------ Test if a number is an integer
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {abs(x - round(x)) < tol}
+
+
+# ------------------ Test if a number is a positive integer
+is.poswholenumber <- function(x, tol = .Machine$double.eps^0.5)  {is.wholenumber(x) & (x >= 0)}
+
+
+
+################################################################################################################
+###----------------Check the sizes of the matrix with respect to the Functional group they involve  -------#####
+################################################################################################################
 
 check_extract=function(list_Mat,mat_E)
   #same inputs as in VEM_gen_BM
@@ -71,10 +82,27 @@ transfo_E <- function(E, type_inter){
   return(Ecode)
 }
 
+################################################################################################################
+#------------------ transform the data given by the user into  a R6 type coll_interaction object
+################################################################################################################
+
+FormattingData = function(listNetwork,vdistrib = NULL)
+  #listNet
+{
+
+  mats = lapply(listNetwork,function(net){return(net$mat)})
+  intFG = lapply(listNetwork,function(net){return(c(net$rowFG,net$colFG))})
+  intFG = do.call(rbind,intFG)
+  types = sapply(listNetwork,function(net){return(net$type)})
 
 
+  return(coll_interaction$new(mats,intFG,type = types,distrib = vdistrib))
+}
 
+
+##############################################################################################################
 ###-----------------------------------FUNCTIONS USED in the VEM algortihm ---------------
+##############################################################################################################
 
 #prevent the parameters from being too close from 0 or 1
 readjust_alph=function(alpha,eps)
@@ -259,23 +287,10 @@ erparam=function(res,param_vrai)
 
 
 
-# internal function -------------------------------------------------------
 
-FormattingData = function(listNetwork,vdistrib = NULL)
-#listNet
-{
-
-  mats = lapply(listNetwork,function(net){return(net$mat)})
-  intFG = lapply(listNetwork,function(net){return(c(net$rowFG,net$colFG))})
-  intFG = do.call(rbind,intFG)
-  types = sapply(listNetwork,function(net){return(net$type)})
-
-
-  return(coll_interaction$new(mats,intFG,type = types,distrib = vdistrib))
-}
-
-
+##############################################################################################################
 # ------------------ Cleaning a list of estimations
+##############################################################################################################
 
 Cleaning_estim <- function(dataR6,R){
 
@@ -307,10 +322,5 @@ Cleaning_estim <- function(dataR6,R){
 
 
 
-is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {abs(x - round(x)) < tol}
-is.poswholenumber <- function(x, tol = .Machine$double.eps^0.5)  {is.wholenumber(x) & (x >= 0)}
-
-
-  #
 
 
