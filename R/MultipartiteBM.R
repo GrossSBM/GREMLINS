@@ -41,7 +41,7 @@ MultipartiteBM = function(listNet, namesFG = NULL, vdistrib = NULL , vKmin = 1 ,
 
 
   dataR6 = FormattingData(listNet,vdistrib)
-  browser()
+
 
   if (verbose)
   print("------------Nb of entities in each functional group--------------")
@@ -123,7 +123,7 @@ MultipartiteBM = function(listNet, namesFG = NULL, vdistrib = NULL , vKmin = 1 ,
   }else{vKinit_list <- list(vKinit)}
 
 
-   #browser()
+
 
   ################ ESTIMATION starting from one or two initialisation
   # classif CAH

@@ -36,7 +36,7 @@ rMBM <- function(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesfg
 
 
   ####
-  if (length(unique(c(E))) != n_FG) {stop("One or more")}
+  if (length(unique(c(E))) != n_FG) {stop("One or more FG non involved in the networks")}
   if (ncol(E) != 2) {stop("wrong definition of mat_E. mat_E should contain 2 columns")}
 
   n_net  <- nrow(E)

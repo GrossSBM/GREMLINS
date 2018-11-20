@@ -120,10 +120,14 @@ readjust_pi=function(pi,eps)
 }
 
 
-readjust_theta=function(theta,eps)
+readjust_theta <- function(theta,eps, distrib)
 {
-  theta[theta<eps]=eps
-  theta[theta>1-eps]=1-eps
+
+  if (distrib == 'bernoulli') {
+    theta[theta < eps] = eps
+    theta[theta > 1 - eps] = 1 - eps }
+  if (distrib == 'poisson') { theta[theta < eps] = eps }
+
   return(theta)
 }
 

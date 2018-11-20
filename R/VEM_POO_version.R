@@ -75,7 +75,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
     iter_VEM <- iter_VEM + 1
     #if(iter_VEM%%100==0){print(paste("Iteration of VEM",iter_VEM,sep=' : '))}
 
-
+#browser()
     #--------------------------------   M step
     ltheta_old <- ltheta
 
@@ -106,7 +106,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
 
     #prevent the values from being too close from 0 or 1
     lpi <- lapply(lpi,readjust_pi,eps)
-    ltheta <- lapply(ltheta,readjust_theta,eps)
+    ltheta <- lapply(1:cardE,function(e){readjust_theta(ltheta[[e]],eps,vdistrib[e])})
 
 
     # pseudolik <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
@@ -150,13 +150,15 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
               matltheta <- t(matltheta)
             }
           }
-
+          #browser()
           #poisson or bernoulli likelihood
           switch(vdistrib[l[1]],
             bernoulli = {
               #lik = don%*%tau[[qprime]]%*%t(log(matltheta))+Unmdon%*%tau[[qprime]]%*%t(log(1-matltheta))},
               lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
-            poisson = {stop("Codes non ecrits pour les lois de poisson")}
+            poisson = { #stop("Codes non ecrits pour les lois de poisson")}
+              lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) -  matrix(1,nrow(don),ncol(don)) %*% tcrossprod(tau[[qprime]], matltheta)
+            }
           )
 
 
@@ -169,7 +171,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
             switch(vdistrib[l[1]],
               #bernoulli = {lik = lik + don %*% tau[[qprime]] %*% t(log(matltheta)) + Unmdon %*% tau[[qprime]] %*% t(log(1 - matltheta))},
               bernoulli = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
-              poisson = {stop("Codes non ecrits pour les lois de poisson")})
+              poisson = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matltheta))  -  matrix(1,nrow(don),ncol(don)) %*% tcrossprod(tau[[qprime]], matltheta)})
           }
           return(lik)
         })
