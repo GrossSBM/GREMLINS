@@ -123,7 +123,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
     while ((iterVE < maxiter) & (stopVE == 0))
     {
       #VE step
-      browser()
+
       tau_old <- tau #useful ?
       for (q in 1:dataR6$Q)
       {
@@ -140,7 +140,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
 
           if (qprime < 1)   #if sbm
           {
-            diag(Unmdon) <- 0
+            if (vdistrib[l[1]] =='bernoulli' ){diag(Unmdon) <- 0 }
             qprime <- q
           }
           else  # if lbm
@@ -165,7 +165,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
           if (second_index < 0)#sbm but non sym
           {
             don <- t(don)
-            Unmdon <- t(Unmdon)
+            if (vdistrib[l[1]] =='bernoulli' ){ Unmdon <- t(Unmdon) }
             matltheta <- t(matltheta)
             switch(vdistrib[l[1]],
               #bernoulli = {lik = lik + don %*% tau[[qprime]] %*% t(log(matltheta)) + Unmdon %*% tau[[qprime]] %*% t(log(1 - matltheta))},
@@ -176,8 +176,8 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
         })
         L <- (Reduce('+',der))
 
-        B <- L + matrix(log(lpi[[q]]),nrow = nrow(tau[[q]]),ncol = vK[q],byrow = TRUE)  -  sum(const_lik_poisson)
-        B <- B - max(B)
+        B <- L + matrix(log(lpi[[q]]),nrow = nrow(tau[[q]]),ncol = vK[q],byrow = TRUE)
+        #B <- B - max(B)
         B <- B - apply(B,2,mean)
 
         temp <- exp(B)
@@ -193,7 +193,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
       if (disttau(tau,tau_old) < val_stopcrit)   stopVE <- 1
     }
     #
-
+    browser()
     #computing lik
     pseudolik <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
     vJ[iter_VEM] <- pseudolik$condlik + pseudolik$marglik + pseudolik$entr
