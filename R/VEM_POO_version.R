@@ -42,7 +42,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
 
 
 
-
+  const_lik_poisson <- vapply(1:cardE, function(e){if (vdistrib[e] == 'poisson') {return(sum(lfactorial(c(dataR6$mats[[e]]))))} else {return(0)}},1)
   #for computations when SBM putting 0 on the diagonal
   indSBM <- which(mat_E[,2] < 1)
   for (i in indSBM) {diag(list_Mat[[i]])  <- 0}
@@ -75,7 +75,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
     iter_VEM <- iter_VEM + 1
     #if(iter_VEM%%100==0){print(paste("Iteration of VEM",iter_VEM,sep=' : '))}
 
-#browser()
+
     #--------------------------------   M step
     ltheta_old <- ltheta
 
@@ -123,6 +123,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
     while ((iterVE < maxiter) & (stopVE == 0))
     {
       #VE step
+      browser()
       tau_old <- tau #useful ?
       for (q in 1:dataR6$Q)
       {
@@ -133,7 +134,8 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
           qprime <- second_index
 
           don <- list_Mat[[l[1]]] #pb a regler ligne ou colonne et si sbm enlever de 1-don la diag
-          Unmdon <- 1 - don
+          if (vdistrib[l[1]] =='bernoulli' ){ Unmdon <- 1 - don }
+
           matltheta <- ltheta[[l[1]]]
 
           if (qprime < 1)   #if sbm
@@ -146,19 +148,16 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
             if (l[2] == 2) #functional group q at stake in rows
             {
               don <- t(don)
-              Unmdon <- t(Unmdon)
+              if (vdistrib[l[1]] =='bernoulli' ){ Unmdon <- t(Unmdon) }
               matltheta <- t(matltheta)
             }
           }
           #browser()
           #poisson or bernoulli likelihood
           switch(vdistrib[l[1]],
-            bernoulli = {
-              #lik = don%*%tau[[qprime]]%*%t(log(matltheta))+Unmdon%*%tau[[qprime]]%*%t(log(1-matltheta))},
-              lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
-            poisson = { #stop("Codes non ecrits pour les lois de poisson")}
-              lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) -  matrix(1,nrow(don),ncol(don)) %*% tcrossprod(tau[[qprime]], matltheta)
-            }
+            bernoulli = {lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
+            poisson = {Unit <- matrix(1,nrow(don),ncol(don))
+                        lik  <- - Unit %*% tcrossprod(tau[[qprime]], matltheta) + don %*% tcrossprod(tau[[qprime]],log(matltheta))  }
           )
 
 
@@ -177,8 +176,9 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
         })
         L <- (Reduce('+',der))
 
-        B <- L + matrix(log(lpi[[q]]),nrow = nrow(tau[[q]]),ncol = vK[q],byrow = TRUE)
+        B <- L + matrix(log(lpi[[q]]),nrow = nrow(tau[[q]]),ncol = vK[q],byrow = TRUE)  -  sum(const_lik_poisson)
         B <- B - max(B)
+        B <- B - apply(B,2,mean)
 
         temp <- exp(B)
         temp2 <- temp/rowSums(temp)
