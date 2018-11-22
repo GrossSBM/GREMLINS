@@ -133,71 +133,78 @@ readjust_theta <- function(theta,eps, distrib)
 
 
 #computing ICL and likelihood
-comp_lik_ICL = function(tau,pi,alpha,mat_E,list_Mat,n_q,vK)
+comp_lik_ICL = function(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK,vdistrib)
 {
-  cardE=nrow(mat_E)
-  Q=length(alpha)
+  cardE <- nrow(mat_E)
+  Q <-  length(ltheta)
+
+
 
   #condlik
-  condliks=sapply(1:cardE,function(e)
+  condliks = sapply(1:cardE,function(e)
   {
-    gr=mat_E[e,1]
-    gc=mat_E[e,2]
-    don=list_Mat[[e]]
-    Unmdon=1-don
-    facteur=1
-    if (gc<1)
+    gr = mat_E[e,1]
+    gc = mat_E[e,2]
+    don = list_Mat[[e]]
+    if (vdistrib[e] == 'bernoulli') {Unmdon = 1 - don}
+    facteur = 1
+    if (gc < 1)
     {
-      if (gc==0)  facteur=1/2 #sbm sym
-      gc=gr
-      diag(Unmdon)=0
+      if (gc == 0)  facteur = 1/2 #sbm sym
+      gc = gr
+      if (vdistrib[e] == 'bernoulli') {diag(Unmdon) = 0}
     }
-    prov=(tau[[gr]])%*%log(pi[[e]])%*%t(tau[[gc]])
-    prov1m=(tau[[gr]])%*%log(1-pi[[e]])%*%t(tau[[gc]])
-    return((sum(don*prov) +sum(Unmdon*prov1m))*facteur)
+    if (vdistrib[e] == 'bernoulli') {
+      prov = (tau[[gr]]) %*% log(ltheta[[e]]) %*% t(tau[[gc]])
+      prov1m = (tau[[gr]]) %*% log(1 - ltheta[[e]]) %*% t(tau[[gc]])
+      return((sum(don * prov) + sum(Unmdon * prov1m)) * facteur)
+    }
+    if (vdistrib[e] == 'poisson') {
+      prov = (tau[[gr]]) %*% log(ltheta[[e]]) %*% t(tau[[gc]])
+      prov2 = (tau[[gr]]) %*%  ltheta[[e]]  %*% t(tau[[gc]])
+      Unit <- matrix(1,nrow = nrow(don),ncol = ncol(don))
+      return((sum(don * prov) - sum(Unit * prov2)) * facteur)
+    }
+
   }
   )
-  condlik=sum(condliks)
+  condlik = sum(condliks)
 
-  likmargs=sapply(1:Q,function(q)
+  likmargs = sapply(1:Q,function(q)
   {
-    return(sum(tau[[q]]*matrix(log(alpha[[q]]),nrow(tau[[q]]),ncol(tau[[q]]),byrow = TRUE)))
+    return(sum(tau[[q]]*matrix(log(lpi[[q]]),nrow(tau[[q]]),ncol(tau[[q]]),byrow = TRUE)))
   })
-  likmarg=sum(likmargs)
+  likmarg = sum(likmargs)
 
-  entros=sapply(1:Q,function(q)
-  {
-    return(-sum(log(tau[[q]])*tau[[q]]))
-  })
-
+  entros = sapply(1:Q,function(q){return(-sum(log(tau[[q]]) * tau[[q]]))})
   entro = sum(entros)
 
   #penalty
-  pen_mats=vapply(1:cardE,function(s)
+  pen_mats = vapply(1:cardE,function(s)
   {
-    gr=mat_E[s,1]
-    gc=mat_E[s,2]
-    if (gc>0) #LBM
+    gr = mat_E[s,1]
+    gc = mat_E[s,2]
+    if (gc > 0) #LBM
     {
-      return(c(vK[gr]*vK[gc], prod(dim(list_Mat[[s]]))))
+      return(c(vK[gr] * vK[gc], prod(dim(list_Mat[[s]]))))
     }
-    if (gc==0) #SBM sym
+    if (gc == 0) #SBM sym
     {
-      return(c(vK[gr]*(vK[gr]+1)/2, nrow(list_Mat[[s]])*(nrow(list_Mat[[s]])-1)/2))
+      return(c(vK[gr] * (vK[gr] + 1) / 2, nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)/2))
     }
-    if (gc==-1) #SBM non sym
+    if (gc == -1) #SBM non sym
     {
-      return(c(vK[gr]*(vK[gr]), nrow(list_Mat[[s]])*(nrow(list_Mat[[s]])-1)))
+      return(c(vK[gr] * (vK[gr]), nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)))
     }
 
   },c(1.0,2.0)
   )
 
 
-  penICL=sum((vK-1)*log(n_q))  + sum(pen_mats[1,])*log(sum(pen_mats[2,]))
+  penICL = sum((vK - 1) * log(n_q))  + sum(pen_mats[1,]) * log(sum(pen_mats[2,]))
 
 
-  return(list(condlik=condlik,marglik=likmarg,entr=entro,pen=penICL))
+  return(list(condlik = condlik,marglik = likmarg,entr = entro,pen = penICL))
 
 }
 

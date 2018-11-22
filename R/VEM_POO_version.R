@@ -11,6 +11,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   #checking the dimensions of matrices and extracting number of indiviuals
   #for a given q functional groups, gives the list of matrix in row or in columns where it plays a role
 
+
   #browser()
   where_q <- dataR6$where
   n_q <- dataR6$v_NQ
@@ -18,6 +19,9 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   mat_E <- dataR6$Ecode ### a remettre en public?????
   list_Mat <- dataR6$mats
   vdistrib <- dataR6$vdistrib
+
+  #const_lik_poisson <- vapply(1:cardE, function(e){if (vdistrib[e] == 'poisson') {return(sum(lfactorial(c(list_Mat[[e]]))))} else {return(0)}},1)
+  #const_lik_poisson <- sum(const_lik_poisson)
 
   #some constants
   eps <- 2*.Machine$double.eps
@@ -42,7 +46,6 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
 
 
 
-  const_lik_poisson <- vapply(1:cardE, function(e){if (vdistrib[e] == 'poisson') {return(sum(lfactorial(c(dataR6$mats[[e]]))))} else {return(0)}},1)
   #for computations when SBM putting 0 on the diagonal
   indSBM <- which(mat_E[,2] < 1)
   for (i in indSBM) {diag(list_Mat[[i]])  <- 0}
@@ -193,14 +196,14 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
       if (disttau(tau,tau_old) < val_stopcrit)   stopVE <- 1
     }
     #
-    browser()
+    #browser()
     #computing lik
-    pseudolik <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
+    pseudolik <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK,vdistrib)
     vJ[iter_VEM] <- pseudolik$condlik + pseudolik$marglik + pseudolik$entr
   }
 
   #computing ICL
-  likicl <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK)
+  likicl <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK,vdistrib)
 
   icl <-  likicl$condlik + likicl$marglik - 1/2 * likicl$pen
 
