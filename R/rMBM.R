@@ -1,26 +1,33 @@
-#' Simulates multipartite blocl models
+#' Simulate datasets from  multipartite block  models
 #'
-
 #' @param  v_NQ : number of individual in each Functional Group (FG)
-#' @param mat_E : define the architecture of the Multipartite.
-#' @param type_int : type of interaction (  adjacency symetric or not or incidence)
-#' @param vdistrib : vector of the distributions  (bernoulli or poisson for each network)
-#' @param lpi : parameters of the clustering distribution
+#' @param  E : define the architecture of the Multipartite.
+#' @param type_inter : type of interaction (  adjacency symetric or not or incidence) (vector of size equal to nrow(E) )
+#' @param vdistrib : vector of the distributions  (bernoulli or poisson for each network) ( vector of size equal to nrow(E) )
+#' @param lpi  : parameters of the blocks distribution
 #' @param ltheta : parameters of the interactions distribution
-#' @param namesfg : names of the FG.
-#' @return Pseudo-Likelihood, penalty
+#' @param seed : set the seed for the random simulation (default value  = NULL)
+#' @param namesfg : names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)
+#' @return A list of lists. Each element of the list corresponds to a network : each network is described by a matrix (mat) , a type (diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
 #' @examples
-#' A <- matrix(rbinom(100,1,.2),10,10)
-#' type <- "diradj"
-#' DefineNetwork(A,"diradj","FG1","FG1")
+#' v_K <- c(3,2,2)
+#' n_FG <- 3
+#' lpi <- vector("list", 3);
+#' lpi[[1]] <- c(0.4,0.3,0.3); lpi[[2]] <- c(0.6,0.4); lpi[[3]]  <- c(0.6,0.4)
+#' E  = rbind(c(1,2),c(2,3),c(2,2))
+#' vdistrib <- c('bernoulli','poisson','poisson')
+#' type_inter <- c( "inc", "inc"  ,  "adj" )
+#' ltheta <- list()
+#' ltheta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+#' ltheta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
+#' ltheta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
+#' ltheta[[3]] <- 0.5*(ltheta[[3]] + t(ltheta[[3]])) # symetrisation for network 3
+#' v_NQ = c(100,50,40)
+#' data_sim <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesfg= c('A','B','D'))
 #' @export
-
-
-
 
 ##############################################################################################################
 rMBM <- function(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesfg= NULL){
-
 
   #####
   n_FG <- length(v_NQ)
@@ -28,14 +35,8 @@ rMBM <- function(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesfg
   if (length(namesfg) != n_FG) {stop("Unmatching number of functional group names")}
   if (length(lpi) != n_FG) {stop("Unmatching size of lpi. Should be of length equal to the number of functional groups")}
 
-  # ord <- order(E[,1])
-  # E <- E[ord,]
-  # ltheta <- ltheta[ord]
-  # vdistrib <- vdistrib[ord]
-  # type_inter <- type_inter[ord]
-
-
   ####
+
   if (length(unique(c(E))) != n_FG) {stop("One or more FG non involved in the networks")}
   if (ncol(E) != 2) {stop("wrong definition of mat_E. mat_E should contain 2 columns")}
 
