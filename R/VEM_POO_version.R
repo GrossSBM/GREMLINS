@@ -12,7 +12,7 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   #for a given q functional groups, gives the list of matrix in row or in columns where it plays a role
 
 
-  #browser()
+
   where_q <- dataR6$where
   n_q <- dataR6$v_NQ
   cardE <- dataR6$card_E
@@ -76,7 +76,6 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   while (iter_VEM < maxiter & stopcrit == 0)
   {
     iter_VEM <- iter_VEM + 1
-    #if(iter_VEM%%100==0){print(paste("Iteration of VEM",iter_VEM,sep=' : '))}
 
 
     #--------------------------------   M step
@@ -130,77 +129,86 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
       tau_old <- tau #useful ?
       for (q in 1:dataR6$Q)
       {
-        w_q <- where_q[[q]]
-        der <- lapply(as.list(as.data.frame(t(w_q))),function(l)
-        {
-          second_index <- mat_E[l[1],ifelse(l[2] == 1,2,1)]
-          qprime <- second_index
+        if (vK[q] == 1) { tau[[q]] = matrix(1,ncol  = 1,nrow = n_q[q])}
+        else{
+          w_q <- where_q[[q]]
+          der <- lapply(as.list(as.data.frame(t(w_q))),function(l)
+            {
+            second_index <- mat_E[l[1],ifelse(l[2] == 1,2,1)]
+            qprime <- second_index
 
-          don <- list_Mat[[l[1]]] #pb a regler ligne ou colonne et si sbm enlever de 1-don la diag
-          if (vdistrib[l[1]] =='bernoulli' ){ Unmdon <- 1 - don }
+            don <- list_Mat[[l[1]]] #pb a regler ligne ou colonne et si sbm enlever de 1-don la diag
+            if (vdistrib[l[1]] == 'bernoulli' ) { Unmdon <- 1 - don }
 
-          matltheta <- ltheta[[l[1]]]
+            matltheta <- ltheta[[l[1]]]
 
-          if (qprime < 1)   #if sbm
-          {
-            if (vdistrib[l[1]] =='bernoulli' ){diag(Unmdon) <- 0 }
-            qprime <- q
-          }
-          else  # if lbm
-          {
-            if (l[2] == 2) #functional group q at stake in rows
+            if (qprime < 1)   #if sbm
+            {
+              if (vdistrib[l[1]] == 'bernoulli' ) {diag(Unmdon) <- 0 }
+              qprime <- q
+            }
+            else  # if lbm
+            {
+              if (l[2] == 2) #functional group q at stake in rows
+              {
+                don <- t(don)
+                if (vdistrib[l[1]] == 'bernoulli' ) {Unmdon <- t(Unmdon) }
+                matltheta <- t(matltheta)
+              }
+            }
+            #browser()
+            #poisson or bernoulli likelihood
+            switch(vdistrib[l[1]],
+              bernoulli = {lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
+              poisson = {Unit <- matrix(1,nrow(don),ncol(don))
+              lik  <- -Unit %*% tcrossprod(tau[[qprime]], matltheta) + don %*% tcrossprod(tau[[qprime]],log(matltheta))  }
+            )
+
+
+
+            if (second_index < 0)#sbm but non sym
             {
               don <- t(don)
-              if (vdistrib[l[1]] =='bernoulli' ){ Unmdon <- t(Unmdon) }
+              if (vdistrib[l[1]] == 'bernoulli' ) { Unmdon <- t(Unmdon) }
               matltheta <- t(matltheta)
+              switch(vdistrib[l[1]],
+                #bernoulli = {lik = lik + don %*% tau[[qprime]] %*% t(log(matltheta)) + Unmdon %*% tau[[qprime]] %*% t(log(1 - matltheta))},
+                bernoulli = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
+                poisson = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matltheta))  -  matrix(1,nrow(don),ncol(don)) %*% tcrossprod(tau[[qprime]], matltheta)})
             }
-          }
-          #browser()
-          #poisson or bernoulli likelihood
-          switch(vdistrib[l[1]],
-            bernoulli = {lik  = don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
-            poisson = {Unit <- matrix(1,nrow(don),ncol(don))
-                        lik  <- - Unit %*% tcrossprod(tau[[qprime]], matltheta) + don %*% tcrossprod(tau[[qprime]],log(matltheta))  }
-          )
+            return(lik)
+          })
+          L <- (Reduce('+',der))
+
+          B <- L + matrix(log(lpi[[q]]),nrow = nrow(tau[[q]]),ncol = vK[q],byrow = TRUE)
+          #B <- B - max(B)
+          B <- B - matrix(apply(B,1,mean),nrow = n_q[q],ncol = vK[q],byrow=FALSE)
+          # B[B > 709] = 709
 
 
+          temp <- exp(B)
+          temp2 <- temp/rowSums(temp)
+          temp2[temp2 < eps] <- eps
+          temp2[temp2 > (1 - eps)] <- 1 - eps
+          temp2 <- temp2/rowSums(temp2)
+          #if (any(is.na(temp2))) { browser()}
+          #if (any(is.infinite(temp2))) { browser()}
 
-          if (second_index < 0)#sbm but non sym
-          {
-            don <- t(don)
-            if (vdistrib[l[1]] =='bernoulli' ){ Unmdon <- t(Unmdon) }
-            matltheta <- t(matltheta)
-            switch(vdistrib[l[1]],
-              #bernoulli = {lik = lik + don %*% tau[[qprime]] %*% t(log(matltheta)) + Unmdon %*% tau[[qprime]] %*% t(log(1 - matltheta))},
-              bernoulli = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matltheta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matltheta))},
-              poisson = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matltheta))  -  matrix(1,nrow(don),ncol(don)) %*% tcrossprod(tau[[qprime]], matltheta)})
-          }
-          return(lik)
-        })
-        L <- (Reduce('+',der))
+          tau[[q]] <- temp2
 
-        B <- L + matrix(log(lpi[[q]]),nrow = nrow(tau[[q]]),ncol = vK[q],byrow = TRUE)
-        #B <- B - max(B)
-        B <- B - apply(B,2,mean)
 
-        temp <- exp(B)
-        temp2 <- temp/rowSums(temp)
-        temp2[temp2 < eps] <- eps
-        temp2[temp2 > 1 - eps] <- 1 - eps
-        temp2 <- temp2/rowSums(temp2)
-        tau[[q]] <- temp2
+        }
+        #if (any(dim(tau[[q]]) != dim(tau_old[[q]]))) { browser()}
       }
-
-      #boucle VE
       iterVE <- iterVE + 1
       if (disttau(tau,tau_old) < val_stopcrit)   stopVE <- 1
-    }
-    #
-    #browser()
+    }#-------------------- END of VE Step
+
+
     #computing lik
     pseudolik <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK,vdistrib)
     vJ[iter_VEM] <- pseudolik$condlik + pseudolik$marglik + pseudolik$entr
-  }
+  } # ------------ end of EM var
 
   #computing ICL
   likicl <- comp_lik_ICL(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK,vdistrib)

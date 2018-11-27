@@ -1,4 +1,4 @@
-#' Model selection and estimation of MBM
+#' Model selection and parameter estimation of MBM
 #'
 #' Select the number of blocks per functional group using a stepwise search and estimate parameters
 #'
@@ -25,24 +25,22 @@
 #' vdistrib <- c('bernoulli','poisson','poisson')
 #' type_inter <- c( "inc", "inc"  ,  "adj" )
 #' ltheta <- list()
-#' ltheta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-#' ltheta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
-#' ltheta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
+#' ltheta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]])
+#' ltheta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]])
+#' ltheta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
 #' ltheta[[3]] <- 0.5*(ltheta[[3]] + t(ltheta[[3]])) # symetrisation for network 3
 #' v_NQ = c(100,50,40)
 #' list_networks <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesfg= c('A','B','D'))
-#' res <- MultipartiteBM(list_networks,namesfg = NULL, vdistrib = c('bernoulli",'poisson','poisson'), vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
-#' res2 <- MultipartiteBM(list(Agr,Bgr),namesfg = c("1","2"),vKmin = c(1,1),vKmax = c(10,10),vKinit = NULL,init.BM = TRUE, save=FALSE, verbose = TRUE)
+#' res <- MultipartiteBM(list_networks,namesfg = NULL, vdistrib = c("bernoulli","poisson","poisson"), vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
 #' @export
 
-MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 , vKmax = 10 , vKinit = NULL , init.BM = FALSE , save=FALSE , verbose = TRUE)
+MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 , vKmax = 10 , vKinit = NULL , init.BM = FALSE , save=FALSE , verbose = TRUE,nb_cores = NULL)
 {
-
 
   #----------------- Formatting the data ---
   dataR6 = FormattingData(listNet,vdistrib)
 
-  #------------------------------------------
+  #------------------- Messages  ----------
   if (verbose) {
     Nb.entities <- dataR6$v_NQ;
     names(Nb.entities) <- dataR6$namesfg;
@@ -100,7 +98,7 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
   }
 
 
-
+  #------------------------  Initial values for the number of the  numbers  of clusters VK
   if (is.null(vKinit)) {
     vKinit_list <- list(vKmin)
     vKmean <- floor((vKmax + vKmin)/2)
@@ -110,16 +108,24 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
 
 
 
-  ################ ESTIMATION starting from one or two initialisation
-  # classif CAH
+  #----------------------   ESTIMATION starting from one (given) or two initialisations  (vKmean and vKmin)
+
+  #browser()
+  # vkinit_list[[1]] :  init classif CAH + searching from that point
   param.init <- genBMfit$new(vK = vKinit_list[[1]],vdistrib = dataR6$vdistrib)
   classif.init = initialize(dataR6,param.init,method = "CAH")$groups
-  R = dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose)
+  R = dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores)
+
+
+  # vkinit_list[[2]] and further  :  init classif CAH + searching from that point
   if (length(vKinit_list) > 1) {
     param.init <- genBMfit$new(vK = vKinit_list[[2]],vdistrib = dataR6$vdistrib)
     classif.init = initialize(dataR6,param.init,method = "CAH")$groups
-    R <- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose))}
+    R <- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
+  }
 
+
+  # Additional initialisation starting from a block model on each network
   if (init.BM)
   {
     if (dataR6$card_E == 1) {print("initialisation based on each network is not relevant")}
@@ -128,9 +134,11 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
     names(list_classif.initBM) = dataR6$namesfg
 
     lapply(1:dataR6$card_E, function(e){
-      #version GREMLIN
       if (dataR6$type_inter[e] == "inc") { indFG = dataR6$E[e,]} else {indFG = dataR6$E[e,1]}
-      estim = MultipartiteBM(list(listNet[[e]]),namesfg = dataR6$namesfg[indFG] , vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG], verbose = FALSE)
+
+      #version LBM or  SBM for any network
+      estim = MultipartiteBM(list(listNet[[e]]),namesfg = dataR6$namesfg[indFG] ,  vdistrib = vdistrib[e], vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG],  init.BM = FALSE, verbose = FALSE)
+
       if (dataR6$type_inter[e] == "inc")
       {
         list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
@@ -167,7 +175,7 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
     {
          rowcombin = as.vector(combin_classif.initBM[i,])
          classif.init = lapply(1:dataR6$Q, function(q) list_classif.initBM[[q]][[rowcombin[q]]])
-          R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose))
+          R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
     }
    )
   }
@@ -177,6 +185,7 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
 
 
   #-------------------- cleaning the results
+
   res <- dataR6$clean_results(R) # remove models that have been estimated twice or more to keep the estimation with the better J
 
   lapply(1:length(res),function(k){names(res[[k]]$param_estim$vK) <<- namesfg})

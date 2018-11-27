@@ -305,6 +305,7 @@ erparam=function(res,param_vrai)
 
 Cleaning_estim <- function(dataR6,R){
 
+  #browser()
   ### first  : for equal model keep the estimate wit the highest J
   J_seq <- sapply(R ,function(u){max(u$vJ)})
   o <- order(J_seq,decreasing = TRUE)

@@ -2,26 +2,26 @@
 % Please edit documentation in R/MultipartiteBM.R
 \name{MultipartiteBM}
 \alias{MultipartiteBM}
-\title{Model selection and estimation of MBM}
+\title{Model selection and parameter estimation of MBM}
 \usage{
-MultipartiteBM(listNet, namesFG = NULL, vdistrib = NULL, vKmin = 1,
+MultipartiteBM(listNet, namesfg = NULL, vdistrib = NULL, vKmin = 1,
   vKmax = 10, vKinit = NULL, init.BM = FALSE, save = FALSE,
   verbose = TRUE)
 }
 \arguments{
 \item{listNet}{A list of networks (defined via the function DefineNetwork) i.e. multipartite networks}
 
-\item{namesFG}{Names of functional groups (FG) (must correspond to names in listNet)}
+\item{namesfg}{Names of functional groups (FG) (must correspond to names in listNet)}
 
-\item{vKmin}{A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
+\item{vKmin}{A vector of minimal number of blocks per functional group provided in the same order as in namesfg.
 vKmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
 If vKmin is not specified,  vKmin = 1.}
 
-\item{vKmax}{A vector of maximal number of blocks per functional group provided in the same order as in namesFG.
+\item{vKmax}{A vector of maximal number of blocks per functional group provided in the same order as in namesfg.
 vKmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
 If vKmin is not specified,  vKmin = 1.}
 
-\item{vKinit}{A vector of initial number of blocks per functional group provided in the same order as in namesFG.
+\item{vKinit}{A vector of initial number of blocks per functional group provided in the same order as in namesfg.
 if vKinit is not specified, then several initialisations will be used :  vKinit = vKmin, and vKinit = floor((vKmax + vKmin)/2)}
 
 \item{init.BM}{If init.BM   =  TRUE, then an aditional initialisation is done using simple LBM or SBM on each network separatly. The default value is FALSE}
@@ -45,12 +45,11 @@ E  = rbind(c(1,2),c(2,3),c(2,2))
 vdistrib <- c('bernoulli','poisson','poisson')
 type_inter <- c( "inc", "inc"  ,  "adj" )
 ltheta <- list()
-ltheta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-ltheta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
-ltheta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
+ltheta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]])
+ltheta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]])
+ltheta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
 ltheta[[3]] <- 0.5*(ltheta[[3]] + t(ltheta[[3]])) # symetrisation for network 3
 v_NQ = c(100,50,40)
 list_networks <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesfg= c('A','B','D'))
-res <- MultipartiteBM(list_networks,namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
-res2 <- MultipartiteBM(list(Agr,Bgr),namesFG = c("1","2"),vKmin = c(1,1),vKmax = c(10,10),vKinit = NULL,init.BM = TRUE, save=FALSE, verbose = TRUE)
+res <- MultipartiteBM(list_networks,namesfg = NULL, vdistrib = c("bernoulli","poisson","poisson"), vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
 }

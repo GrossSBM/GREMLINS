@@ -5,7 +5,7 @@
 \title{Simulate datasets from  multipartite block  models}
 \usage{
 rMBM(v_NQ, E, type_inter, vdistrib, lpi, ltheta, seed = NULL,
-  namesFG = NULL)
+  namesfg = NULL)
 }
 \arguments{
 \item{v_NQ}{: number of individual in each Functional Group (FG)}
@@ -22,7 +22,7 @@ rMBM(v_NQ, E, type_inter, vdistrib, lpi, ltheta, seed = NULL,
 
 \item{seed}{: set the seed for the random simulation (default value  = NULL)}
 
-\item{namesFG}{: names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)}
+\item{namesfg}{: names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)}
 }
 \value{
 A list of lists. Each element of the list corresponds to a network : each network is described by a matrix (mat) , a type (diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
@@ -44,5 +44,5 @@ ltheta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]
 ltheta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
 ltheta[[3]] <- 0.5*(ltheta[[3]] + t(ltheta[[3]])) # symetrisation for network 3
 v_NQ = c(100,50,40)
-data_sim <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesFG= c('A','B','D'))
+data_sim <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed=NULL, namesfg= c('A','B','D'))
 }
