@@ -115,18 +115,26 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
   #----------------------   ESTIMATION starting from one (given) or two initialisations  (vKmean and vKmin)
 
   #browser()
+  collection_tested_classif.init <- list()
   # vkinit_list[[1]] :  init classif CAH + searching from that point
   param.init <- genBMfit$new(vK = vKinit_list[[1]],vdistrib = dataR6$vdistrib)
   classif.init = initialize(dataR6,param.init,method = "CAH")$groups
   R = dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores)
 
+  ind.init = 1
+  collection_tested_classif.init[[ind.init]] <-  classif.init
 
   # vkinit_list[[2]] and further  :  init classif CAH + searching from that point
   if (length(vKinit_list) > 1) {
     param.init <- genBMfit$new(vK = vKinit_list[[2]],vdistrib = dataR6$vdistrib)
     classif.init = initialize(dataR6,param.init,method = "CAH")$groups
+
+    ind.init <- ind.init +  1
+    collection_tested_classif.init[[ind.init]] = classif_init
     R <- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
   }
+
+  ind.init <- length(collection_tested_classif.init)
 
 
   # Additional initialisation starting from a block model on each network
@@ -173,15 +181,23 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
 
     Nb_classif.initBM = lapply(list_classif.initBM,function(l) 1:length(l))
     combin_classif.initBM = as.matrix(expand.grid(Nb_classif.initBM))
-
-
-    lapply(1:nrow(combin_classif.initBM),function(i)
-    {
-         rowcombin = as.vector(combin_classif.initBM[i,])
-         classif.init = lapply(1:dataR6$Q, function(q) list_classif.initBM[[q]][[rowcombin[q]]])
-          R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
+    ind_ref <- ind.init
+    for (i in 1:nrow(combin_classif.initBM))
+      {
+      ind.init <- ind.init + 1
+      rowcombin = as.vector(combin_classif.initBM[i,])
+      classif.init = lapply(1:dataR6$Q, function(q) list_classif.initBM[[q]][[rowcombin[q]]])
+      collection_tested_classif.init[[ind.init]] <- classif.init
+          #R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
     }
-   )
+
+    collection_tested_classif.init <- clean_collection_classif(collection_tested_classif.init,ind_ref)
+    L <- length(collection_tested_classif.init)
+    for (i in (ind_ref + 1):length(collection_tested_classif.init))
+    {
+       R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
+    }
+
   }
   }
 

@@ -1,14 +1,11 @@
-initialize = function(data , param , method = "CAH", givenclassif = NULL)
+initialize = function(dataR6 , param , method = "CAH", givenclassif = NULL)
   #method can be pure random or classical clustering CAH or given classif
 {
-  #mats <- data$mats;
-  #Ecode <- data$Ecode;
+
   vK <- param$vK;
-  v_NQ <- data$v_NQ;
-  where_q <- data$where;
-  Q <- data$Q
-  #card_E <- data$card_E
-  #parameters
+  v_NQ <- dataR6$v_NQ;
+  where_q <- dataR6$where;
+  Q <- dataR6$Q
   eps = .Machine$double.eps
 
   if (method == "random") { groups <- lapply(1:Q,function(q){return(sample(1:vK[q],v_NQ[q],replace = TRUE))})}
@@ -21,8 +18,8 @@ initialize = function(data , param , method = "CAH", givenclassif = NULL)
       w_q <- where_q[[q]]
       dists <- lapply(as.list(as.data.frame(t(w_q))),function(l)
       {
-        if (l[2] == 1)   d <- dist(data$mats[[l[1]]],"manhattan")
-        else  d <- dist(t(data$mats[[l[1]]]),"manhattan")
+        if (l[2] == 1)   d <- dist(dataR6$mats[[l[1]]],"manhattan")
+        else  d <- dist(t(dataR6$mats[[l[1]]]),"manhattan")
         return(d)
       })
       totdist <- Reduce('+',dists)
@@ -33,7 +30,7 @@ initialize = function(data , param , method = "CAH", givenclassif = NULL)
         cah1 <- hclust(totdist,method = "ward.D")
         gr1 <- cutree(cah1,vK[q])
        }
-       else {gr1 <- rep(1,data$v_NQ[q])}
+       else {gr1 <- rep(1,dataR6$v_NQ[q])}
 
       return(gr1)
     })
@@ -54,7 +51,7 @@ initialize = function(data , param , method = "CAH", givenclassif = NULL)
 
 
 ###################################################################"
-sequential_initialize = function(classif.c, data ,Kmin = NULL,Kmax = NULL,os = "windows"){
+sequential_initialize = function(classif.c, dataR6 ,Kmin = NULL,Kmax = NULL,os = "windows"){
 
   Q <- length(classif.c);
   if (is.null(Kmin)) {Kmin  <- rep(1,Q)}
@@ -64,7 +61,7 @@ sequential_initialize = function(classif.c, data ,Kmin = NULL,Kmax = NULL,os = "
 
   F_q <-  function(q){
     classif_forward_q  <- classif_backward_q <-  classif.c;
-    classif_forward_q <- split_classif(classif.c,q,data,Kmax[q])
+    classif_forward_q <- split_classif(classif.c,q,dataR6,Kmax[q])
     classif_backward_q <- merge_classif(classif.c,q,Kmin[q])
     res <- do.call(c, list(classif_backward_q, classif_forward_q))
     return(res)}
@@ -87,7 +84,7 @@ calc_vK = function(classif){
 
 
 
-split_classif =  function(classif,q,data,Kmax_q){
+split_classif =  function(classif,q,dataR6,Kmax_q){
 
   classif_q <- classif[[q]]
   classif_q <- match(classif_q, unique(sort(classif_q))) # pour avoir comme numéro de groupe 1... K_q
@@ -100,9 +97,9 @@ split_classif =  function(classif,q,data,Kmax_q){
       classif_split_q_k <-  classif; # nouvelle classif coupant le cluster k du FG q en 2
 
       # on coupe les individus du groupe $k$ en utilisant CAH sur les distances
-      dists <- lapply(as.list(as.data.frame(t(data$where[[q]]))),function(l)
-        { if (l[2] == 1)   d <- dist(data$mats[[l[1]]][classif_q == k,],"manhattan")
-          else  d <- dist(t(data$mats[[l[1]]][,classif_q == k]),"manhattan")
+      dists <- lapply(as.list(as.data.frame(t(dataR6$where[[q]]))),function(l)
+        { if (l[2] == 1)   d <- dist(dataR6$mats[[l[1]]][classif_q == k,],"manhattan")
+          else  d <- dist(t(dataR6$mats[[l[1]]][,classif_q == k]),"manhattan")
           return(d)
         })
       totdist <- Reduce('+',dists)

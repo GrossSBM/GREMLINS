@@ -136,7 +136,7 @@ readjust_theta <- function(theta,eps, distrib)
 comp_lik_ICL = function(tau,ltheta,lpi,mat_E,list_Mat,n_q,vK,vdistrib)
 {
   cardE <- nrow(mat_E)
-  Q <-  length(ltheta)
+  Q <-  length(lpi)
 
 
 
@@ -332,6 +332,38 @@ Cleaning_estim <- function(dataR6,R){
   return(res)
 }
 
+
+compar_classif <- function(classif_1,classif_2){
+
+  if (length(classif_1) != length(classif_2) )
+  {
+    stop('classification can not be compared because objects of different sizes')
+  }
+  ARI <- mean(vapply(1:length(classif_1),function(q){adjustedRandIndex(classif_1[[q]],classif_2[[q]])},1))
+  if (ARI == 1){return(TRUE)}else{return(FALSE)}
+}
+
+clean_collection_classif <- function(collection_classif,ind_ref){
+
+  L <- length(collection_classif)
+  mat_compar <- matrix(NA,L,L)
+  for (l in 2:L){for (k in 1:(l - 1)){mat_compar[l,k] <- compar_classif(collection_classif[[k]],collection_classif[[l]])}}
+  w <- which(rowSums(mat_compar[ind_ref:L,],na.rm = TRUE)>0)- ind_ref+1
+  u <- (1:L)[ -w]
+  res <- lapply(u,function(i){collection_classif[[i]]})
+  return(res)
+}
+
+
+
+
+  }
+
+
+
+
+
+}
 
 
 

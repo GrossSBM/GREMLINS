@@ -6,7 +6,7 @@ v_K <- c(3,2,2)
 n_FG <- length(v_K)
 lpi <- lapply(1:n_FG,function(i) {rdirichlet(1,rep(2,v_K[i]))} )
 
-n_net = 3
+n_net = 4
 vdistrib <- sample(c('bernoulli','poisson'),n_net,replace = TRUE)
 #vdistrib <- rep('poisson',n_net)
 #vdistrib <- rep('bernoulli',n_net)
@@ -56,13 +56,22 @@ for (i in 1:n_net) {
 
 # nb of individuals
 
+<<<<<<< HEAD
 v_NQ = c(100,100,100)
 data_sim <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed = NULL, namesfg =  c('A','B','D'))
+=======
+v_NQ = c(80,50,40)
+data_sim <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed = NULL, namesfg = LETTERS[1:length(v_NQ)])
+>>>>>>> master
 
 listNet <- data_sim
 #vdistrib[1] = 'poisson'
 
 
+<<<<<<< HEAD
 res <- MultipartiteBM(listNet, namesfg = c('A','B','D'), vdistrib = vdistrib , vKmin = 1 , vKmax = c(6,6,6) , vKinit = NULL, init.BM = FALSE, save = FALSE , verbose = TRUE,nb_cores = 10)
+=======
+res <- MultipartiteBM(listNet, namesfg = LETTERS[1:length(v_NQ)], vdistrib = vdistrib , vKmin = 1 , vKmax = c(6,6,6) , vKinit = c(2,2,2), init.BM = TRUE, save = FALSE , verbose = TRUE,nb_cores = 10)
+>>>>>>> master
 
 
