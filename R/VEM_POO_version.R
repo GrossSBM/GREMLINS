@@ -12,7 +12,6 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
   #for a given q functional groups, gives the list of matrix in row or in columns where it plays a role
 
 
-
   where_q <- dataR6$where
   n_q <- dataR6$v_NQ
   cardE <- dataR6$card_E
@@ -127,8 +126,11 @@ VEM_gen_BM <- function(dataR6,classif.init,tau.init=NULL)
       #VE step
 
       tau_old <- tau #useful ?
+      #browser()
       for (q in 1:dataR6$Q)
       {
+
+
         if (vK[q] == 1) { tau[[q]] = matrix(1,ncol  = 1,nrow = n_q[q])}
         else{
           w_q <- where_q[[q]]
