@@ -46,6 +46,10 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
     names(Nb.entities) <- dataR6$namesfg;
     print("------------Nb of entities in each functional group--------------")
     print(Nb.entities)
+
+
+    print("------------Porbability distributions on each network--------------")
+    print(vdistrib)
   }
 
   #------------------- Check the order of names_FG

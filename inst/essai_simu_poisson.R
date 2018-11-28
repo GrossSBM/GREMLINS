@@ -8,7 +8,7 @@ lpi <- lapply(1:n_FG,function(i) {rdirichlet(1,rep(2,v_K[i]))} )
 
 n_net = 3
 vdistrib <- sample(c('bernoulli','poisson'),n_net,replace = TRUE)
-vdistrib <- rep('poisson',n_net)
+#vdistrib <- rep('poisson',n_net)
 #vdistrib <- rep('bernoulli',n_net)
 type_inter <- rep('NA',n_net)
 
@@ -31,12 +31,24 @@ for (i in 1:n_net) {
   if (E[i,1] == E[i,2]) {type_inter[i] = sample(c('diradj','adj'),1)}  else{type_inter[i] = 'inc' }
 }
 
+
+
+mu = 0.3
+V  = 0.1;
+beta  = mu*(1-mu)^2/V-(1-mu)
+alpha <- beta*mu/(1-mu)
+H  = rbeta(10000,alpha,beta)
+
 ltheta <- list()
 for (i in 1:n_net) {
   if (vdistrib[i] == 'bernoulli') {
-    ltheta[[i]] <- matrix(rbeta(v_K[E[i,1]] * v_K[E[i,2]],1.5,1.5 ),nrow = v_K[E[i,1]], ncol = v_K[E[i,2]] )
+    u <- c(1:(2 * v_K[E[i,1]] * v_K[E[i,2]]))/(2 * v_K[E[i,1]]*v_K[E[i,2]])
+    u <- round(u[-c(1,length(u))],4)
+    mu <- sample(u,v_K[E[i,1]] * v_K[E[i,2]],replace = FALSE)
+    ltheta[[i]] <- matrix(mu,nrow = v_K[E[i,1]], ncol = v_K[E[i,2]] )
+    #matrix(rbeta(v_K[E[i,1]] * v_K[E[i,2]],alpha,beta ),nrow = v_K[E[i,1]], ncol = v_K[E[i,2]] )
   }else{
-    mean_theta_i = sample(c(1:(2 * v_K[E[i,1]] * v_K[E[i,2]])),v_K[E[i,1]] * v_K[E[i,2]],replace=FALSE)
+    mean_theta_i = sample(c(1:(2 * v_K[E[i,1]] * v_K[E[i,2]])),v_K[E[i,1]] * v_K[E[i,2]],replace = FALSE)
     ltheta[[i]] <- matrix(rgamma(v_K[E[i,1]] * v_K[E[i,2]],mean_theta_i*10,10 ),nrow = v_K[E[i,1]], ncol = v_K[E[i,2]] )
   }
   if (type_inter[i] == 'adj') { ltheta[[i]] <- 0.5*(ltheta[[i]] + t(ltheta[[i]]))} # symetrisation
@@ -44,13 +56,13 @@ for (i in 1:n_net) {
 
 # nb of individuals
 
-v_NQ = c(80,50,40)
-data_sim <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed = NULL, namesfg= c('A','B','D'))
+v_NQ = c(100,100,100)
+data_sim <- rMBM(v_NQ ,E , type_inter, vdistrib, lpi, ltheta, seed = NULL, namesfg =  c('A','B','D'))
 
 listNet <- data_sim
 #vdistrib[1] = 'poisson'
 
 
-res <- MultipartiteBM(listNet, namesfg = c('A','B','D'), vdistrib = vdistrib , vKmin = 1 , vKmax = c(6,6,6) , vKinit = NULL, init.BM = TRUE, save = FALSE , verbose = TRUE,nb_cores = 10)
+res <- MultipartiteBM(listNet, namesfg = c('A','B','D'), vdistrib = vdistrib , vKmin = 1 , vKmax = c(6,6,6) , vKinit = NULL, init.BM = FALSE, save = FALSE , verbose = TRUE,nb_cores = 10)
 
 
