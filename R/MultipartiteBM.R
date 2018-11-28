@@ -114,9 +114,8 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
 
   #----------------------   ESTIMATION starting from one (given) or two initialisations  (vKmean and vKmin)
 
-  #browser()
   collection_tested_classif.init <- list()
-  # vkinit_list[[1]] :  init classif CAH + searching from that point
+
   param.init <- genBMfit$new(vK = vKinit_list[[1]],vdistrib = dataR6$vdistrib)
   classif.init = initialize(dataR6,param.init,method = "CAH")$groups
   R = dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores)
@@ -142,60 +141,42 @@ MultipartiteBM = function(listNet, namesfg = NULL, vdistrib = NULL , vKmin = 1 ,
   {
     if (dataR6$card_E == 1) {print("initialisation based on each network is not relevant")}
     else {
-    list_classif.initBM = lapply(1:dataR6$Q,function(q){list()})
-    names(list_classif.initBM) = dataR6$namesfg
+      list_classif.initBM = lapply(1:dataR6$Q,function(q){list()})
+      names(list_classif.initBM) = dataR6$namesfg
 
-    lapply(1:dataR6$card_E, function(e){
-      if (dataR6$type_inter[e] == "inc") { indFG = dataR6$E[e,]} else {indFG = dataR6$E[e,1]}
-
-      #version LBM or  SBM for any network
-      estim = MultipartiteBM(list(listNet[[e]]),namesfg = dataR6$namesfg[indFG] ,  vdistrib = vdistrib[e], vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG],  init.BM = FALSE, verbose = FALSE)
-
-      if (dataR6$type_inter[e] == "inc")
-      {
-        list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
-        list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(estim$fitted.model[[1]]$param_estim$Z[[2]]))
-      } else {
-        list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
+      lapply(1:dataR6$card_E, function(e){
+        if (dataR6$type_inter[e] == "inc") { indFG = dataR6$E[e,]} else {indFG = dataR6$E[e,1]}
+        estim = MultipartiteBM(list(listNet[[e]]),namesfg = dataR6$namesfg[indFG] ,  vdistrib = vdistrib[e], vKmin = vKmin[indFG] ,vKmax = vKmax[indFG] ,vKinit = vKmin[indFG],  init.BM = FALSE, verbose = FALSE)
+        if (dataR6$type_inter[e] == "inc")
+        {
+          list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
+          list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(estim$fitted.model[[1]]$param_estim$Z[[2]]))
+        } else {
+          list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(estim$fitted.model[[1]]$param_estim$Z[[1]]))
       }
-      #version blockmodels
-    #   estim =  switch(dataR6$type_inter[e],
-    #          "inc" = BM_bernoulli("LBM",dataR6$mats[[e]],verbosity=0,plotting=""),
-    #          "diradj" = BM_bernoulli("SBM",dataR6$mats[[e]],verbosity=0,plotting=""),
-    #          "adj" = BM_bernoulli("SBM_sym",dataR6$mats[[e]],verbosity=0,plotting=""))
-    #
-    #   estim$estimate()
-    #   k = which.max(estim$ICL)
-    #   best_clust = estim$memberships[[k]]
-    #
-    #   if (dataR6$type_inter[e]=="inc")
-    #   {
-    #       list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z1,1,which.max)))
-    #       list_classif.initBM[[dataR6$E[e,2]]] <<- c(list_classif.initBM[[dataR6$E[e,2]]],list(apply(best_clust$Z2,1,which.max)))
-    #   } else {
-    #     list_classif.initBM[[dataR6$E[e,1]]] <<- c(list_classif.initBM[[dataR6$E[e,1]]],list(apply(best_clust$Z,1,which.max)))
-    #   }
      })
 
 
 
-    Nb_classif.initBM = lapply(list_classif.initBM,function(l) 1:length(l))
-    combin_classif.initBM = as.matrix(expand.grid(Nb_classif.initBM))
-    ind_ref <- ind.init
-    for (i in 1:nrow(combin_classif.initBM))
+
+      Nb_classif.initBM = lapply(list_classif.initBM,function(l) 1:length(l))
+      combin_classif.initBM = as.matrix(expand.grid(Nb_classif.initBM))
+      ind_ref <- ind.init
+      for (i in 1:nrow(combin_classif.initBM))
       {
-      ind.init <- ind.init + 1
-      rowcombin = as.vector(combin_classif.initBM[i,])
-      classif.init = lapply(1:dataR6$Q, function(q) list_classif.initBM[[q]][[rowcombin[q]]])
-      collection_tested_classif.init[[ind.init]] <- classif.init
+        ind.init <- ind.init + 1
+        rowcombin = as.vector(combin_classif.initBM[i,])
+        classif.init = lapply(1:dataR6$Q, function(q) list_classif.initBM[[q]][[rowcombin[q]]])
+        collection_tested_classif.init[[ind.init]] <- classif.init
           #R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
-    }
+      }
 
     collection_tested_classif.init <- clean_collection_classif(collection_tested_classif.init,ind_ref)
-    L <- length(collection_tested_classif.init)
-    for (i in (ind_ref + 1):length(collection_tested_classif.init))
-    {
-       R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
+    if(length(collection_tested_classif.init) > ind_ref){
+      for (i in (ind_ref + 1):length(collection_tested_classif.init))
+      {
+         R <<- c(R,dataR6$search_nb_clusters(classif.init,Kmin = vKmin,Kmax = vKmax,verbose = verbose,nb_cores = nb_cores))
+      }
     }
 
   }
