@@ -2,7 +2,7 @@ Package: GREMLIN
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.1
-Author: Who wrote it
+Author: P. Barbillon et S. Donnet
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
@@ -14,18 +14,19 @@ Imports:
       R6, 
       parallel,
       igraph,
-      blockmodels
+      mclust
 Collate: 
       'GREMLIN_package.R'
-      'BM_POO.R'
-      'DefineNetwork.R'
-      'MultipartiteBM.R'
-      'VEM_POO_version.R'
-      'MultipartiteBMfixedmodel.R'
-      'initialize_VEM.R'
-      'plot_MBM.R'
-      'search_VK_POO_version.R'
+      'BMPOO.R'
+      'defineNetwork.R'
+      'multipartiteBM.R'
+      'VEMPOOVersion.R'
+      'multipartiteBMFixedModel.R'
+      'initializeVEM.R'
+      'plotMBM.R'
+      'searchVKPOOVersion.R'
       'utils.R'
-      'comp_lik_ICL_export.R'
-      'extract_clusters_MBM.R'
+      'compLikICLExport.R'
+      'extractClustersMBM.R'
       'rMBM.R'
+      'comparClassif.R'

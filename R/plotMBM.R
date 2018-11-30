@@ -12,21 +12,21 @@
 #' Z1 <- diag(Q1)%x%matrix(1,npc1,1)
 #' P1 <- matrix(runif(Q1*Q1),Q1,Q1)
 #' A <- 1*(matrix(runif(n1*n1),n1,n1)<Z1%*%P1%*%t(Z1)) ## adjacency matrix
-#' Agr <- DefineNetwork(A,"diradj","FG1","FG1")  # First network
+#' Agr <- defineNetwork(A,"diradj","FG1","FG1")  # First network
 #' npc2 <- 40 #  number of nodes per block for functional group 2
 #' Q2 <- 2 # blocks   for functional group 2
 #' n2 <- npc2 * Q2 #  number of nodes for functional group 2
 #' Z2 <- diag(Q2)%x%matrix(1,npc2,1)
 #' P2 <- matrix(runif(Q1*Q2),Q1,Q2)
 #' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## incidence matrix
-#' Bgr <- DefineNetwork(B,"inc","FG1","FG2")
+#' Bgr <- defineNetwork(B,"inc","FG1","FG2")
 #' res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
 #' plot_MBM(res,mycol=c('blue','red'))
 #' @export
 
 plot_MBM = function(fitted_MBM,which.model = 1, mycol = NULL,thres = 0.01,leg.cex=1,max.curved=3){
 
-  dataR6 <- FormattingData(fitted_MBM$listNet)
+  dataR6 <- formattingData(fitted_MBM$listNet)
   Q <-  dataR6$Q
 
   param <- fitted_MBM$fitted.model[[which.model]]$param_estim
@@ -49,7 +49,7 @@ plot_MBM = function(fitted_MBM,which.model = 1, mycol = NULL,thres = 0.01,leg.ce
     c2 <- rep(code_node[[q.col]],each = vK_estim[q.row])
     edges_i <- cbind(c1,c2,c(ltheta_i))
     edges_i <- as.data.frame(edges_i)
-    edges_i$type <- rep(dataR6$type_inter[i],length(c1))
+    edges_i$type <- rep(dataR6$typeInter[i],length(c1))
     return(edges_i)})
   all_edges <- do.call("rbind", list_edges)
 
