@@ -11,7 +11,7 @@ multipartiteBM(list_Net, namesFG = NULL, v_distrib = NULL, v_Kmin = 1,
 \arguments{
 \item{list_Net}{A list of networks (defined via the function defineNetwork) i.e. multipartite networks}
 
-\item{namesFG}{Names of functional groups (FG) (must correspond to names in listNet)}
+\item{namesFG}{Names of functional groups (FG) (must correspond to names in list_Net)}
 
 \item{v_Kmin}{A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
 v_Kmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
@@ -50,6 +50,7 @@ list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[
 list_theta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
 list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 v_NQ = c(100,50,40)
-list_Nets <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'))
-res <- multipartiteBM(list_Nets,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
+dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif = FALSE)
+list_Net <- dataSim$list_Net
+res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
 }

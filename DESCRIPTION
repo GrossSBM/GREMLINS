@@ -26,7 +26,7 @@ Collate:
       'plotMBM.R'
       'searchVKPOOVersion.R'
       'utils.R'
-      'compLikICLExport.R'
+      'compLikICL.R'
       'extractClustersMBM.R'
       'rMBM.R'
       'comparClassif.R'

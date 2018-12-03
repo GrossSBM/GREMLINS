@@ -56,9 +56,9 @@ for (i in 1:nSimu)
   #load data
   namedata  <- paste('datasim',i,'.Rdata',sep = "")
   load(file = paste(dirSaveSimuData,namedata,sep = '/' ))
-  listNet <- datasim$list_net
+  list_Net <- datasim$list_Net
   # estim
-  res_estim <- MultipartiteBM(listNet, namesfg = namesfg, vdistrib = vdistrib , vKmin = 1 , vKmax = 10 , vKinit = c(1,1,1,1), init.BM = TRUE, save = FALSE , verbose = FALSE,nb_cores = 10)
+  res_estim <- MultipartiteBM(list_Net, namesfg = namesfg, vdistrib = vdistrib , vKmin = 1 , vKmax = 10 , vKinit = c(1,1,1,1), init.BM = TRUE, save = FALSE , verbose = FALSE,nb_cores = 10)
   nameres  <- paste('resMBM_',i,'.Rdata',sep = "")
   save(res_estim, file = paste(dirSaveSimuRes,nameres,sep = '/' ))
 }

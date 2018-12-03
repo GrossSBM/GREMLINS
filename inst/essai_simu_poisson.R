@@ -56,14 +56,34 @@ for (i in 1:n_net) {
 # nb of individuals
 
 v_NQ = sample(c(50:100),n_FG,replace = TRUE)
-data_sim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed = NULL, namesFG = LETTERS[1:length(v_NQ)])
+dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed = NULL, namesFG = LETTERS[1:length(v_NQ)])
+list_Net <- dataSim$list_Net
 
 
-list_Net <- data_sim$list_net
-#vdistrib[1] = 'poisson'
-length(list_Net)
+
+
+###################################################################################
+#------------------------- ESTIMATION for fixed numbers of clusters
+###################################################################################
+
+
+resBNFM <- multipartiteBMFixedModel(list_Net, namesFG = LETTERS[1:length(v_NQ)] ,v_K = v_K, v_distrib = v_distrib,classifInit = NULL, nbCores = NULL)
+
+ICL <- compLikICL(resBNFM$fittedModel[[1]]$paramEstim,resBNFM$list_Net,v_distrib = v_distrib)
+
+
+plotMBM(resBNFM,whichModel = 1)
+
+###################################################################################
+#------------------------- Model selection
+###################################################################################
+
+
+
 
 
 res <- multipartiteBM(list_Net, namesFG = LETTERS[1:length(v_NQ)], v_distrib = v_distrib , v_Kmin = 1 , v_Kmax = rep(6,n_FG) , v_Kinit = NULL, initBM = TRUE, save = FALSE , verbose = TRUE,nbCores = 10)
 
+
+plotMBM(res,whichModel = 1)
 

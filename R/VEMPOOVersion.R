@@ -49,6 +49,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
 
   #entering VEM
   maxiter <- 1000
+  maxiterVE <- 100
   stopcrit <- 0
   iterVEM <- 0
 
@@ -118,7 +119,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
     #--------------------------------   VE step : boucle
     iterVE <- 0
     stopVE <- 0
-    while ((iterVE < maxiter) & (stopVE == 0))
+    while ((iterVE < maxiterVE) & (stopVE == 0))
     {
       #VE step
 
@@ -201,16 +202,19 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
       }
       iterVE <- iterVE + 1
       if (distTau(tau,tau_old) < valStopCrit)   stopVE <- 1
+
+      if (iterVE == maxiterVE) { warning(paste("Maximum number of VE iterations reached for model ", v_K,sep = ' ' ))}
+
     }#-------------------- END of VE Step
 
 
     #computing lik
-    pseudolik <- compLikICL(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
+    pseudolik <- compLikICLInt(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
     vJ[iterVEM] <- pseudolik$condLik + pseudolik$margLik + pseudolik$entr
   } # ------------ end of EM var
 
   #computing ICL
-  likICL <- compLikICL(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
+  likICL <- compLikICLInt(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
 
  ICL <-  likICL$condLik + likICL$margLik - 1/2 * likICL$pen
 

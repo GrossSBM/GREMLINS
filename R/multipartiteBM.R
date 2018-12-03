@@ -30,8 +30,9 @@
 #' list_theta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
 #' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 #' v_NQ = c(100,50,40)
-#' list_Nets <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'))
-#' res <- multipartiteBM(list_Nets,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
+#' dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif = FALSE)
+#' list_Net <- dataSim$list_Net
+#' res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
 #' @export
 
 multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = FALSE , save=FALSE , verbose = TRUE,nbCores = NULL)
@@ -49,7 +50,7 @@ multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 
     print(NBEntities)
 
 
-    print("------------Porbability distributions on each network--------------")
+    print("------------Probability distributions on each network--------------")
     print(v_distrib)
   }
 

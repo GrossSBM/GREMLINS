@@ -4,57 +4,54 @@
 #'
 #' @param list_Net A list of network (defined via the function DefineNetwork)
 #' @param namesFG Names of functional groups (must correspond to names in listNet)
-#' @param vK A vector with the numbers of blocks per functional group
+#' @param v_K A vector with the numbers of blocks per functional group
 #' @param classifInit A list of initial classification for each functional group in the same order as in namesFG
 #' @param nb_cores Number of cores used for estimation
 #' @return Estimated parameters and a classification
 #' @examples
-#' npc1 <- 20 # nodes per class
-#' Q1 <- 3 # classes
-#' n1 <- npc1 * Q1 # nodes
-#' Z1 <- diag(Q1)%x%matrix(1,npc1,1)
-#' P1 <- matrix(runif(Q1*Q1),Q1,Q1)
-#' A <- 1*(matrix(runif(n1*n1),n1,n1)<Z1%*%P1%*%t(Z1)) ## adjacency matrix
-#' Agr <- DefineNetwork(A,"diradj","FG1","FG1")
-#' npc2 <- 30 # nodes per class
-#' Q2 <- 2 # classes
-#' n2 <- npc2 * Q2 # nodes
-#' Z2 <- diag(Q2)%x%matrix(1,npc2,1)
-#' P2 <- matrix(runif(Q1*Q2),Q1,Q2)
-#' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## incidence matrix
-#' Bgr <- defineNetwork(B,"inc","FG1","FG2")
-#' res <- multipartiteBMFixedModel(list(Agr,Bgr),namesFG=c("FG1","FG2"),vK=c(3,2))
+#' v_K <- c(3,2,2)
+#' n_FG <- 3
+#' list_pi <- vector("list", 3);
+#' list_pi[[1]] <- c(0.4,0.3,0.3); list_pi[[2]] <- c(0.6,0.4); list_pi[[3]]  <- c(0.6,0.4)
+#' E  = rbind(c(1,2),c(2,3),c(2,2))
+#' v_distrib <- c('bernoulli','poisson','poisson')
+#' typeInter <- c( "inc", "inc"  ,  "adj" )
+#' list_theta <- list()
+#' list_theta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]])
+#' list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]])
+#' list_theta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
+#' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
+#' v_NQ = c(100,50,40)
+#' list_Net <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'))$list_Net
+#' res <- multipartiteBMFixedModel(list_Net,namesFG = c('A','B','D'), v_K = c(3,2,2),v_distrib = v_distrib)
 #' @export
 
 
-multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, classifInit = NULL, nbCores = NULL){
-  #
-
-  dataR6 = formattingData(list_Net)
+multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , classifInit = NULL, nbCores = NULL){
 
 
+
+
+  dataR6 = formattingData(list_Net,v_distrib = v_distrib)
   if ( dataR6$Q == 1 ) {namesFG <- dataR6$nameFG}
+
+
 
   os <- Sys.info()["sysname"]
   if ((os != 'Windows') & (is.null(nbCores))) {nbCores = detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
 
 
-  v_distrib <- dataR6$v_distrib
-
 
   # Check names FG and permute ----------------------------------------------
-
   if ((is.null(namesFG) == FALSE)  & (setequal(namesFG,dataR6$namesFG) == FALSE)) {stop("Unmatching names of Functional Groups")}
 
-  if ((is.null(v_K)) & is.null(classifInit)) {stop("one of vK and classifInit have to be defined")}
 
-
-
+  if ((is.null(v_K)) & is.null(classifInit)) {stop("one of v_K or classifInit have to be defined")}
   if (!is.null(classifInit))
   {
     v_Kprov = calcVK(classifInit)
     if (is.null(v_K)) {v_K <-  v_Kprov}
-    else {if (sum(v_K != v_Kprov) > 0) {stop("unconsistent initial classification and vK")}}
+    else {if (sum(v_K != v_Kprov) > 0) {stop("unconsistent initial classification and v_K")}}
   }
 
   permut_vector = numeric(length(v_K))
@@ -62,9 +59,7 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, classifInit = N
     permut_vector[q] = which(dataR6$namesFG == namesFG[q])
   }
   v_K <- v_K[permut_vector]
-
   if (!is.null(classifInit)) {classifInit = classifInit[permut_vector]}
-
 
   #------------------------  Initialisation of the number of clusters and the classification.
 
@@ -115,7 +110,7 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, classifInit = N
   #----------------------------------- ## step 2 -> M(-1)
 
   Func_Backward_q <-  function(q){
-    classiFunc_Backward_q <- mergeClassif(classif.0,q,1)
+    classiFunc_Backward_q <- mergeClassif(classif0,q,1)
     res <- do.call(c, list(classiFunc_Backward_q))
     return(res)}
   list_ClassifInitBackward = list()
@@ -125,7 +120,7 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, classifInit = N
   if (os == "Windows") {
     allEstimBackward <- lapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init)})
   }else{
-    allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nb_cores)
+    allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nbCores)
   }
 
   allEstimBackward = dataR6$cleanResults(allEstimBackward)
@@ -139,12 +134,12 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, classifInit = N
 
 
 
-  qForward <- which(paramNew.forward$vK != vK)
+  qForward <- which(paramNew.forward$v_K != v_K)
   initForward <- mergeClassif(classifNew.forward,qForward,1)
   if (os == "Windows") {
     lastEstimForward <- lapply(initForward,function(init){estim.c.l <- dataR6$estime(init)})
   }else{
-    lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nb_cores)
+    lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nbCores)
   }
 
 
@@ -156,23 +151,23 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, classifInit = N
   Z_q <- match(Z_q, unique(sort(Z_q)))
   names(Z_q) <- dataR6$namesInd[[q]]; return(Z_q)})
 
-  qBackward <- which(paramNewBackward$vK != vK)
-  initBackward <- split_classif(classifNewBackward,qBackward,dataR6,100)
+  qBackward <- which(paramNewBackward$v_K != v_K)
+  initBackward <- splitClassif(classifNewBackward,qBackward,dataR6,100)
   if (os == "Windows") {
     lastEstimBackward <- lapply(initBackward,function(init){estim.c.l <- dataR6$estime(init)})
   }else{
-    lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nb_cores)
+    lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nbCores)
   }
 
 
   allEstim <- vector("list", length =  1 + length(lastEstimForward) + length(lastEstimBackward))
-  allEstim[[1]] <- estim.0
+  allEstim[[1]] <- estim0
   for (j in 1:length(lastEstimForward)) {allEstim[[j + 1]] =  lastEstimForward[[j]]}
   for (j in 1:length(lastEstimBackward)) {allEstim[[j + length(lastEstimForward)  + 1  ]] = lastEstimBackward[[j]]}
 
 
   #browser()
-  allEstim <- dataR6$clean_results(allEstim)
+  allEstim <- dataR6$cleanResults(allEstim)
   res <- allEstim[[1]]
 
   #garde t on Z ?
@@ -181,7 +176,10 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, classifInit = N
   names(Z_q) <- dataR6$namesInd[[q]]; return(Z_q)})
 
   res$classif <- res$paramEstim$Z
-  return(res)
+  resReturn <- list()
+  resReturn$fittedModel <- list(res)
+  resReturn$list_Net <- list_Net
+  return(resReturn)
 }
 
 ###########################"

@@ -103,6 +103,7 @@ transfoE <- function(E, typeInter){
 formattingData <- function(list_Net,v_distrib = NULL)
 {
 
+
   mats = lapply(list_Net,function(net){return(net$mat)})
   intFG = lapply(list_Net,function(net){return(c(net$rowFG,net$colFG))})
   intFG = do.call(rbind,intFG)
@@ -148,8 +149,10 @@ readjustTheta <- function(theta,eps, distrib)
 
 
 #------------------- computing ICL and likelihood
-compLikICL = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
+compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
 {
+
+  #browser()
   cardE <- nrow(matE)
   Q <-  length(list_pi)
 

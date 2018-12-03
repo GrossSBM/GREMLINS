@@ -23,7 +23,9 @@
 #' list_theta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
 #' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 #' v_NQ = c(100,50,40)
-#' data_sim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'))
+#' dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif  = TRUE)
+#' list_net <- dataSim$list_net
+#' classifTrue <- dataSim$classif
 #' @export
 
 ##############################################################################################################
@@ -59,9 +61,9 @@ rMBM <- function(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL,
   dataSim <- dataSim$sim(seed=seed,E,v_NQ,typeInter,keepClassif = keepClassif)
 
   resSim <- dataSim$networks
-  list_net <- lapply(1:n_net,function(i){defineNetwork(resSim$mats[[i]],typeInter  = resSim$typeInter[i],rowFG = namesFG[E[i,1]],colFG = namesFG[E[i,2]])})
+  list_Net <- lapply(1:n_net,function(i){defineNetwork(resSim$mats[[i]],typeInter  = resSim$typeInter[i],rowFG = namesFG[E[i,1]],colFG = namesFG[E[i,2]])})
 
-  res = list(list_net = list_net)
+  res = list(list_Net = list_Net)
   if (keepClassif) {res$classif <- dataSim$classif}
   return(res)
 
