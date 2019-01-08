@@ -35,15 +35,16 @@ ltheta[[3]][3,] = 0.0753
 ltheta[[3]][5,] = 0.0163
 ltheta[[3]][6,] = 0.5108
 
-save(ltheta,lpi,file ='/home/donnet/WORK_ALL/RECHERCHE/TRAVAUX_RECHERCHE/Avner-Pierre/Ecologie/Code/generalized_multi_BM/res_simu_AoAS/res_simu_AoAS_DATTILO/param2/paramSim2.Rdata')
+#save(ltheta,lpi,file ='/home/donnet/WORK_ALL/RECHERCHE/TRAVAUX_RECHERCHE/Avner-Pierre/Ecologie/Code/generalized_multi_BM/res_simu_AoAS/res_simu_AoAS_DATTILO/param2/paramSim2.Rdata')
 #------------------------SIMULATION -----------------------------
-nSimu = 100 ;
+nSimu = 1 ;
 vdistrib = rep('bernoulli',3)
-dirSaveSimuData <- '/home/donnet/WORK_ALL/RECHERCHE/TRAVAUX_RECHERCHE/Avner-Pierre/Ecologie/Code/generalized_multi_BM/res_simu_AoAS/res_simu_AoAS_DATTILO/param2/data'
+#dirSaveSimuData <- '/home/donnet/WORK_ALL/RECHERCHE/TRAVAUX_RECHERCHE/Avner-Pierre/Ecologie/Code/generalized_multi_BM/res_simu_AoAS/res_simu_AoAS_DATTILO/param2/data'
 
-# for (i in 1:nSimu){
-#   datasim <- rMBM(vNQ ,E , typeinter, vdistrib, lpi, ltheta, seed = NULL, namesfg = namesfg,keepclassif = TRUE)
-#   namedata  <- paste('datasim',i,'.Rdata',sep = "")
+## for (i in 1:nSimu){
+i=1
+   datasim <- rMBM(vNQ ,E , typeinter, vdistrib, lpi, ltheta, seed = NULL, namesfg = namesfg)
+   namedata  <- paste('datasim',i,'.Rdata',sep = "")
 #   save(datasim,file=paste(dirSaveSimuData,namedata,sep='/' ))
 # }
 
@@ -56,9 +57,9 @@ for (i in 1:nSimu)
   #load data
   namedata  <- paste('datasim',i,'.Rdata',sep = "")
   load(file = paste(dirSaveSimuData,namedata,sep = '/' ))
-  list_Net <- datasim$list_Net
+  list_Net <- datasim
   # estim
-  res_estim <- MultipartiteBM(list_Net, namesfg = namesfg, vdistrib = vdistrib , vKmin = 1 , vKmax = 10 , vKinit = c(1,1,1,1), init.BM = TRUE, save = FALSE , verbose = FALSE,nb_cores = 10)
+  res_estim <- MultipartiteBM(list_Net, namesfg = namesfg, vdistrib = vdistrib , vKmin = 1 , vKmax = 10 , vKinit = c(1,1,1,1), init.BM = FALSE, save = FALSE , verbose = FALSE,nb_cores = 10)
   nameres  <- paste('resMBM_',i,'.Rdata',sep = "")
   save(res_estim, file = paste(dirSaveSimuRes,nameres,sep = '/' ))
 }

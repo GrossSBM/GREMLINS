@@ -56,9 +56,8 @@ for (i in 1:n_net) {
 # nb of individuals
 
 v_NQ = sample(c(50:100),n_FG,replace = TRUE)
-dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed = NULL, namesFG = LETTERS[1:length(v_NQ)])
+dataSim <- rMBM(v_NQ ,E , type_inter=typeInter, vdistrib = v_distrib, lpi = list_pi,ltheta =  list_theta, seed = NULL, namesfg = LETTERS[1:length(v_NQ)])
 list_Net <- dataSim$list_Net
-
 
 
 
