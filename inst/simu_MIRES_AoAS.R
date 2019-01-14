@@ -3,14 +3,14 @@
 
 #
 # nFG <- 4;
- namesFG <- c('famers','plants')
-# v_K <- c(3,2)
-# v_NQ <- c(30,37)
-# E = matrix(1,2,2)
-# E[1,] = c(1,1)
-# E[2,] = c(1,2)
-# nnet <- 2
-# typeInter = c('diradj','inc')
+namesFG <- c('famers','plants')
+v_K <- c(3,2)
+v_NQ <- c(30,37)
+E = matrix(1,2,2)
+E[1,] = c(1,1)
+E[2,] = c(1,2)
+nnet <- 2
+typeInter = c('diradj','inc')
 # #
 #
 # #---------------------- parameters
@@ -24,6 +24,7 @@
 # list_theta[[2]][3,] = c( 0.390,0.696)
 # #
 # save(list_theta,list_pi,file = '/home/donnet/WORK_ALL/RECHERCHE/TRAVAUX_RECHERCHE/Avner-Pierre/Ecologie/Code/generalized_multi_BM/res_simu_AoAS/res_simu_AoAS_MIRES/param1/paramSim1.Rdata')
+load(file = '/home/donnet/WORK_ALL/RECHERCHE/TRAVAUX_RECHERCHE/Avner-Pierre/Ecologie/Code/generalized_multi_BM/res_simu_AoAS/res_simu_AoAS_MIRES/param1/paramSim1.Rdata')
 # #------------------------SIMULATION -----------------------------
 nSimu = 100 ;
 v_distrib = rep('bernoulli',2)
@@ -66,15 +67,13 @@ for (i in 1:nSimu)
 #   #listNet <- datasim$list_Net
 #   trueZ <- datasim$classif
 #   truevK[i,] <- vapply(1:2,function(q){length(unique(trueZ[[q]]))},1)
-#   # estim
-#   #res_estim <- MultipartiteBM(listNet, namesfg = namesfg, vdistrib = vdistrib , vKmin = 1 , vKmax = 10 , vKinit = c(1,1,1,1), init.BM = TRUE, save = FALSE , verbose = FALSE,nb_cores = 10)
 #   nameres  <- paste('resMBM_',i,'.Rdata',sep = "")
 #   load(file = paste(dirSaveSimuRes,nameres,sep = '/' ))
-#   estimZ <- res_estim$fitted.model[[1]]$param_estim$Z
+#   estimZ <- res_estim$fittedModel[[1]]$paramEstim$Z
 #   resCompar[i,] <-  comparClassif(trueZ,estimZ)
-#   vK_estim[i,] <- res_estim$fitted.model[[1]]$param_estim$vK
+#   vK_estim[i,] <- res_estim$fittedModel[[1]]$paramEstim$v_K
 # }
-#
+
 # vK_estim - truevK
 # summary(resCompar)
 # par(mfrow=c(2,2))
