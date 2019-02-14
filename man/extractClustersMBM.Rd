@@ -7,9 +7,9 @@
 extractClustersMBM(fittedMBM, whichModel = 1)
 }
 \arguments{
-\item{fitted_MBM}{A fitted Generalized BlockModel}
+\item{fittedMBM}{A fitted Generalized BlockModel}
 
-\item{which.model}{The index corresponding to the model to plot (default is 1, the best model)}
+\item{whichModel}{The index corresponding to the model to plot (default is 1, the best model)}
 }
 \description{
 #'
@@ -29,6 +29,6 @@ Z2 <- diag(Q2)\%x\%matrix(1,npc2,1)
 P2 <- matrix(runif(Q1*Q2),Q1,Q2)
 B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1\%*\%P2\%*\%t(Z2)) ## incidence matrix
 Bgr <- defineNetwork(B,"inc","FG1","FG2")
-res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
-extract_clusters_MBM(res,mycol=c('blue','red'))
+res <-   multipartiteBM(list(Agr,Bgr),namesFG = NULL,v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
+extractClustersMBM (res,whichModel = 1)
 }

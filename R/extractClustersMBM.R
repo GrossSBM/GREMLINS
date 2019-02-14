@@ -1,8 +1,8 @@
 #' Plot the mesoscopic view  of the estimated MBM
 #'
 #' #'
-#' @param fitted_MBM A fitted Generalized BlockModel
-#' @param which.model The index corresponding to the model to plot (default is 1, the best model)
+#' @param fittedMBM A fitted Generalized BlockModel
+#' @param whichModel The index corresponding to the model to plot (default is 1, the best model)
 #' @examples
 #' npc1 <- 20 # number of nodes per block for functional group 1
 #' Q1 <- 3 # blocks   for functional group 1
@@ -18,16 +18,21 @@
 #' P2 <- matrix(runif(Q1*Q2),Q1,Q2)
 #' B <- 1*(matrix(runif(n1*n2),n1,n2)<Z1%*%P2%*%t(Z2)) ## incidence matrix
 #' Bgr <- defineNetwork(B,"inc","FG1","FG2")
-#' res <- MultipartiteBM(list(Agr,Bgr),namesFG = NULL,vKmin = 1,vKmax = 10,vKinit = NULL,verbose = TRUE, save=FALSE)
-#' extract_clusters_MBM(res,mycol=c('blue','red'))
+#' res <-   multipartiteBM(list(Agr,Bgr),namesFG = NULL,v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
+#' extractClustersMBM (res,whichModel = 1)
 #' @export
 
 extractClustersMBM = function(fittedMBM,whichModel = 1){
 
+
   dataR6 <- formattingData(fittedMBM$list_Net)
-  param <- fittedMBM$fitted.model[[whichModel]]$paramEstim
+  param <- fittedMBM$fittedModel[[whichModel]]$paramEstim
   vK_estim <- param$v_K
-  clusters <- lapply(1:dataR6$Q,function(q){lapply(1:vK_estim[q],function(l){names(param$Z[[q]])[param$Z[[q]]==l]})})
+  clusters <- lapply(1:length(vK_estim),function(q){lapply(1:vK_estim[q],function(l){
+    namesq <- names(param$Z[[q]])
+    if (is.null(namesq)){namesq <- 1:length(param$Z[[q]])}
+    clustql <- namesq[param$Z[[q]] == l]
+    return(clustql)})})
   names(clusters) <- dataR6$namesFG
   return(clusters)
 }
