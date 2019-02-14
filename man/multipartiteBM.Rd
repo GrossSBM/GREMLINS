@@ -13,6 +13,9 @@ multipartiteBM(list_Net, namesFG = NULL, v_distrib = NULL, v_Kmin = 1,
 
 \item{namesFG}{Names of functional groups (FG) (must correspond to names in list_Net)}
 
+\item{v_distrib}{Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
+Must give a vector wos length the number of networks in list_Net}
+
 \item{v_Kmin}{A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
 v_Kmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
 If v_Kmin is not specified,  v_Kmin = 1.}
@@ -29,6 +32,8 @@ if v_Kinit is not specified, then several initialisations will be used :  v_Kini
 \item{save}{Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput}
 
 \item{verbose}{Set to TRUE to display the current step of the search algorithm}
+
+\item{nbCores}{Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores}
 }
 \value{
 a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1

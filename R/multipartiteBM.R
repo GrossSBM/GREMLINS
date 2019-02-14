@@ -4,6 +4,8 @@
 #'
 #' @param list_Net A list of networks (defined via the function defineNetwork) i.e. multipartite networks
 #' @param namesFG Names of functional groups (FG) (must correspond to names in list_Net)
+#' @param v_distrib  Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
+#'                   Must give a vector wos length the number of networks in list_Net
 #' @param v_Kmin A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
 #'              v_Kmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
 #'              If v_Kmin is not specified,  v_Kmin = 1.
@@ -15,6 +17,7 @@
 #' @param initBM If initBM   =  TRUE, then an aditional initialisation is done using simple LBM or SBM on each network separatly. The default value is FALSE
 #' @param save Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput
 #' @param verbose Set to TRUE to display the current step of the search algorithm
+#' @param nbCores Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores
 #' @return a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1
 #' @examples
 #' v_K <- c(3,2,2)
