@@ -56,7 +56,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
 
 
     if (os == "Windows") {
-      all_estim <- lapply(1:L,function(l){
+      allEstim <- lapply(1:L,function(l){
         #print(l);
         estim.c.l <- dataR6$estime(list_classif_init[[l]])})
     }else{
