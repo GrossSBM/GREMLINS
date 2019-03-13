@@ -25,6 +25,32 @@ adjustedRandIndex <- function (x, y)
   return(ARI)
 }
 
+# ------------------ Laplace distribution
+rlaplace <- function(n, location = 0, scale = 1){
+  mu <- c(location)
+  b <- c(scale)
+  U <- runif(n,-0.5,0.5)
+  res <- mu - b * sign(U) * log(1 - 2 * abs(U))
+  return(res)
+}
+
+dlaplace <- function(x, location = 0, scale = 1, log = FALSE){
+  mu <- c(location)
+  b <- c(scale)
+  log.df <- -log(2 * b) - abs(x - mu) / b;
+  if (log == TRUE) {return(log.df)} else {return(exp(log.df))}
+
+}
+
+argminWeightedTAV <- function(Y,weights,o = NULL,isYordered = FALSE){
+
+    if (length(Y) != length(weights) ){stop('pb of vector size in argminWeightedTAV')}
+    W <- weights
+    if (is.null(o )) {o <- order(Y,decreasing = FALSE)}
+    if (!isYordered) {Yo <- Y[o]} else {Yo <- Y}
+    A <- sum(cumsum(W[o]) < sum(W[o]) * 0.5)
+    return(Yo[A + 1])
+  }
 
 
 ################################################################################################################
@@ -57,7 +83,7 @@ checkExtract = function(list_Mat,matE)
   }
 
   #check SBM nonsym
-  ind_SBM = which(matE[,2] == -1)
+  indSBM = which(matE[,2] == -1)
   vnonsym = sapply(indSBM,function(i){
     calc = dim(list_Mat[[i]])
     return(calc[1] != calc[[2]])
@@ -144,6 +170,8 @@ readjustTheta <- function(theta,eps, distrib)
     theta[theta < eps] = eps
     theta[theta > 1 - eps] = 1 - eps }
   if (distrib == 'poisson') { theta[theta < eps] = eps }
+  if (distrib == 'gaussian'){ theta$sd[theta$sd < eps] = eps }
+  if (distrib == 'laplace') { theta$scale[theta$scale < eps] = eps }
   return(theta)
 }
 

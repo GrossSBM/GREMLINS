@@ -26,6 +26,10 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
   valStopCrit <- 1e-6
 
 
+  #  special quantities necessary for laplace
+  list_Y_ord <- vector("list", cardE)
+  wLaplace <- which(v_distrib == 'laplace')
+  for (e in wLaplace) {o <- order(c(list_Mat[[e]])); list_Y_ord[[e]]$o <- o ; list_Y_ord[[e]]$Yo <- c(list_Mat[[e]])[o] }
 
   ##  initialisation
   v_K <- calcVK(classifInit)
@@ -58,8 +62,8 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
   #for stopping criterion
   list_theta <- lapply(1:cardE,function(s)
   {
-    gr <- matE[s,1]
-    gc <- matE[s,2]
+    gr <- matE[e,1]
+    gc <- matE[e,2]
     if (gc < 1) gc <- gr
     return(matrix(Inf,v_K[gr],v_K[gc]))
   })
@@ -79,9 +83,9 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
     list_theta_old <- list_theta
 
     list_pi = lapply(tau,colMeans)
-    list_theta  = lapply(1:cardE,function(j){
-      gr <- matE[j,1]
-      gc <- matE[j,2]
+    list_theta  = lapply(1:cardE,function(e){
+      gr <- matE[e,1]
+      gc <- matE[e,2]
 
 
       if (gc < 1) {  #for sbm sym or notsym
@@ -89,28 +93,49 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
         #useful matrix
         Unitmdiag <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
         diag(Unitmdiag) <- 0
-        #bernoulli or poisson distribution same expression for M step
-        #list_thetac = t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unitmdiag) %*% tau[[gc]])
-        #   passage en crossprod
-        list_thetac <- crossprod(crossprod(list_Mat[[j]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unitmdiag, tau[[gr]]), tau[[gc]])
-      }
-      else #for lbm
-      {
+        Unit <- Unitmdiag
+      }else{
         Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
-        #list_thetac <-  t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unit) %*% tau[[gc]])
-        list_thetac <- crossprod(crossprod(list_Mat[[j]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+      }
+
+      #bernoulli or poisson distribution same expression for M step
+      if (v_distrib[e] %in% c('poisson','bernoulli')) {
+        list_theta_e <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+      }
+      if (v_distrib[e] == 'gaussian') {
+        list_theta_e <- list()
+        list_theta_e$mean <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+        A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+        list_theta_e$sd <- sqrt(A - list_theta_e$mean^2)
+      }
+      if (v_distrib[e] == 'laplace') {
+          list_theta_e <- list()
+          list_theta_e$location <- matrix(0,v_K[gr],v_K[gc])
+          for (k in 1:v_K[gr]) {
+            for (l in 1:v_K[gc]) {
+              wkl <- tau[[gr]][k]  %o% tau[[gc]][l]
+              list_theta_e$location[k,l] <- argminWeightedTAV(list_Y_ord[[e]]$Yo ,weights  = c(wkl), o = list_Y_ord[[e]]$o,isYordered = TRUE)
+              list_theta_e$scale[k,l] <- matrix(tau[[gr]][k],nrow = 1) %*% abs(list_Mat[[e]] - list_theta_e$location[k,l] ) %*% matrix(tau[[gc]][l],ncol = 1)
+            }
+          }
+          list_theta_e$scale <- list_theta_e$scale / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+
 
       }
-      return(list_thetac)})
+      # else #for lbm
+      # {
+      #   Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
+      #   #list_thetac <-  t(tau[[gr]]) %*% list_Mat[[j]] %*% tau[[gc]] / (t(tau[[gr]]) %*% (Unit) %*% tau[[gc]])
+      #   list_thetac <- crossprod(crossprod(list_Mat[[s]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+      #
+      # }
+      return(list_theta_e)})
 
-    #prevent the values from being too close from 0 or 1
+    #prevent the values from being too close from 0 or 1 for pi, and from the bounds of the support for the others
     list_pi <- lapply(list_pi,readjustPi,eps)
     list_theta <- lapply(1:cardE,function(e){readjustTheta(list_theta[[e]],eps,v_distrib[e])})
 
 
-    # pseudolik <- comp_lik_ICL(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K)
-    # vJ <- pseudolik$condlik + pseudolik$marglik + pseudolik$entr
-    # print(vJ)
 
     #stop criterion
     if (distListTheta(list_theta,list_theta_old) < valStopCrit) stopcrit <- 1
@@ -160,8 +185,10 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
             #poisson or bernoulli likelihood
             switch(v_distrib[l[1]],
               bernoulli = {lik  = don %*% tcrossprod(tau[[qprime]],log(matlist_theta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta))},
-              poisson = {Unit <- matrix(1,nrow(don),ncol(don))
-              lik  <- -Unit %*% tcrossprod(tau[[qprime]], matlist_theta) + don %*% tcrossprod(tau[[qprime]],log(matlist_theta))  }
+              poisson = {
+                Unit <- matrix(1,nrow(don),ncol(don))
+                lik  <- -Unit %*% tcrossprod(tau[[qprime]], matlist_theta) + don %*% tcrossprod(tau[[qprime]],log(matlist_theta))
+                }
             )
 
 

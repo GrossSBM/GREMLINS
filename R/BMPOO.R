@@ -26,6 +26,15 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
 
                 #browser()
 
+                #init v_distrib, default Bernoulli
+                if (is.null(v_distrib)) {self$v_distrib = rep("bernoulli",self$cardE)}
+                else{
+                  if (length(v_distrib) != self$cardE) stop("number of distributions not consistent with number of interaction matrices")
+                  self$v_distrib = v_distrib
+                }
+
+
+                #chack adequation of v_distrib from data
                 v_distrib_guessed <- unlist(lapply(mats,function(Net){
                    support <- sort(unique(as.vector(Net)))
                    if (all(is.poswholenumber(support))) {
@@ -33,20 +42,20 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
                      if ((length(support) == 2) & all(support == c(0,1))) {return('bernoulli')}
                      if ((length(support) == 2) & any(support != c(0,1))) {return('poisson')}
                      if ((length(support) < 2) & (support == 0 | support == 1)) {return('bernoulli')}
-                   }
+                   }else{return('continuous')}
                 } ))
 
+                w.continuous <- which(v_distrib_guessed == 'continuous')
+                w.noncontinuous <- (1:self$cardE)[-w.continuous]
 
-
-
-                #init v_distrib, default Bernoulli
-                if (is.null(v_distrib)) {self$v_distrib = rep("bernoulli",self$cardE)}
-                else{
-                    if (length(v_distrib) != self$cardE) stop("number of distributions not consistent with number of interaction matrices")
-                    self$v_distrib = v_distrib
-                  }
-
-                if (any(v_distrib_guessed != self$v_distrib)) {stop('Non adequate distributions')}
+                if (length(w.continuous) > 0) {
+                  check <- 1
+                  for (u in w.continuous) {check = check * as.numeric(v_distrib[u] %in% c('gaussian','laplace'))}
+                  if ( check == 0) {stop('Check distribution for continuous weighted network')}
+                }
+                if (length(w.noncontinuous) > 0) {
+                  if (any(v_distrib_guessed[w.noncontinuous] != self$v_distrib[w.noncontinuous])) {stop('Non adequate distributions')}
+                }
 
 
 
@@ -84,7 +93,7 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
 MBMfit = R6Class("MBMfit",
               public = list(
                 v_K = NULL, #vector of number of blocks in each functional group
-                v_distrib = NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli...)
+                v_distrib = NULL, #vector of emission distribution (same length as number mats) (bernoulli, poisson, gaussian, laplace...)
                 list_pi = NULL, #list of vectors (length given in vK) for mixture distribution of Z
                 list_theta = NULL,
                 v_NQ = NULL, # number of individuas by functional groups.
@@ -123,8 +132,16 @@ MBMfit$set("public",'sim',
                         bernoulli = {
                           X_e <- matrix(rbinom(self$v_NQ[fg1] * self$v_NQ[fg2],1,list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
                           diag(X_e) <- 0;                              },
-                        poisson = {X_e <- matrix(rpois(self$v_NQ[fg1] * self$v_NQ[fg2],list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])},
-                        stop("Enter a valid distribution (poisson or bernoulli)!"))
+                        poisson = {
+                          X_e <- matrix(rpois(self$v_NQ[fg1] * self$v_NQ[fg2],list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
+                          },
+                        gaussian  = {
+                          X_e <- matrix(rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = list_theta_e$sd[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
+                          },
+                       laplace = {
+                          X_e <- matrix(rlaplace(self$v_NQ[fg1] * self$v_NQ[fg2], location = list_theta_e$location[Z_fg1,Z_fg2], scale = list_theta_e$scale[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
+                          },
+                      stop("Enter a valid distribution (poisson or bernoulli or laplace or gaussian)!"))
                  if (self$typeInter[e] == "adj") {X_e[lower.tri(X_e)] = t(X_e)[lower.tri(X_e)]}
                  return(X_e)}
                )

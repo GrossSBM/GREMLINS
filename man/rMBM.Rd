@@ -14,11 +14,11 @@ rMBM(v_NQ, E, typeInter, v_distrib, list_pi, list_theta, seed = NULL,
 
 \item{typeInter}{: type of interaction (  adjacency symetric or not or incidence) (vector of size equal to nrow(E) )}
 
-\item{v_distrib}{: vector of the distributions  (bernoulli or poisson for each network) ( vector of size equal to nrow(E) )}
+\item{v_distrib}{: vector of the distributions  (bernoulli, poisson, gaussian or laplace for each network) ( vector of size equal to nrow(E) )}
 
 \item{list_pi}{: parameters of the blocks distribution}
 
-\item{list_theta}{: parameters of the interactions distribution}
+\item{list_theta}{: parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and sd, for Laplace a list with location and scale}
 
 \item{seed}{: set the seed for the random simulation (default value  = NULL)}
 
@@ -31,20 +31,26 @@ A list of lists. Each element of the list corresponds to a network : each networ
 Simulate datasets from  multipartite block  models
 }
 \examples{
-v_K <- c(3,2,2)
-n_FG <- 3
-list_pi <- vector("list", 3);
+n_FG <- 3  #number of functional groups
+v_K <- c(3,2,2) #number of clusters in each functional group
+list_pi <- vector("list", 3); # parameters of clusterning
 list_pi[[1]] <- c(0.4,0.3,0.3); list_pi[[2]] <- c(0.6,0.4); list_pi[[3]]  <- c(0.6,0.4)
-E  = rbind(c(1,2),c(2,3),c(2,2))
-v_distrib <- c('bernoulli','poisson','poisson')
-typeInter <- c( "inc", "inc"  ,  "adj" )
+E  = rbind(c(1,2),c(2,3),c(2,2),c(1,3))
+v_distrib <- c('bernoulli','poisson','laplace','gaussian')
+typeInter <- c( "inc", "inc"  ,  "adj" ,"inc")
 list_theta <- list()
 list_theta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
 list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
-list_theta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
-list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
+list_theta[[3]] <- list()
+list_theta[[3]]$location <- matrix(rnorm(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
+list_theta[[3]]$scale <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
+list_theta[[3]]$location <- 0.5*(list_theta[[3]]$location + t(list_theta[[3]]$location)) # symetrisation for network 3
+list_theta[[3]]$scale <- 0.5*(list_theta[[3]]$scale + t(list_theta[[3]]$scale)) # symetrisation for network 3
+list_theta[[4]] <- list()
+list_theta[[4]]$mean <- matrix(rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
+list_theta[[4]]$sd <- matrix(rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
 v_NQ = c(100,50,40)
-dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif  = TRUE)
+dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','C'),keepClassif  = TRUE)
 list_net <- dataSim$list_net
 classifTrue <- dataSim$classif
 }
