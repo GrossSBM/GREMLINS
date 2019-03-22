@@ -21,10 +21,8 @@
 #' list_theta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
 #' list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
 #' list_theta[[3]] <- list()
-#' list_theta[[3]]$location <- matrix(rnorm(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
-#' list_theta[[3]]$scale <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
-#' list_theta[[3]]$location <- 0.5*(list_theta[[3]]$location + t(list_theta[[3]]$location)) # symetrisation for network 3
-#' list_theta[[3]]$scale <- 0.5*(list_theta[[3]]$scale + t(list_theta[[3]]$scale)) # symetrisation for network 3
+#' list_theta[[3]] <- matrix(rnorm(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
+#' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 #' list_theta[[4]] <- list()
 #' list_theta[[4]]$mean <- matrix(rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
 #' list_theta[[4]]$sd <- matrix(rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
