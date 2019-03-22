@@ -26,7 +26,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
   valStopCrit <- 1e-6
 
 
-
+  #browser()
   ##  initialisation
   v_K <- calcVK(classifInit)
   tau <- tauInit
@@ -56,7 +56,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
   vJ  <- numeric(maxiter)
 
   #for stopping criterion
-  list_theta <- lapply(1:cardE,function(s)
+  list_theta <- lapply(1:cardE,function(e)
   {
     gr <- matE[e,1]
     gc <- matE[e,2]

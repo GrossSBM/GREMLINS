@@ -215,8 +215,9 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
       return((sum(don * prov) - sum(Unit * prov2)) * facteur)
     }
     if (v_distrib[e] == 'laplace') {
+      #browser()
       prov = (tau[[gr]]) %*% log(2 * list_theta[[e]]) %*% t(tau[[gc]])
-      prov2 = (tau[[gr]]) %*%  1 / list_theta[[e]]  %*% t(tau[[gc]])
+      prov2 = (tau[[gr]]) %*%  (1 / list_theta[[e]])  %*% t(tau[[gc]])
       return((-sum(Unit * prov) - sum(don * prov2)) * facteur)
     }
 
@@ -278,7 +279,7 @@ distListTheta <- function(list_theta,list_thetaOld)
 {
   Q <- length(list_theta)
   v_dis <- sapply(1:Q,function(q){
-    return(sqrt(sum(as.vector(list_theta[[q]] - list_thetaOld[[q]])^2)))
+    return(sqrt(sum(as.vector(unlist(list_theta[[q]]) - unlist(list_thetaOld[[q]]))^2)))
   })
   return(sum(v_dis))
 }
