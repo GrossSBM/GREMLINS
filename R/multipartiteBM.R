@@ -18,6 +18,7 @@
 #' @param save Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput
 #' @param verbose Set to TRUE to display the current step of the search algorithm
 #' @param nbCores Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores
+#' @param maxiterVE  Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100
 #' @return a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1
 #' @examples
 #' v_K <- c(3,2,2)
@@ -35,10 +36,10 @@
 #' v_NQ = c(100,50,40)
 #' dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif = FALSE)
 #' list_Net <- dataSim$list_Net
-#' res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
+#' res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
 #' @export
 
-multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = FALSE , save=FALSE , verbose = TRUE,nbCores = NULL)
+multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = FALSE , save=FALSE , verbose = TRUE,nbCores = NULL, maxiterVE = NULL)
 {
 
 
@@ -123,7 +124,7 @@ multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 
 
   paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]],v_distrib = dataR6$v_distrib)
   classifInit = initialize(dataR6,paramInit,method = "CAH")$groups
-  R = dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores)
+  R = dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE)
   indInit = 1
   collectionTestedClassifInit[[indInit]] <-  classifInit
 
@@ -134,7 +135,7 @@ multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 
     classifInit = initialize(dataR6,paramInit,method = "CAH")$groups
     indInit <- indInit +  1
     collectionTestedClassifInit[[indInit]] = classifInit
-    R <- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores))
+    R <- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE))
   }
 
   indInit <- length(collectionTestedClassifInit)
@@ -150,7 +151,7 @@ multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 
 
       lapply(1:dataR6$cardE, function(e){
         if (dataR6$typeInter[e] == "inc") { indFG = dataR6$E[e,]} else {indFG = dataR6$E[e,1]}
-        estim = multipartiteBM(list(list_Net[[e]]),namesFG = dataR6$namesFG[indFG] ,  v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG] ,v_Kmax = v_Kmax[indFG] ,v_Kinit = v_Kmin[indFG],  initBM = FALSE, verbose = FALSE)
+        estim = multipartiteBM(list(list_Net[[e]]),namesFG = dataR6$namesFG[indFG] ,  v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG] ,v_Kmax = v_Kmax[indFG] ,v_Kinit = v_Kmin[indFG],  initBM = FALSE, verbose = FALSE, maxiterVE = maxiterVE)
         if (dataR6$typeInter[e] == "inc")
         {
           list_classifInitBM[[dataR6$E[e,1]]] <<- c(list_classifInitBM[[dataR6$E[e,1]]],list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
@@ -178,7 +179,7 @@ multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 
     if (length(collectionTestedClassifInit) > indRef) {
       for (i in (indRef + 1):length(collectionTestedClassifInit))
       {
-         R <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores))
+         R <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE))
       }
     }
 

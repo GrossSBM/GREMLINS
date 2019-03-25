@@ -5,7 +5,7 @@
 \title{Model selection and estimation of multipartite blockmodels}
 \usage{
 multipartiteBMFixedModel(list_Net, namesFG, v_K = NULL, v_distrib,
-  classifInit = NULL, nbCores = NULL)
+  classifInit = NULL, nbCores = NULL, maxiterVE = NULL)
 }
 \arguments{
 \item{list_Net}{A list of network (defined via the function DefineNetwork)}
@@ -15,6 +15,8 @@ multipartiteBMFixedModel(list_Net, namesFG, v_K = NULL, v_distrib,
 \item{v_K}{A vector with the numbers of blocks per functional group}
 
 \item{classifInit}{A list of initial classification for each functional group in the same order as in namesFG}
+
+\item{maxiterVE}{Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100}
 
 \item{nb_cores}{Number of cores used for estimation}
 }

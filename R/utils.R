@@ -25,6 +25,34 @@ adjustedRandIndex <- function (x, y)
   return(ARI)
 }
 
+# ------------------ Laplace distribution
+rlaplace <- function(n, location = 0, scale = 1){
+  mu <- c(location)
+  b <- c(scale)
+  U <- runif(n,-0.5,0.5)
+  res <- mu - b * sign(U) * log(1 - 2 * abs(U))
+  return(res)
+}
+
+dlaplace <- function(x, location = 0, scale = 1, log = FALSE){
+  mu <- c(location)
+  b <- c(scale)
+  log.df <- -log(2 * b) - abs(x - mu) / b;
+  if (log == TRUE) {return(log.df)} else {return(exp(log.df))}
+
+}
+
+
+#------------- for estimation of the location parameter of a laplace. Not required her
+# argminWeightedTAV <- function(Y,weights,o = NULL,isYordered = FALSE){
+#
+#     if (length(Y) != length(weights) ){stop('pb of vector size in argminWeightedTAV')}
+#     W <- weights
+#     if (is.null(o )) {o <- order(Y,decreasing = FALSE)}
+#     if (!isYordered) {Yo <- Y[o]} else {Yo <- Y}
+#     A <- sum(cumsum(W[o]) < sum(W[o]) * 0.5)
+#     return(Yo[A + 1])
+#   }
 
 
 ################################################################################################################
@@ -57,7 +85,7 @@ checkExtract = function(list_Mat,matE)
   }
 
   #check SBM nonsym
-  ind_SBM = which(matE[,2] == -1)
+  indSBM = which(matE[,2] == -1)
   vnonsym = sapply(indSBM,function(i){
     calc = dim(list_Mat[[i]])
     return(calc[1] != calc[[2]])
@@ -144,6 +172,8 @@ readjustTheta <- function(theta,eps, distrib)
     theta[theta < eps] = eps
     theta[theta > 1 - eps] = 1 - eps }
   if (distrib == 'poisson') { theta[theta < eps] = eps }
+  if (distrib == 'gaussian'){ theta$sd[theta$sd < eps] = eps }
+  if (distrib == 'laplace') { theta[theta < eps] = eps }
   return(theta)
 }
 
@@ -163,23 +193,32 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
     gc = matE[e,2]
     don = list_Mat[[e]]
     if (v_distrib[e] == 'bernoulli') {Unmdon = 1 - don}
+    if (v_distrib[e]  %in% c('poisson','laplace')) { Unit = matrix(1,nrow = nrow(don),ncol = ncol(don))}
+
     facteur = 1
-    if (gc < 1)
+
+    if (gc < 1) #sbm or sbm sym
     {
       if (gc == 0)  facteur = 1/2 #sbm sym
       gc = gr
-      if (v_distrib[e] == 'bernoulli') {diag(Unmdon) = 0}
+      if (v_distrib[e] %in% c('poisson','laplace')) {diag(Unit) = 0}
+      if (v_distrib[e] == 'bernoulli') { diag(Unmdon) <- 0}
     }
     if (v_distrib[e] == 'bernoulli') {
       prov = (tau[[gr]]) %*% log(list_theta[[e]]) %*% t(tau[[gc]])
       prov1m = (tau[[gr]]) %*% log(1 - list_theta[[e]]) %*% t(tau[[gc]])
-      return((sum(don * prov) + sum(Unmdon * prov1m)) * facteur)
+      return((sum(don * prov) + sum((Unmdon) * prov1m)) * facteur)
     }
     if (v_distrib[e] == 'poisson') {
       prov = (tau[[gr]]) %*% log(list_theta[[e]]) %*% t(tau[[gc]])
       prov2 = (tau[[gr]]) %*%  list_theta[[e]]  %*% t(tau[[gc]])
-      Unit <- matrix(1,nrow = nrow(don),ncol = ncol(don))
       return((sum(don * prov) - sum(Unit * prov2)) * facteur)
+    }
+    if (v_distrib[e] == 'laplace') {
+      #browser()
+      prov = (tau[[gr]]) %*% log(2 * list_theta[[e]]) %*% t(tau[[gc]])
+      prov2 = (tau[[gr]]) %*%  (1 / list_theta[[e]])  %*% t(tau[[gc]])
+      return((-sum(Unit * prov) - sum(don * prov2)) * facteur)
     }
 
   }
@@ -240,7 +279,7 @@ distListTheta <- function(list_theta,list_thetaOld)
 {
   Q <- length(list_theta)
   v_dis <- sapply(1:Q,function(q){
-    return(sqrt(sum(as.vector(list_theta[[q]] - list_thetaOld[[q]])^2)))
+    return(sqrt(sum(as.vector(unlist(list_theta[[q]]) - unlist(list_thetaOld[[q]]))^2)))
   })
   return(sum(v_dis))
 }

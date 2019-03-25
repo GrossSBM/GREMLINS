@@ -7,6 +7,7 @@
 #' @param v_K A vector with the numbers of blocks per functional group
 #' @param classifInit A list of initial classification for each functional group in the same order as in namesFG
 #' @param nb_cores Number of cores used for estimation
+#' @param maxiterVE  Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100
 #' @return Estimated parameters and a classification
 #' @examples
 #' v_K <- c(3,2,2)
@@ -27,7 +28,7 @@
 #' @export
 
 
-multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , classifInit = NULL, nbCores = NULL){
+multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , classifInit = NULL, nbCores = NULL,maxiterVE = NULL){
 
 
 
@@ -72,7 +73,7 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , cla
 
 
   #----------------------   Initialisation of the algorithm
-  estim0 <- dataR6$estime(classifInit);
+  estim0 <- dataR6$estime(classifInit,maxiterVE = maxiterVE);
   param0 <- estim0$paramEstim
   classif0 <- lapply(1:dataR6$Q,
     function(q){
@@ -82,7 +83,7 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , cla
       return(Z_q)}
   )
 
-  ICL0 <- estim0$ICL
+  #ICL0 <- estim0$ICL
 
 
 
@@ -100,9 +101,9 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , cla
 
 
   if (os == "Windows") {
-    allEstimForward <- lapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init)})
+    allEstimForward <- lapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
   }else{
-    allEstimForward <- mclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nbCores)
+    allEstimForward <- mclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
   }
 
 
@@ -118,9 +119,9 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , cla
 
 
   if (os == "Windows") {
-    allEstimBackward <- lapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init)})
+    allEstimBackward <- lapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
   }else{
-    allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nbCores)
+    allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
   }
 
   allEstimBackward = dataR6$cleanResults(allEstimBackward)
@@ -137,9 +138,9 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , cla
   qForward <- which(paramNew.forward$v_K != v_K)
   initForward <- mergeClassif(classifNew.forward,qForward,1)
   if (os == "Windows") {
-    lastEstimForward <- lapply(initForward,function(init){estim.c.l <- dataR6$estime(init)})
+    lastEstimForward <- lapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
   }else{
-    lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nbCores)
+    lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
   }
 
 
@@ -154,9 +155,9 @@ multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , cla
   qBackward <- which(paramNewBackward$v_K != v_K)
   initBackward <- splitClassif(classifNewBackward,qBackward,dataR6,100)
   if (os == "Windows") {
-    lastEstimBackward <- lapply(initBackward,function(init){estim.c.l <- dataR6$estime(init)})
+    lastEstimBackward <- lapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
   }else{
-    lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init)},mc.cores = nbCores)
+    lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
   }
 
 

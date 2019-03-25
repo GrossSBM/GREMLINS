@@ -4,9 +4,9 @@
 \alias{multipartiteBM}
 \title{Model selection and parameter estimation of MBM}
 \usage{
-multipartiteBM(list_Net, namesFG = NULL, v_distrib = NULL, v_Kmin = 1,
-  v_Kmax = 10, v_Kinit = NULL, initBM = FALSE, save = FALSE,
-  verbose = TRUE, nbCores = NULL)
+multipartiteBM(list_Net, namesFG = NULL, v_distrib = NULL,
+  v_Kmin = 1, v_Kmax = 10, v_Kinit = NULL, initBM = FALSE,
+  save = FALSE, verbose = TRUE, nbCores = NULL, maxiterVE = NULL)
 }
 \arguments{
 \item{list_Net}{A list of networks (defined via the function defineNetwork) i.e. multipartite networks}
@@ -34,6 +34,8 @@ if v_Kinit is not specified, then several initialisations will be used :  v_Kini
 \item{verbose}{Set to TRUE to display the current step of the search algorithm}
 
 \item{nbCores}{Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores}
+
+\item{maxiterVE}{Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100}
 }
 \value{
 a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1
@@ -57,5 +59,5 @@ list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation fo
 v_NQ = c(100,50,40)
 dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif = FALSE)
 list_Net <- dataSim$list_Net
-res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE)
+res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
 }
