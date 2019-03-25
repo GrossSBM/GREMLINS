@@ -73,11 +73,11 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
                 else{self$namesInd <-  lapply(1:self$Q,function(q){namesInd[[q]]})}
 
                 },
-            estime = function(classif,tau=NULL){varEMMBM(self,classif,tau)},
+            estime = function(classif,tau=NULL,maxiterVE=NULL){varEMMBM(self,classif,tau,maxiterVE)},
             cleanResults = function(R){cleanEstim(self,R)},
-            searchNbClusters = function(classifInit,Kmin,Kmax, nbCores = NULL, verbose = TRUE)
+            searchNbClusters = function(classifInit,Kmin,Kmax, nbCores = NULL, verbose = TRUE,maxiterVE = NULL)
             {
-              searchKQ(dataR6 = self,classifInit = classifInit,Kmin = Kmin,Kmax = Kmax,nbCores = nbCores,verbose = verbose)
+              searchKQ(dataR6 = self,classifInit = classifInit,Kmin = Kmin,Kmax = Kmax,nbCores = nbCores,verbose = verbose, maxiterVE = maxiterVE)
             }
         ),
       private = list(

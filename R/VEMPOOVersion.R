@@ -2,14 +2,13 @@
 #initialization provides a first classification and corresponding tau
 #method can be random, CAH, given in which case add given classif
 
-varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
+varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
   #data :  coll_interaction type object
   #classif  : liste de classifications (Z) au sein des groupes fonctionnels fg (de longueur Q )
 
 {
   #checking the dimensions of matrices and extracting number of indiviuals
   #for a given q functional groups, gives the list of matrix in row or in columns where it plays a role
-
 
   where_q <- dataR6$where
   n_q <- dataR6$v_NQ
@@ -48,8 +47,8 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL)
 
 
   #entering VEM
+  if (is.null(maxiterVE)) { maxiterVE = 100}
   maxiter <- 1000
-  maxiterVE <- 100
   stopcrit <- 0
   iterVEM <- 0
 

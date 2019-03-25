@@ -1,5 +1,7 @@
-searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, verbose = TRUE){
+searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, verbose = TRUE, maxiterVE = NULL){
   #
+
+
 
 
   os <- Sys.info()["sysname"]
@@ -16,7 +18,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
   ICL.c <- -Inf;
   classifC <- classifInit;
   classifNew <- classifC
-  estimNew <- dataR6$estime(classifInit);
+  estimNew <- dataR6$estime(classifInit,maxiterVE);
 
 
   paramNew <- estimNew$paramEstim
@@ -58,9 +60,9 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
     if (os == "Windows") {
       allEstim <- lapply(1:L,function(l){
         #print(l);
-        estim.c.l <- dataR6$estime(list_classif_init[[l]])})
+        estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE)})
     }else{
-      allEstim <- mclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]])},mc.cores = nbCores)
+      allEstim <- mclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE)},mc.cores = nbCores)
     }
 
 
