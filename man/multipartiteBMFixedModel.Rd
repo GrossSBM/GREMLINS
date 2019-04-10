@@ -4,7 +4,7 @@
 \alias{multipartiteBMFixedModel}
 \title{Model selection and estimation of multipartite blockmodels}
 \usage{
-multipartiteBMFixedModel(list_Net, namesFG, v_K = NULL, v_distrib,
+multipartiteBMFixedModel(list_Net, namesFG, v_distrib, v_K = NULL,
   classifInit = NULL, nbCores = NULL, maxiterVE = NULL)
 }
 \arguments{
@@ -24,7 +24,7 @@ multipartiteBMFixedModel(list_Net, namesFG, v_K = NULL, v_distrib,
 Estimated parameters and a classification
 }
 \description{
-Select the number of blocks per functional group using a stepwise search and estimate parameters
+Estimate the parameters and give the clustering for given numbers of blocks
 }
 \examples{
 v_K <- c(3,2,2)
@@ -41,5 +41,5 @@ list_theta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[
 list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 v_NQ = c(100,50,40)
 list_Net <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'))$list_Net
-res <- multipartiteBMFixedModel(list_Net,namesFG = c('A','B','D'), v_K = c(3,2,2),v_distrib = v_distrib)
+res <- multipartiteBMFixedModel(list_Net,namesFG = c('A','B','D'),v_distrib = v_distrib,v_K = c(3,2,2))
 }
