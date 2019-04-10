@@ -1,6 +1,6 @@
 #' Model selection and estimation of multipartite blockmodels
 #'
-#' Select the number of blocks per functional group using a stepwise search and estimate parameters
+#' Estimate the parameters and give the clustering for given numbers of blocks
 #'
 #' @param list_Net A list of network (defined via the function DefineNetwork)
 #' @param namesFG Names of functional groups (must correspond to names in listNet)
@@ -24,11 +24,11 @@
 #' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 #' v_NQ = c(100,50,40)
 #' list_Net <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'))$list_Net
-#' res <- multipartiteBMFixedModel(list_Net,namesFG = c('A','B','D'), v_K = c(3,2,2),v_distrib = v_distrib)
+#' res <- multipartiteBMFixedModel(list_Net,namesFG = c('A','B','D'),v_distrib = v_distrib,v_K = c(3,2,2))
 #' @export
 
 
-multipartiteBMFixedModel <- function(list_Net,namesFG ,v_K=NULL, v_distrib , classifInit = NULL, nbCores = NULL,maxiterVE = NULL){
+multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  classifInit = NULL, nbCores = NULL, maxiterVE = NULL){
 
 
 

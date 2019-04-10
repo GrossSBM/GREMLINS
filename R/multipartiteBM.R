@@ -36,10 +36,10 @@
 #' v_NQ = c(100,50,40)
 #' dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif = FALSE)
 #' list_Net <- dataSim$list_Net
-#' res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
+#' res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
 #' @export
 
-multipartiteBM = function(list_Net, namesFG = NULL, v_distrib = NULL , v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = FALSE , save=FALSE , verbose = TRUE,nbCores = NULL, maxiterVE = NULL)
+multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = FALSE , save=FALSE , verbose = TRUE,nbCores = NULL, maxiterVE = NULL)
 {
 
 
