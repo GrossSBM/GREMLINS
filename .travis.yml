@@ -30,6 +30,8 @@ matrix:
       r: devel
     - os: osx
       r: release
+    - os: windows
+      r: release
 
 before_install:
   - Rscript -e 'c(physical = parallel::detectCores(logical = FALSE), logical = parallel::detectCores())'
