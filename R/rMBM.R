@@ -2,32 +2,40 @@
 #'
 #' @param  v_NQ : number of individual in each Functional Group (FG)
 #' @param  E : define the architecture of the Multipartite.
-#' @param typeInter : type of interaction (  adjacency symetric or not or incidence) (vector of size equal to nrow(E) )
-#' @param v_distrib : vector of the distributions  (bernoulli, poisson, gaussian or laplace for each network) ( vector of size equal to nrow(E) )
-#' @param list_pi  : parameters of the blocks distribution
-#' @param list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and sd, for Laplace a list with location and scale
-#' @param seed : set the seed for the random simulation (default value  = NULL)
+#' @param  typeInter : type of interaction in each network: undirected adjacency (adj), directed adjacency (diradj) or incidence (inc).  (vector of size equal to nrow(E) )
+#' @param  v_distrib : vector of the distributions  (bernoulli, poisson, gaussian or laplace for each network) ( vector of size equal to nrow(E) )
+#' @param  list_pi  : parameters of the blocks distribution
+#' @param  list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and sd, for Laplace a list with location and scale
+#' @param  seed : set the seed for the random simulation (default value  = NULL)
 #' @param namesFG : names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)
-#' @return A list of lists. Each element of the list corresponds to a network : each network is described by a matrix (mat) , a type (diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
+#' @param keepClassif : equal to TRUE if you want to keep the simulated blocks/classification (default value  = TRUE).
+#' @return A list of lists containing the networks (list_net) and if keepClassif = TRUE the classifications (classif)
+#'         Each element of  list_net corresponds to a network : each network is a list containing  the matrix (mat) , the type of network(diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
 #' @examples
 #' n_FG <- 3  #number of functional groups
 #' v_K <- c(3,2,2) #number of clusters in each functional group
-#' list_pi <- vector("list", 3); # parameters of clusterning
+#' list_pi <- vector("list", 3); # parameters of clustering
 #' list_pi[[1]] <- c(0.4,0.3,0.3); list_pi[[2]] <- c(0.6,0.4); list_pi[[3]]  <- c(0.6,0.4)
 #' E  = rbind(c(1,2),c(2,3),c(2,2),c(1,3))
 #' v_distrib <- c('bernoulli','poisson','laplace','gaussian')
 #' typeInter <- c( "inc", "inc"  ,  "adj" ,"inc")
 #' list_theta <- list()
-#' list_theta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-#' list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
+#' theta1 <- rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 )
+#' list_theta[[1]] <- matrix(theta1,nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+#' theta2 <- rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 )
+#' list_theta[[2]] <- matrix(theta2,nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
 #' list_theta[[3]] <- list()
-#' list_theta[[3]] <- matrix(rnorm(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
+#' theta3 <- rnorm(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 )
+#' list_theta[[3]] <- matrix(theta3, nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
 #' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 #' list_theta[[4]] <- list()
-#' list_theta[[4]]$mean <- matrix(rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
-#' list_theta[[4]]$sd <- matrix(rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
-#' v_NQ = c(100,50,40)
-#' dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','C'),keepClassif  = TRUE)
+#' theta4_mean <- rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
+#' theta4_sd <- rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
+#' list_theta[[4]]$mean <- matrix(theta4_mean,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
+#' list_theta[[4]]$sd <- matrix(theta_sd,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
+#' v_NQ <-  c(100,50,40)
+#' namesFG <-  c('A','B','C')
+#' dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, namesFG)
 #' list_net <- dataSim$list_net
 #' classifTrue <- dataSim$classif
 #' @export
