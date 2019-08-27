@@ -1,3 +1,6 @@
+context("testing clusters recovery")
+
+
 set.seed(123)
 v_K <- c(2,2)
 n_FG <- 2
@@ -14,7 +17,7 @@ dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL,
 list_Net <- dataSim$list_Net
 res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 5,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
 
-res$fittedModel[[1]]
+#res$fittedModel[[1]]
 
 library(aricode)
 

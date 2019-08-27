@@ -125,7 +125,7 @@ MBMfit$set("public",'sim',
                mats <- lapply(1:nrow(self$E),function(e){
                  fg1 <- self$E[e,1]
                  fg2 <- self$E[e,2]
-                 list_theta_e <- list_theta[[e]] ###
+                 list_theta_e <- self$list_theta[[e]] ###
                  Z_fg1 <- self$Z[[fg1]]
                  Z_fg2 <- self$Z[[fg2]]
                  switch(self$v_distrib[e],

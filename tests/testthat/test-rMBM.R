@@ -1,3 +1,5 @@
+context("testing sampling MBM")
+
 
 n_FG <- 3  #number of functional groups
 v_K <- c(3,2,2) #number of clusters in each functional group
