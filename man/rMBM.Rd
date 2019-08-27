@@ -23,6 +23,7 @@ rMBM(v_NQ, E, typeInter, v_distrib, list_pi, list_theta, namesFG = NULL,
 \item{namesFG}{: names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)}
 
 \item{keepClassif}{: equal to TRUE if you want to keep the simulated blocks/classification (default value  = TRUE).}
+\item{keepClassif}{: equal to TRUE if you want to keep the simulated blocks/classification (default value  = FALSE).}
 
 \item{seed}{: set the seed for the random simulation (default value  = NULL)}
 }
