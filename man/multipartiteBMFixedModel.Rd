@@ -4,11 +4,14 @@
 \alias{multipartiteBMFixedModel}
 \title{Model selection and estimation of multipartite blockmodels}
 \usage{
-multipartiteBMFixedModel(list_Net, namesFG, v_distrib, v_K = NULL,
+multipartiteBMFixedModel(list_Net, v_distrib, namesFG, v_K = NULL,
   classifInit = NULL, nbCores = NULL, maxiterVE = NULL)
 }
 \arguments{
 \item{list_Net}{A list of network (defined via the function DefineNetwork)}
+
+\item{v_distrib}{Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
+Must give a vector whose length is the number of networks in list_Net}
 
 \item{namesFG}{Names of functional groups (must correspond to names in listNet)}
 
@@ -16,9 +19,9 @@ multipartiteBMFixedModel(list_Net, namesFG, v_distrib, v_K = NULL,
 
 \item{classifInit}{A list of initial classification for each functional group in the same order as in namesFG}
 
-\item{maxiterVE}{Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100}
+\item{nbCores}{Number of cores used for estimation}
 
-\item{nb_cores}{Number of cores used for estimation}
+\item{maxiterVE}{Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100}
 }
 \value{
 Estimated parameters and a classification

@@ -7,9 +7,9 @@
 comparClassif(classif1, classif2)
 }
 \arguments{
-\item{classif_1}{: list a length n_FG.}
+\item{classif1}{: list a length n_FG.}
 
-\item{classif_2}{: list a length n_FG.}
+\item{classif2}{: list a length n_FG.}
 }
 \value{
 Adjusted Rand Index (ARI) for each Functional Group.

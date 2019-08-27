@@ -1,7 +1,7 @@
 #' Compare two classifications on all the  Functional groups
 #'
-#' @param  classif_1 : list a length n_FG.
-#' @param  classif_2 : list a length n_FG.
+#' @param  classif1 : list a length n_FG.
+#' @param  classif2 : list a length n_FG.
 #' @return Adjusted Rand Index (ARI) for each Functional Group.
 #' @examples
 #' nFG <- 3;

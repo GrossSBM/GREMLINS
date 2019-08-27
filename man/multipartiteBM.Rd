@@ -4,17 +4,17 @@
 \alias{multipartiteBM}
 \title{Model selection and parameter estimation of MBM}
 \usage{
-multipartiteBM(list_Net, namesFG = NULL, v_distrib = NULL,
+multipartiteBM(list_Net, v_distrib = NULL, namesFG = NULL,
   v_Kmin = 1, v_Kmax = 10, v_Kinit = NULL, initBM = FALSE,
   save = FALSE, verbose = TRUE, nbCores = NULL, maxiterVE = NULL)
 }
 \arguments{
 \item{list_Net}{A list of networks (defined via the function defineNetwork) i.e. multipartite networks}
 
-\item{namesFG}{Names of functional groups (FG) (must correspond to names in list_Net)}
-
 \item{v_distrib}{Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
-Must give a vector wos length the number of networks in list_Net}
+Must give a vector whose length is the number of networks in list_Net}
+
+\item{namesFG}{Names of functional groups (FG) (must correspond to names in list_Net)}
 
 \item{v_Kmin}{A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
 v_Kmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
@@ -59,5 +59,5 @@ list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation fo
 v_NQ = c(100,50,40)
 dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif = FALSE)
 list_Net <- dataSim$list_Net
-res <- multipartiteBM(list_Net,namesFG = NULL, v_distrib = c("bernoulli","poisson","poisson"), v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
+res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
 }

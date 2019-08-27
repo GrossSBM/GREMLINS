@@ -7,12 +7,15 @@
 compLikICL(paramEstim, list_Net, v_distrib = NULL)
 }
 \arguments{
+\item{paramEstim}{Estimated parameters of MBM}
+
 \item{list_Net}{A list of network}
 
-\item{param_est}{Estimated parameters of MBM}
+\item{v_distrib}{Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
+Must give a vector whose length is the number of networks in list_Net}
 }
 \value{
-Pseudo-Likelihood, penalty
+Pseudo-Likelihood and penalty
 }
 \description{
 compute the Integrated likeilhood and the ICL criteria for the MBM

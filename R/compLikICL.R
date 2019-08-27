@@ -1,8 +1,10 @@
 #' compute the Integrated likeilhood and the ICL criteria for the MBM
 #'
-#' @param param_est Estimated parameters of MBM
+#' @param paramEstim Estimated parameters of MBM
 #' @param list_Net A list of network
-#' @return Pseudo-Likelihood, penalty
+#' @param v_distrib  Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
+#'                   Must give a vector whose length is the number of networks in list_Net
+#' @return Pseudo-Likelihood and penalty
 #' @examples
 #'
 #' @export
