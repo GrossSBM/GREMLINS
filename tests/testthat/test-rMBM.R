@@ -1,6 +1,5 @@
 context("testing sampling MBM")
 
-
 n_FG <- 3  #number of functional groups
 v_K <- c(3,2,2) #number of clusters in each functional group
 list_pi <- vector("list", 3); # parameters of clusterning
@@ -18,10 +17,10 @@ list_theta[[4]] <- list()
 list_theta[[4]]$mean <- matrix(rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
 list_theta[[4]]$sd <- matrix(rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
 v_NQ = c(100,50,40)
-dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed = NULL, namesFG= c('A','B','C'),keepClassif  = TRUE)
+dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, namesFG = c('A','B','C'),keepClassif = TRUE)
 list_Net <- dataSim$list_Net
 
-dataSim2 <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed = NULL, namesFG= c('A','B','C'),keepClassif  = FALSE)
+dataSim2 <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, namesFG = c('A','B','C') , seed = 4)
 
 
 
