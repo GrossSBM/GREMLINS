@@ -1,6 +1,6 @@
 Package: GREMLIN
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Inferring Multipartite Blockmodels
 Version: 0.1.1
 Author: P. Barbillon et S. Donnet
 Maintainer: The package maintainer <yourself@somewhere.net>
@@ -16,7 +16,8 @@ Imports:
     igraph,
     mclust,
     stats,
-    blockmodels
+    blockmodels,
+    aricode
 Collate: 
       'GREMLIN_package.R'
       'BMPOO.R'
