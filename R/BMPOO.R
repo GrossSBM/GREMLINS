@@ -73,9 +73,9 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
                 else{self$namesInd <-  lapply(1:self$Q,function(q){namesInd[[q]]})}
 
                 },
-            estime = function(classif,tau=NULL,maxiterVE=NULL){varEMMBM(self,classif,tau,maxiterVE)},
+            estime = function(classif,tau=NULL, maxiterVE = NULL){varEMMBM(self,classif,tau,maxiterVE)},
             cleanResults = function(R){cleanEstim(self,R)},
-            searchNbClusters = function(classifInit,Kmin,Kmax, nbCores = NULL, verbose = TRUE,maxiterVE = NULL)
+            searchNbClusters = function(classifInit,Kmin,Kmax, nbCores = NULL, verbose = TRUE, maxiterVE = NULL)
             {
               searchKQ(dataR6 = self,classifInit = classifInit,Kmin = Kmin,Kmax = Kmax,nbCores = nbCores,verbose = verbose, maxiterVE = maxiterVE)
             }
@@ -136,7 +136,7 @@ MBMfit$set("public",'sim',
                           X_e <- matrix(rpois(self$v_NQ[fg1] * self$v_NQ[fg2],list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                         gaussian  = {
-                          X_e <- matrix(rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = list_theta_e$sd[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
+                          X_e <- matrix(rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = sqrt(list_theta_e$var[Z_fg1,Z_fg2])),self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                        laplace = {
                           X_e <- matrix(rlaplace(self$v_NQ[fg1] * self$v_NQ[fg2], location = 0, scale = list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])

@@ -10,6 +10,9 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
   #checking the dimensions of matrices and extracting number of indiviuals
   #for a given q functional groups, gives the list of matrix in row or in columns where it plays a role
 
+
+
+
   where_q <- dataR6$where
   n_q <- dataR6$v_NQ
   cardE <- dataR6$cardE
@@ -101,7 +104,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
         list_theta_e <- list()
         list_theta_e$mean <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
         A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
-        list_theta_e$sd <- sqrt(A - list_theta_e$mean^2)
+        list_theta_e$var <-  A - list_theta_e$mean^2
       }
       if (v_distrib[e] == 'laplace') {
           Omega <- list_Mat[[e]]
@@ -129,7 +132,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
 
       tau_old <- tau #useful ?
       #browser()
-      for (q in 1:dataR6$Q)
+        for (q in 1:dataR6$Q)
       {
 
 
@@ -144,11 +147,11 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
             matlist_theta <- list_theta[[l[1]]]
             don <- list_Mat[[l[1]]]
             if (v_distrib[l[1]] == 'bernoulli' ) { Unmdon <- 1 - don }
-            if (v_distrib[l[1]] %in% c('laplace','poisson')) {Unit <- matrix(1,nrow(don),ncol(don))}
+            if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian')) {Unit <- matrix(1,nrow(don),ncol(don))}
             if (qprime < 1)   #if sbm
             {
               if (v_distrib[l[1]] == 'bernoulli' ) {diag(Unmdon) <- 0 }
-              if (v_distrib[l[1]] %in% c('laplace','poisson') ) {diag(Unit) <- 0 }
+              if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian') ) {diag(Unit) <- 0 }
               qprime <- q
             }
             else  # if lbm
@@ -157,17 +160,25 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
               {
                 don <- t(don)
                 if (v_distrib[l[1]] == 'bernoulli' ) {Unmdon <- t(Unmdon) }
-                if (v_distrib[l[1]]  %in% c('laplace','poisson') ) {Unit <- t(Unit) }
-                matlist_theta <- t(matlist_theta)
+                if (v_distrib[l[1]]  %in% c('laplace','poisson','gaussian') ) {Unit <- t(Unit) }
+
+                if (v_distrib[l[1]] == 'gaussian' ) {
+                  matlist_theta <- lapply(matlist_theta,function(theta){t(theta)})
+                }else{
+                    matlist_theta = t(matlist_theta)
+                    }
               }
             }
             #browser()
             #poisson or bernoulli likelihood
             switch(v_distrib[l[1]],
               bernoulli = {lik  = don %*% tcrossprod(tau[[qprime]],log(matlist_theta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta))},
-              poisson = {lik  <- -Unit %*% tcrossprod(tau[[qprime]], matlist_theta) + don %*% tcrossprod(tau[[qprime]],log(matlist_theta))},
-              laplace  = {lik  <- -Unit %*% tcrossprod(tau[[qprime]], log(2 * matlist_theta)) - abs(don) %*% tcrossprod(tau[[qprime]], 1/matlist_theta)}
-            )
+              poisson = {lik  = -Unit %*% tcrossprod(tau[[qprime]], matlist_theta) + don %*% tcrossprod(tau[[qprime]],log(matlist_theta))},
+              laplace  = {lik  = -Unit %*% tcrossprod(tau[[qprime]], log(2 * matlist_theta)) - abs(don) %*% tcrossprod(tau[[qprime]], 1/matlist_theta)},
+              gaussian  = {
+                lik = -0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)
+                }
+                )
 
 
 
@@ -175,12 +186,17 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
             {
               don <- t(don)
               if (v_distrib[l[1]] == 'bernoulli' ) { Unmdon <- t(Unmdon) }
-              if (v_distrib[l[1]]  %in% c('laplace','poisson') ) {Unit <- t(Unit) }
-              matlist_theta <- t(matlist_theta)
+              if (v_distrib[l[1]]  %in% c('laplace','poisson','gaussian') ) {Unit <- t(Unit) }
+              if (v_distrib[l[1]] == 'gaussian' ) {
+                matlist_theta <- lapply(matlist_theta,function(theta){t(theta)})
+              }else{matlist_theta <- t(matlist_theta)}
+
               switch(v_distrib[l[1]],
                 bernoulli = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matlist_theta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta))},
                 poisson =   {lik = lik - Unit %*% tcrossprod(tau[[qprime]], matlist_theta)  +   don %*% tcrossprod(tau[[qprime]],log(matlist_theta))},
-                laplace  =  {lik  <- lik - Unit %*% tcrossprod(tau[[qprime]], log(2 * matlist_theta)) - abs(don) %*% tcrossprod(tau[[qprime]], 1/matlist_theta)}
+                laplace  =  {lik = lik - Unit %*% tcrossprod(tau[[qprime]], log(2 * matlist_theta)) - abs(don) %*% tcrossprod(tau[[qprime]], 1/matlist_theta)},
+                gaussian  = {lik = lik - 0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)
+                }
               )
             }
             return(lik)

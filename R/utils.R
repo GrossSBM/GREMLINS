@@ -172,7 +172,7 @@ readjustTheta <- function(theta,eps, distrib)
     theta[theta < eps] = eps
     theta[theta > 1 - eps] = 1 - eps }
   if (distrib == 'poisson') { theta[theta < eps] = eps }
-  if (distrib == 'gaussian'){ theta$sd[theta$sd < eps] = eps }
+  if (distrib == 'gaussian'){ theta$var[theta$var < eps] = eps }
   if (distrib == 'laplace') { theta[theta < eps] = eps }
   return(theta)
 }
@@ -201,7 +201,7 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
     {
       if (gc == 0)  facteur = 1/2 #sbm sym
       gc = gr
-      if (v_distrib[e] %in% c('poisson','laplace')) {diag(Unit) = 0}
+      if (v_distrib[e] %in% c('poisson','laplace','gaussian')) {diag(Unit) = 0}
       if (v_distrib[e] == 'bernoulli') { diag(Unmdon) <- 0}
     }
     if (v_distrib[e] == 'bernoulli') {
@@ -219,6 +219,13 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
       prov = (tau[[gr]]) %*% log(2 * list_theta[[e]]) %*% t(tau[[gc]])
       prov2 = (tau[[gr]]) %*%  (1 / list_theta[[e]])  %*% t(tau[[gc]])
       return((-sum(Unit * prov) - sum(don * prov2)) * facteur)
+    }
+    if (v_distrib[e] == 'gaussian') {
+      #browser()
+      prov = 0.5 * (tau[[gr]]) %*% (log(2 * pi * list_theta[[e]]$var) + list_theta[[e]]$mean^2/list_theta[[e]]$var) %*% t(tau[[gc]])
+      prov2 = 0.5 * (tau[[gr]]) %*%  (1 / list_theta[[e]]$var)  %*% t(tau[[gc]])
+      prov3  = (tau[[gr]]) %*%  (list_theta[[e]]$mean/list_theta[[e]]$var)  %*% t(tau[[gc]])
+      return((-sum(Unit * prov) - sum(don^2 * prov2) + sum(don  * prov3)) * facteur)
     }
 
   }
@@ -278,6 +285,7 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
 distListTheta <- function(list_theta,list_thetaOld)
 {
   Q <- length(list_theta)
+  browser()
   v_dis <- sapply(1:Q,function(q){
     return(sqrt(sum(as.vector(unlist(list_theta[[q]]) - unlist(list_thetaOld[[q]]))^2)))
   })
