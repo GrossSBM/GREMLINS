@@ -1,4 +1,4 @@
-searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, verbose = TRUE, maxiterVE = NULL){
+searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, verbose = TRUE, maxiterVE = NULL, maxiterVEM = NULL){
   #
 
 
@@ -6,11 +6,13 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
 
   os <- Sys.info()["sysname"]
   if ((os != 'Windows') & (is.null(nbCores))) {nbCores <- detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
+  if (os  == "Windows") {nbCores = 1}
+
 
   #------
   vKinit = calcVK(classifInit)
   if (length(vKinit) != dataR6$Q) { stop('Length of vKinit incorrect') }
-  if (verbose) { print(paste("Searching the numbers of blocks starting from",paste(as.character(vKinit),collapse = " "),"clusters",sep = " "))}
+  if (verbose) { print(paste(" ------ Searching the numbers of blocks starting from [",paste(as.character(vKinit),collapse = " "),"] clusters",sep = " "))}
 
 
   #----------------------   Initialisation of the algorithm
@@ -18,7 +20,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
   ICL.c <- -Inf;
   classifC <- classifInit;
   classifNew <- classifC
-  estimNew <- dataR6$estime(classifInit,maxiterVE);
+  estimNew <- dataR6$estime(classifInit,maxiterVE = maxiterVE, maxiterVEM = maxiterVEM);
 
 
   paramNew <- estimNew$paramEstim
@@ -33,15 +35,21 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
 
   estimNew$paramEstim$Z = classifNew
   ICLNew <- estimNew$ICL
+  if( !estimNew$convergence){ ICLNewprint = -Inf}else{ ICLNewprint <- ICLNew }
 
   if (verbose) {
     mess <- paste(round(c(calcVK(classifNew))),collapse = " " )
-    print(paste("ICL :",round(ICLNew,2),". Nb of clusters: ", mess,sep = " "))
+    mess <- paste("ICL :",round(ICLNewprint,2),". Nb of clusters: [", mess, "]",sep = " ")
+    if (!estimNew$convergence){
+      mess = paste(mess,". Convergence was not reached here.")
+    }
+    print(mess)
   }
 
   vec.ICL = ICLNew
   RES = list()
   RES[[niterSearch + 1]] <- estimNew;
+
   #----------------------------------------------  ALGORITHM
   while ((ICLNew > ICL.c) & (niterSearch < 1000)) {
     #
@@ -57,18 +65,19 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
     L = length(list_classif_init)
 
 
-    if (os == "Windows") {
-      allEstim <- lapply(1:L,function(l){
+    #if (os == "Windows") {
+    #  allEstim <- lapply(1:L,function(l){
         #print(l);
-        estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE)})
-    }else{
-      allEstim <- mclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE)},mc.cores = nbCores)
-    }
+    #    estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
+    #}else{
+      allEstim <- mclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+     # allEstim <- pbmcmapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+
 
 
 
     all_estim <- dataR6$cleanResults(allEstim)
-    ICLNew <- all_estim[[1]]$ICL
+    if (length(all_estim) > 0){ICLNew <- all_estim[[1]]$ICL}else{ICLNew = -Inf}
     vec.ICL <- c(vec.ICL,ICLNew)
 
     if (ICLNew > ICL.c) {
@@ -83,7 +92,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
       classifNew <- paramNew$Z
       if (verbose) {
         mess <- paste(round(c(calcVK(classifNew))),collapse = " " )
-        print(paste("ICL :",round(ICLNew,2),". Nb of clusters: ", mess,sep = " "))
+        print(paste("ICL :",round(ICLNew,2),". Nb of clusters: [", mess,"]",sep = " "))
       }
     }
 

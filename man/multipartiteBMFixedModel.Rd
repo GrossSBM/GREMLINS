@@ -4,8 +4,15 @@
 \alias{multipartiteBMFixedModel}
 \title{Model selection and estimation of multipartite blockmodels}
 \usage{
-multipartiteBMFixedModel(list_Net, v_distrib, namesFG, v_K = NULL,
-  classifInit = NULL, nbCores = NULL, maxiterVE = NULL)
+multipartiteBMFixedModel(
+  list_Net,
+  v_distrib,
+  namesFG,
+  v_K = NULL,
+  classifInit = NULL,
+  nbCores = NULL,
+  maxiterVE = NULL
+)
 }
 \arguments{
 \item{list_Net}{A list of network (defined via the function DefineNetwork)}

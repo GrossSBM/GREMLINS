@@ -2,7 +2,7 @@
 #initialization provides a first classification and corresponding tau
 #method can be random, CAH, given in which case add given classif
 
-varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
+varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiterVEM = NULL)
   #data :  coll_interaction type object
   #classif  : liste de classifications (Z) au sein des groupes fonctionnels fg (de longueur Q )
 
@@ -28,7 +28,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
   valStopCrit <- 1e-6
 
 
-  #browser()
+
   ##  initialisation
   v_K <- calcVK(classifInit)
   tau <- tauInit
@@ -50,8 +50,9 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
 
 
   #entering VEM
-  if (is.null(maxiterVE)) { maxiterVE = 100}
-  maxiter <- 1000
+  if (is.null(maxiterVE)) { maxiterVE = 1000}
+  if (is.null(maxiterVEM)) { maxiterVEM  =  1000}
+  maxiter <- maxiterVEM
   stopcrit <- 0
   iterVEM <- 0
 
@@ -63,8 +64,13 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
     gr <- matE[e,1]
     gc <- matE[e,2]
     if (gc < 1) gc <- gr
-    return(matrix(Inf,v_K[gr],v_K[gc]))
-  })
+    if (v_distrib[e] == 'gaussian') {
+      return(list(mean=matrix(Inf,v_K[gr],v_K[gc]), var = matrix(Inf,v_K[gr],v_K[gc])))
+    }else{
+      return(matrix(Inf,v_K[gr],v_K[gc]))
+    }
+    }
+    )
 
 
 
@@ -72,6 +78,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
   ######################
   # Algo begins
   #####################
+  no.convergence = 0;
   while (iterVEM < maxiter & stopcrit == 0)
   {
     iterVEM <- iterVEM + 1
@@ -84,8 +91,6 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
     list_theta  = lapply(1:cardE,function(e){
       gr <- matE[e,1]
       gc <- matE[e,2]
-
-
       if (gc < 1) {  #for sbm sym or notsym
         gc <- gr
         #useful matrix
@@ -96,8 +101,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
         Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
       }
 
-      #bernoulli or poisson distribution same expression for M step
-      if (v_distrib[e] %in% c('poisson','bernoulli')) {
+      if (v_distrib[e] %in% c('poisson','bernoulli')) { #bernoulli or poisson distribution same expression for M step
         list_theta_e <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
       }
       if (v_distrib[e] == 'gaussian') {
@@ -126,21 +130,21 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
     #--------------------------------   VE step : boucle
     iterVE <- 0
     stopVE <- 0
+
     while ((iterVE < maxiterVE) & (stopVE == 0))
     {
       #VE step
 
       tau_old <- tau #useful ?
-      #browser()
+
         for (q in 1:dataR6$Q)
-      {
-
-
-        if (v_K[q] == 1) { tau[[q]] = matrix(1,ncol  = 1,nrow = n_q[q])}
-        else{
+          {
+          #----------------------------------------------------------------
+          if (v_K[q] == 1) { tau[[q]] = matrix(1,ncol  = 1,nrow = n_q[q])
+          }else{
+          #----------------------------------------------------------------
           w_q <- where_q[[q]]
-          der <- lapply(as.list(as.data.frame(t(w_q))),function(l)
-            {
+          der <- lapply(as.list(as.data.frame(t(w_q))),function(l){
             second_index <- matE[l[1],ifelse(l[2] == 1,2,1)]
             qprime <- second_index
 
@@ -148,37 +152,30 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
             don <- list_Mat[[l[1]]]
             if (v_distrib[l[1]] == 'bernoulli' ) { Unmdon <- 1 - don }
             if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian')) {Unit <- matrix(1,nrow(don),ncol(don))}
+            #------------
             if (qprime < 1)   #if sbm
             {
               if (v_distrib[l[1]] == 'bernoulli' ) {diag(Unmdon) <- 0 }
               if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian') ) {diag(Unit) <- 0 }
               qprime <- q
-            }
-            else  # if lbm
-            {
+            }else{ # if lbm
               if (l[2] == 2) #functional group q at stake in rows
               {
                 don <- t(don)
                 if (v_distrib[l[1]] == 'bernoulli' ) {Unmdon <- t(Unmdon) }
                 if (v_distrib[l[1]]  %in% c('laplace','poisson','gaussian') ) {Unit <- t(Unit) }
-
-                if (v_distrib[l[1]] == 'gaussian' ) {
-                  matlist_theta <- lapply(matlist_theta,function(theta){t(theta)})
-                }else{
-                    matlist_theta = t(matlist_theta)
-                    }
+                if (v_distrib[l[1]] == 'gaussian' ) {matlist_theta <- lapply(matlist_theta,function(theta){t(theta)})}else{matlist_theta = t(matlist_theta)}
               }
+            #------------
             }
-            #browser()
+
             #poisson or bernoulli likelihood
             switch(v_distrib[l[1]],
               bernoulli = {lik  = don %*% tcrossprod(tau[[qprime]],log(matlist_theta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta))},
               poisson = {lik  = -Unit %*% tcrossprod(tau[[qprime]], matlist_theta) + don %*% tcrossprod(tau[[qprime]],log(matlist_theta))},
               laplace  = {lik  = -Unit %*% tcrossprod(tau[[qprime]], log(2 * matlist_theta)) - abs(don) %*% tcrossprod(tau[[qprime]], 1/matlist_theta)},
-              gaussian  = {
-                lik = -0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)
-                }
-                )
+              gaussian  = {lik = -0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)}
+            )
 
 
 
@@ -214,19 +211,18 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
           temp2[temp2 < eps] <- eps
           temp2[temp2 > (1 - eps)] <- 1 - eps
           temp2 <- temp2/rowSums(temp2)
-          #if (any(is.na(temp2))) { browser()}
-          #if (any(is.infinite(temp2))) { browser()}
+
 
           tau[[q]] <- temp2
 
 
         }
-        #if (any(dim(tau[[q]]) != dim(tau_old[[q]]))) { browser()}
+
       }
       iterVE <- iterVE + 1
       if (distTau(tau,tau_old) < valStopCrit)   stopVE <- 1
 
-      if (iterVE == maxiterVE) { warning(paste("Maximum number of VE iterations reached for model ", v_K,sep = ' ' ))}
+      if (iterVE == maxiterVE) {no.convergence = no.convergence + 1}; # warning(paste("Maximum number of VE iterations reached for model with v_K=", v_K,sep = ' ' ))}
 
     }#-------------------- END of VE Step
 
@@ -236,6 +232,10 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
     vJ[iterVEM] <- pseudolik$condLik + pseudolik$margLik + pseudolik$entr
   } # ------------ end of EM var
 
+  # convergence
+  if (iterVEM == maxiterVEM) {no.convergence = no.convergence + 1}
+
+
   #computing ICL
   likICL <- compLikICLInt(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
 
@@ -244,6 +244,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit=NULL, maxiterVE = NULL)
   paramEstim   <- MBMfit$new(v_K = v_K, v_distrib = v_distrib, list_pi = list_pi,list_theta = list_theta);
   paramEstim$tau <- tau
   vJ <- vJ[1:iterVEM]
-  return(list(paramEstim = paramEstim,ICL = ICL,vJ = vJ))
+  #if (iterVEM == maxiter) { warning(paste("Maximum number of VEM iterations reached for model with v_K=", v_K,sep = ' ' ))}
+  return( list(paramEstim = paramEstim,ICL = ICL,vJ = vJ, convergence = (no.convergence == 0)))
 }
 

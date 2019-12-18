@@ -4,9 +4,20 @@
 \alias{multipartiteBM}
 \title{Model selection and parameter estimation of MBM}
 \usage{
-multipartiteBM(list_Net, v_distrib = NULL, namesFG = NULL,
-  v_Kmin = 1, v_Kmax = 10, v_Kinit = NULL, initBM = FALSE,
-  save = FALSE, verbose = TRUE, nbCores = NULL, maxiterVE = NULL)
+multipartiteBM(
+  list_Net,
+  v_distrib = NULL,
+  namesFG = NULL,
+  v_Kmin = 1,
+  v_Kmax = 10,
+  v_Kinit = NULL,
+  initBM = TRUE,
+  save = FALSE,
+  verbose = TRUE,
+  nbCores = NULL,
+  maxiterVE = NULL,
+  maxiterVEM = NULL
+)
 }
 \arguments{
 \item{list_Net}{A list of networks (defined via the function defineNetwork) i.e. multipartite networks}
@@ -25,7 +36,7 @@ v_Kmin can be a single value (same minimal number of blocks for all the FGs) or 
 If v_Kmin is not specified,  v_Kmin = 1.}
 
 \item{v_Kinit}{A vector of initial number of blocks per functional group provided in the same order as in namesFG.
-if v_Kinit is not specified, then several initialisations will be used :  v_Kinit = v_Kmin, and v_Kinit = floor((v_Kmax + v_Kmin)/2)}
+if v_Kinit is not specified, then   v_Kinit = v_Kmin}
 
 \item{initBM}{If initBM   =  TRUE, then an aditional initialisation is done using simple LBM or SBM on each network separatly. The default value is FALSE}
 

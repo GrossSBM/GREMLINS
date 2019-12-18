@@ -75,7 +75,7 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
 
 
   #----------------------   Initialisation of the algorithm
-  estim0 <- dataR6$estime(classifInit,maxiterVE = maxiterVE);
+  estim0 <- dataR6$estime(classifInit,maxiterVE = maxiterVE, maxiterVEM = maxiterVEM);
   param0 <- estim0$paramEstim
   classif0 <- lapply(1:dataR6$Q,
     function(q){
@@ -103,9 +103,9 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
 
 
   if (os == "Windows") {
-    allEstimForward <- lapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
+    allEstimForward <- lapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE,  maxiterVEM = maxiterVEM)})
   }else{
-    allEstimForward <- mclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
+    allEstimForward <- mclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
 
 
@@ -121,9 +121,9 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
 
 
   if (os == "Windows") {
-    allEstimBackward <- lapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
+    allEstimBackward <- lapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
   }else{
-    allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
+    allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
 
   allEstimBackward = dataR6$cleanResults(allEstimBackward)
@@ -140,9 +140,9 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
   qForward <- which(paramNew.forward$v_K != v_K)
   initForward <- mergeClassif(classifNew.forward,qForward,1)
   if (os == "Windows") {
-    lastEstimForward <- lapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
+    lastEstimForward <- lapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
   }else{
-    lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
+    lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
 
 
@@ -157,9 +157,9 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
   qBackward <- which(paramNewBackward$v_K != v_K)
   initBackward <- splitClassif(classifNewBackward,qBackward,dataR6,100)
   if (os == "Windows") {
-    lastEstimBackward <- lapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)})
+    lastEstimBackward <- lapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
   }else{
-    lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE)},mc.cores = nbCores)
+    lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
 
 

@@ -13,7 +13,7 @@
 #'              v_Kmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
 #'              If v_Kmin is not specified,  v_Kmin = 1.
 #' @param v_Kinit A vector of initial number of blocks per functional group provided in the same order as in namesFG.
-#'               if v_Kinit is not specified, then several initialisations will be used :  v_Kinit = v_Kmin, and v_Kinit = floor((v_Kmax + v_Kmin)/2)
+#'               if v_Kinit is not specified, then   v_Kinit = v_Kmin
 #' @param initBM If initBM   =  TRUE, then an aditional initialisation is done using simple LBM or SBM on each network separatly. The default value is FALSE
 #' @param save Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput
 #' @param verbose Set to TRUE to display the current step of the search algorithm
@@ -39,8 +39,10 @@
 #' res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
 #' @export
 
-multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = FALSE , save=FALSE , verbose = TRUE,nbCores = NULL, maxiterVE = NULL)
+multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = TRUE , save=FALSE , verbose = TRUE,nbCores = NULL, maxiterVE = NULL , maxiterVEM = NULL)
 {
+
+  if ( all(v_Kmin == v_Kmax)) {stop('v_Kmin = v_Kmax. Use the function "multipartiteBMFixedModel" instead')}
 
 
   #----------------- Formatting the data ---
@@ -56,6 +58,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
 
     print("------------Probability distributions on each network--------------")
     print(v_distrib)
+    print("-------------------------------------------------------------------")
   }
 
   #------------------- Check the order of names_FG
@@ -98,6 +101,12 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   if (length(v_Kmin) == 1) {v_Kmin = rep(v_Kmin,dataR6$Q)} else {if (length(v_Kmin) != dataR6$Q) {stop("Lower bounds on v_K are not of the adequate size")}}
   if (length(v_Kmax) == 1) {v_Kmax = rep(v_Kmax,dataR6$Q)} else {if (length(v_Kmax) != dataR6$Q) {stop("Upper bounds on v_K are not of the adequate size")}}
 
+  if (dataR6$Q >1) {
+    if (length(v_Kinit) != dataR6$Q) {
+      print("v_Kinit was not of the adequate size. The given value has not been taken into account");
+      v_Kinit = NULL}
+  }
+
   for (q in 1:dataR6$Q)
   {
     if (v_Kmax[q] > dataR6$v_NQ[q])
@@ -111,8 +120,8 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   #------------------------  Initial values for the number of the  numbers  of clusters VK
   if (is.null(v_Kinit)) {
     v_Kinit_list <- list(v_Kmin)
-    v_Kmean <- floor((v_Kmax + v_Kmin)/2)
-    if (any(v_Kmean != v_Kmin)) { v_Kinit_list[[2]] <- v_Kmean }
+    #v_Kmean <- floor((v_Kmax + v_Kmin)/2)
+    #if (any(v_Kmean != v_Kmin)) { v_Kinit_list[[2]] <- v_Kmean }
   }else{v_Kinit_list <- list(v_Kinit)}
 
 
@@ -124,7 +133,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
 
   paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]],v_distrib = dataR6$v_distrib)
   classifInit = initialize(dataR6,paramInit,method = "CAH")$groups
-  R = dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE)
+  R = dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)
   indInit = 1
   collectionTestedClassifInit[[indInit]] <-  classifInit
 
@@ -135,7 +144,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
     classifInit = initialize(dataR6,paramInit,method = "CAH")$groups
     indInit <- indInit +  1
     collectionTestedClassifInit[[indInit]] = classifInit
-    R <- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE))
+    R <- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,  maxiterVEM = maxiterVEM))
   }
 
   indInit <- length(collectionTestedClassifInit)
@@ -151,7 +160,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
 
       lapply(1:dataR6$cardE, function(e){
         if (dataR6$typeInter[e] == "inc") { indFG = dataR6$E[e,]} else {indFG = dataR6$E[e,1]}
-        estim = multipartiteBM(list(list_Net[[e]]),namesFG = dataR6$namesFG[indFG] ,  v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG] ,v_Kmax = v_Kmax[indFG] ,v_Kinit = v_Kmin[indFG],  initBM = FALSE, verbose = FALSE, maxiterVE = maxiterVE)
+        estim = multipartiteBM(list(list_Net[[e]]),namesFG = dataR6$namesFG[indFG] ,  v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG] ,v_Kmax = v_Kmax[indFG] ,v_Kinit = v_Kmin[indFG],  initBM = FALSE, verbose = FALSE, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)
         if (dataR6$typeInter[e] == "inc")
         {
           list_classifInitBM[[dataR6$E[e,1]]] <<- c(list_classifInitBM[[dataR6$E[e,1]]],list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
@@ -179,7 +188,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
     if (length(collectionTestedClassifInit) > indRef) {
       for (i in (indRef + 1):length(collectionTestedClassifInit))
       {
-         R <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE))
+         R <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM))
       }
     }
 
@@ -200,8 +209,8 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   ############### PRINT RESULT#######################
   if (verbose) {
     mess <- paste(res[[1]]$paramEstim$v_K,collapse = " " )
-    mess <- paste("Best model------ ICL :",round(res[[1]]$ICL,2),". Nb of clusters: ", mess,sep = " ")
-    mess <- paste(mess, "for",paste(dataR6$namesFG,collapse = " , " ),"respectively",sep = ' ')
+    mess <- paste("Best model------ ICL :",round(res[[1]]$ICL,2),". Nb of clusters: [", mess,"]",sep = " ")
+    mess <- paste(mess, "for [",paste(dataR6$namesFG,collapse = " , " ),"] respectively",sep = ' ')
     print(mess)
   }
 

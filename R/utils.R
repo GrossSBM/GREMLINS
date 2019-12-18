@@ -193,7 +193,7 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
     gc = matE[e,2]
     don = list_Mat[[e]]
     if (v_distrib[e] == 'bernoulli') {Unmdon = 1 - don}
-    if (v_distrib[e]  %in% c('poisson','laplace')) { Unit = matrix(1,nrow = nrow(don),ncol = ncol(don))}
+    if (v_distrib[e]  %in% c('poisson','laplace','gaussian')) { Unit = matrix(1,nrow = nrow(don),ncol = ncol(don))}
 
     facteur = 1
 
@@ -284,9 +284,9 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
 #distance between l_theta
 distListTheta <- function(list_theta,list_thetaOld)
 {
-  Q <- length(list_theta)
-  browser()
-  v_dis <- sapply(1:Q,function(q){
+  nQ <- length(list_theta)
+
+  v_dis <- sapply(1:nQ,function(q){
     return(sqrt(sum(as.vector(unlist(list_theta[[q]]) - unlist(list_thetaOld[[q]]))^2)))
   })
   return(sum(v_dis))
@@ -359,6 +359,16 @@ distListTheta <- function(list_theta,list_thetaOld)
 ##############################################################################################################
 
 cleanEstim <- function(dataR6,R){
+
+  #### remove non convergent models
+  conv <- which(sapply(R ,function(u){u$convergence}))
+  if (length(conv) != length(R)){
+    Rconv <- lapply(conv,function(l){R[[l]]})
+  }else{
+    Rconv <- R
+  }
+  R <- Rconv;
+
 
 
   ### first  : for equal model keep the estimate wit the highest J

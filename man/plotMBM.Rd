@@ -4,8 +4,14 @@
 \alias{plotMBM}
 \title{Plot the mesoscopic view  of the estimated MBM}
 \usage{
-plotMBM(resMBM, whichModel = 1, mycol = NULL, thres = 0.01,
-  cex = 1, maxCurved = 3)
+plotMBM(
+  resMBM,
+  whichModel = 1,
+  mycol = NULL,
+  thres = 0.01,
+  cex = 1,
+  maxCurved = 3
+)
 }
 \arguments{
 \item{resMBM}{A fitted Generalized BlockModel}

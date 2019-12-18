@@ -4,8 +4,17 @@
 \alias{rMBM}
 \title{Simulate datasets from  multipartite block  models}
 \usage{
-rMBM(v_NQ, E, typeInter, v_distrib, list_pi, list_theta, namesFG = NULL,
-  keepClassif = FALSE, seed = NULL)
+rMBM(
+  v_NQ,
+  E,
+  typeInter,
+  v_distrib,
+  list_pi,
+  list_theta,
+  namesFG = NULL,
+  keepClassif = FALSE,
+  seed = NULL
+)
 }
 \arguments{
 \item{v_NQ}{: number of individual in each Functional Group (FG)}
