@@ -102,8 +102,9 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   if (length(v_Kmax) == 1) {v_Kmax = rep(v_Kmax,dataR6$Q)} else {if (length(v_Kmax) != dataR6$Q) {stop("Upper bounds on v_K are not of the adequate size")}}
 
   if (dataR6$Q >1) {
-    if (length(v_Kinit) != dataR6$Q) {
+    if (!is.null(v_Kinit) &  (length(v_Kinit) != dataR6$Q)) {
       print("v_Kinit was not of the adequate size. The given value has not been taken into account");
+      print("-------------------------------------------------------------------")
       v_Kinit = NULL}
   }
 
