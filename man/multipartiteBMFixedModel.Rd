@@ -11,7 +11,9 @@ multipartiteBMFixedModel(
   v_K = NULL,
   classifInit = NULL,
   nbCores = NULL,
-  maxiterVE = NULL
+  maxiterVE = NULL,
+  maxiterVEM = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -26,9 +28,13 @@ Must give a vector whose length is the number of networks in list_Net}
 
 \item{classifInit}{A list of initial classification for each functional group in the same order as in namesFG}
 
-\item{nbCores}{Number of cores used for estimation}
+\item{nbCores}{Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores}
 
-\item{maxiterVE}{Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100}
+\item{maxiterVE}{Maximum number of iterations in the VE step of the VEM algorithm. Default value  = 1000}
+
+\item{maxiterVEM}{Maximum number of iterations of the VEM algorithm. Default value  = 1000}
+
+\item{verbose}{Set to TRUE to display the current step of the search algorithm}
 }
 \value{
 Estimated parameters and a classification

@@ -8,8 +8,11 @@
 #' @param namesFG Names of functional groups (must correspond to names in listNet)
 #' @param v_K A vector with the numbers of blocks per functional group
 #' @param classifInit A list of initial classification for each functional group in the same order as in namesFG
-#' @param nbCores Number of cores used for estimation
-#' @param maxiterVE  Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100
+#' @param verbose Set to TRUE to display the current step of the search algorithm
+#' @param nbCores Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores
+#' @param maxiterVE  Maximum number of iterations in the VE step of the VEM algorithm. Default value  = 1000
+#' @param maxiterVEM  Maximum number of iterations of the VEM algorithm. Default value  = 1000
+
 #' @return Estimated parameters and a classification
 #' @examples
 #' v_K <- c(3,2,2)
@@ -30,7 +33,7 @@
 #' @export
 
 
-multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  classifInit = NULL, nbCores = NULL, maxiterVE = NULL){
+multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  classifInit = NULL, nbCores = NULL, maxiterVE = NULL, maxiterVEM = NULL,verbose = TRUE){
 
 
 
@@ -41,8 +44,8 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
 
 
   os <- Sys.info()["sysname"]
-  if ((os != 'Windows') & (is.null(nbCores))) {nbCores = detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
-
+  if ((os != 'Windows') & (is.null(nbCores))) {nbCores <- detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
+  if (os  == "Windows") {nbCores = 1}
 
 
   # Check names FG and permute ----------------------------------------------
@@ -102,11 +105,14 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
   for (q in 1:dataR6$Q) { list_ClassifInitForward <- do.call(c,list(list_ClassifInitForward,Func_Forward_q(q)))}
 
 
-  if (os == "Windows") {
-    allEstimForward <- lapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE,  maxiterVEM = maxiterVEM)})
+  if (verbose) {
+      mess <- '====================== First Forward Step =================='
+      print(mess)
+    allEstimForward <- pbmcapply::pbmclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }else{
     allEstimForward <- mclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
+
 
 
   allEstimForward = dataR6$cleanResults(allEstimForward)
@@ -120,8 +126,11 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
   for (q in 1:dataR6$Q) { list_ClassifInitBackward <- do.call(c,list(list_ClassifInitBackward,Func_Backward_q(q)))}
 
 
-  if (os == "Windows") {
-    allEstimBackward <- lapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
+  if (verbose) {
+    mess <- '====================== First Backward Step =================='
+    print(mess)
+
+    allEstimBackward <- pbmcapply::pbmclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }else{
     allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
@@ -139,8 +148,11 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
 
   qForward <- which(paramNew.forward$v_K != v_K)
   initForward <- mergeClassif(classifNew.forward,qForward,1)
-  if (os == "Windows") {
-    lastEstimForward <- lapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
+  if (verbose) {
+    mess <- '====================== Last Forward Step =================='
+    print(mess)
+
+    lastEstimForward <- pbmcapply::pbmclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }else{
     lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
@@ -156,8 +168,10 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
 
   qBackward <- which(paramNewBackward$v_K != v_K)
   initBackward <- splitClassif(classifNewBackward,qBackward,dataR6,100)
-  if (os == "Windows") {
-    lastEstimBackward <- lapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
+  if (verbose) {
+    mess <- '====================== Last Backward Step =================='
+    print(mess)
+    lastEstimBackward <- pbmcapply::pbmclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }else{
     lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
   }
@@ -169,11 +183,9 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  cl
   for (j in 1:length(lastEstimBackward)) {allEstim[[j + length(lastEstimForward)  + 1  ]] = lastEstimBackward[[j]]}
 
 
-  #browser()
   allEstim <- dataR6$cleanResults(allEstim)
   res <- allEstim[[1]]
 
-  #garde t on Z ?
   res$paramEstim$Z <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(res$paramEstim$tau[[q]]);
   Z_q <- match(Z_q, unique(sort(Z_q)))
   names(Z_q) <- dataR6$namesInd[[q]]; return(Z_q)})

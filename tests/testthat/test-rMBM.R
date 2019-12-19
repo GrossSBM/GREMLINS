@@ -15,7 +15,7 @@ list_theta[[3]] <- matrix(rnorm(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3
 list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 list_theta[[4]] <- list()
 list_theta[[4]]$mean <- matrix(rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
-list_theta[[4]]$sd <- matrix(rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
+list_theta[[4]]$var <- matrix(rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 ),nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
 v_NQ = c(100,50,40)
 dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, namesFG = c('A','B','C'),keepClassif = TRUE)
 list_Net <- dataSim$list_Net

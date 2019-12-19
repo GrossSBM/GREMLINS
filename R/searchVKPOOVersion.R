@@ -35,7 +35,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
 
   estimNew$paramEstim$Z = classifNew
   ICLNew <- estimNew$ICL
-  if( !estimNew$convergence){ ICLNewprint = -Inf}else{ ICLNewprint <- ICLNew }
+  if (!estimNew$convergence){ ICLNewprint = -Inf}else{ ICLNewprint <- ICLNew }
 
   if (verbose) {
     mess <- paste(round(c(calcVK(classifNew))),collapse = " " )
@@ -65,15 +65,12 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
     L = length(list_classif_init)
 
 
-    #if (os == "Windows") {
-    #  allEstim <- lapply(1:L,function(l){
-        #print(l);
-    #    estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
-    #}else{
+
+    if (verbose) {
+      allEstim <- pbmcapply::pbmclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }else{
       allEstim <- mclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
-     # allEstim <- pbmcmapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
-
-
+    }
 
 
     all_estim <- dataR6$cleanResults(allEstim)
@@ -86,6 +83,8 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
       estimNew$paramEstim$Z <- lapply(1:dataR6$Q,function(q){Z_q <- max.col(estimNew$paramEstim$tau[[q]]);
       Z_q = match(Z_q, unique(sort(Z_q)))
       names(Z_q) <- dataR6$namesInd[[q]]; return(Z_q)})
+
+      names(estimNew$paramEstim$Z) = dataR6$namesFG;
 
       RES[[niterSearch + 1]] <- estimNew;
       paramNew <- estimNew$paramEstim

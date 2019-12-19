@@ -46,7 +46,9 @@ if v_Kinit is not specified, then   v_Kinit = v_Kmin}
 
 \item{nbCores}{Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores}
 
-\item{maxiterVE}{Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100}
+\item{maxiterVE}{Maximum number of iterations in the VE step of the VEM algorithm. Default value  = 1000}
+
+\item{maxiterVEM}{Maximum number of iterations of the VEM algorithm. Default value  = 1000}
 }
 \value{
 a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1

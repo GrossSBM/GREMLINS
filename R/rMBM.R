@@ -1,13 +1,15 @@
-#' Simulate datasets from  multipartite block  models
+#' Simulate datasets from  the multipartite block  model (MBM).
+#'
+#' \code{rMBM} simulates a collection of networks involving common functional groups of entities. The networks may be directed, undirected or bipartite. See the vignette for more information about the model
 #'
 #' @param  v_NQ : number of individual in each Functional Group (FG)
 #' @param  E : define the architecture of the Multipartite.
 #' @param  typeInter : type of interaction in each network: undirected adjacency (adj), directed adjacency (diradj) or incidence (inc).  (vector of size equal to nrow(E) )
 #' @param  v_distrib : vector of the distributions  (bernoulli, poisson, gaussian or laplace for each network) ( vector of size equal to nrow(E) )
 #' @param  list_pi  : parameters of the blocks distribution
-#' @param  list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and sd, for Laplace a list with location and scale
-#' @param namesFG : names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)
-#' @param keepClassif : equal to TRUE if you want to keep the simulated blocks/classification (default value  = FALSE).
+#' @param  list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and var, for Laplace a list with location and scale
+#' @param  namesFG : names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)
+#' @param  keepClassif : equal to TRUE if you want to keep the simulated blocks/classification (default value  = FALSE).
 #' @param  seed : set the seed for the random simulation (default value  = NULL)
 #' @return A list of lists containing the networks (list_net) and if keepClassif = TRUE the classifications (classif)
 #'         Each element of  list_net corresponds to a network : each network is a list containing  the matrix (mat) , the type of network(diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
@@ -30,12 +32,14 @@
 #' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 #' list_theta[[4]] <- list()
 #' theta4_mean <- rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
-#' theta4_sd <- rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
+#' theta4_var <- rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
 #' list_theta[[4]]$mean <- matrix(theta4_mean,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
-#' list_theta[[4]]$sd <- matrix(theta4_sd,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
+#' list_theta[[4]]$var <- matrix(theta4_var,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
 #' v_NQ <-  c(100,50,40)
 #' namesFG <-  c('A','B','C')
-#' dataSim <- rMBM(v_NQ = v_NQ , E = E , typeInter = typeInter, v_distrib = v_distrib, list_pi = list_pi, list_theta = list_theta, namesFG)
+#' dataSim <- rMBM(v_NQ = v_NQ , E = E , typeInter = typeInter,
+#'                 v_distrib = v_distrib, list_pi = list_pi,
+#'                 list_theta = list_theta, namesFG)
 #' list_net <- dataSim$list_net
 #' classifTrue <- dataSim$classif
 #' @export
@@ -44,7 +48,6 @@
 rMBM <- function(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, namesFG= NULL, keepClassif = FALSE, seed=NULL){
 
   #####
-  #browser()
   n_FG <- length(v_NQ)
   if (is.null(namesFG)) {namesFG <- vapply(1:n_FG,function(i){paste('FG',i,sep = '')},'FG1')}
   if (length(namesFG) != n_FG) {stop("Unmatching number of functional group names")}

@@ -12,7 +12,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
 
 
 
-
+  namesFG <- dataR6$namesFG
   where_q <- dataR6$where
   n_q <- dataR6$v_NQ
   cardE <- dataR6$cardE
@@ -242,7 +242,14 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
  ICL <-  likICL$condLik + likICL$margLik - 1/2 * likICL$pen
 
   paramEstim   <- MBMfit$new(v_K = v_K, v_distrib = v_distrib, list_pi = list_pi,list_theta = list_theta);
+  names(paramEstim$list_pi) = namesFG
+
+  names_mat <- sapply(1:nrow(dataR6$E),function(e){paste(namesFG[dataR6$E[e,1]],namesFG[dataR6$E[e,2]],sep='')})
+  names(paramEstim$list_theta) = names_mat
+
   paramEstim$tau <- tau
+  names(paramEstim$tau) = namesFG
+
   vJ <- vJ[1:iterVEM]
   #if (iterVEM == maxiter) { warning(paste("Maximum number of VEM iterations reached for model with v_K=", v_K,sep = ' ' ))}
   return( list(paramEstim = paramEstim,ICL = ICL,vJ = vJ, convergence = (no.convergence == 0)))

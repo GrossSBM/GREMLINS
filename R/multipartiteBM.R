@@ -18,7 +18,8 @@
 #' @param save Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput
 #' @param verbose Set to TRUE to display the current step of the search algorithm
 #' @param nbCores Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores
-#' @param maxiterVE  Maximum number of iterations if the VE step of the VEM algorithm. By default  = 100
+#' @param maxiterVE  Maximum number of iterations in the VE step of the VEM algorithm. Default value  = 1000
+#' @param maxiterVEM  Maximum number of iterations of the VEM algorithm. Default value  = 1000
 #' @return a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1
 #' @examples
 #' v_K <- c(3,2,2)
@@ -204,6 +205,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   res <- dataR6$cleanResults(R) # remove models that have been estimated twice or more to keep the estimation with the better J
 
   lapply(1:length(res),function(k){names(res[[k]]$paramEstim$v_K) <<- namesFG})
+
 
 
 

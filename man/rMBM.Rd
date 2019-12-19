@@ -2,7 +2,7 @@
 % Please edit documentation in R/rMBM.R
 \name{rMBM}
 \alias{rMBM}
-\title{Simulate datasets from  multipartite block  models}
+\title{Simulate datasets from  the multipartite block  model (MBM).}
 \usage{
 rMBM(
   v_NQ,
@@ -27,7 +27,7 @@ rMBM(
 
 \item{list_pi}{: parameters of the blocks distribution}
 
-\item{list_theta}{: parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and sd, for Laplace a list with location and scale}
+\item{list_theta}{: parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and var, for Laplace a list with location and scale}
 
 \item{namesFG}{: names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)}
 
@@ -40,7 +40,7 @@ A list of lists containing the networks (list_net) and if keepClassif = TRUE the
         Each element of  list_net corresponds to a network : each network is a list containing  the matrix (mat) , the type of network(diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
 }
 \description{
-Simulate datasets from  multipartite block  models
+\code{rMBM} simulates a collection of networks involving common functional groups of entities. The networks may be directed, undirected or bipartite. See the vignette for more information about the model
 }
 \examples{
 n_FG <- 3  #number of functional groups
@@ -61,12 +61,14 @@ list_theta[[3]] <- matrix(theta3, nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
 list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
 list_theta[[4]] <- list()
 theta4_mean <- rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
-theta4_sd <- rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
+theta4_var <- rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
 list_theta[[4]]$mean <- matrix(theta4_mean,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
-list_theta[[4]]$sd <- matrix(theta4_sd,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
+list_theta[[4]]$var <- matrix(theta4_var,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
 v_NQ <-  c(100,50,40)
 namesFG <-  c('A','B','C')
-dataSim <- rMBM(v_NQ = v_NQ , E = E , typeInter = typeInter, v_distrib = v_distrib, list_pi = list_pi, list_theta = list_theta, namesFG)
+dataSim <- rMBM(v_NQ = v_NQ , E = E , typeInter = typeInter,
+                v_distrib = v_distrib, list_pi = list_pi,
+                list_theta = list_theta, namesFG)
 list_net <- dataSim$list_net
 classifTrue <- dataSim$classif
 }
