@@ -104,7 +104,7 @@ In this example, the functional groups are plants, floral visitors, ants and bir
 
 
 ```{r loading dataset, eval=TRUE}
-load(file = 'MultiPartiteMutalistic.Rda')
+data(MPEcoNetwork, package = "GREMLIN")
 ```
 These 3 networks are provided in 3 incidence matrices, the plants being in rows. *Note that the order of the individuals within the functional groups must be the same in all the matrices*.  
 
@@ -113,12 +113,11 @@ GREMLIN requires  the global network  be encoded in separate matrices for each n
 
 
 ```{r transform dataset,  eval=TRUE}
-PlantFlovis = defineNetwork(Inc_plant_flovis,"inc","plants","flovis")
-PlantAnt = defineNetwork(Inc_plant_ant,"inc","plants","ants")
-PlantBird = defineNetwork(Inc_plant_bird,"inc","plants","birds")
-str(PlantBird)
+PlantFlovis = defineNetwork(MPEconetwork$Inc_plant_flovis,"inc","plants","flovis")
+PlantAnt = defineNetwork(MPEconetwork$Inc_plant_ant,"inc","plants","ants")
+PlantBird = defineNetwork(MPEconetwork$Inc_plant_bird,"inc","plants","birds")
 list_net <- list(PlantFlovis,PlantAnt,PlantBird)
-
+names(PlantFlovis)
 ```
 
 If one wants to keep a track of the names of the species, they should be used as rownames and colnames in the matrices. 

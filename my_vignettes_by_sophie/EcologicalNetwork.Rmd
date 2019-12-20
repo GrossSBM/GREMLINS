@@ -1,5 +1,5 @@
 ---
-title: "Illustration of the GREMLIN package on a simulated dataset"
+title: "Statistical analysis of a multipartite ecological network"
 author: "Sophie Donnet, Pierre Barbillon"
 date: "`r Sys.Date()`"
 output: 
@@ -10,7 +10,7 @@ bibliography: biblio.bib
 link-citations: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{EconetworkSimu}
+  %\VignetteIndexEntry{Econetwork}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -95,95 +95,90 @@ The inference of the model consists in the selection of the number of clusters $
 
 
 
-# Simulation of a complex multipartite
+# Example of a mutualistic ecological network
 
-We use the function  `rMBM` provided in the package to simulate a  multipartite network involving $3$ functional groups ('A','B', and 'C') of respective sizes $n_A = 100$, $n_B = 50$ and $n_C = 60$. 
+## The dataset
+We apply our methodology to an ecological mutualistic multipartite network (see paper @Dattilo).
 
-A,B abd C are  devided respectively into $4$, $3$ and $2$ blocks. The sizes of the blocks are generated randomly. 
+In this example, the functional groups are plants, floral visitors, ants and birds. We observe binary interactions between plants and floralvisitor,  plants and ants, and plants and seed dispersal birds.  
 
-```{r param FG}
-set.seed(302718)
-n_FG <- 3 #number of functional groups
-v_NQ = c(100,50,60)
-v_K <- c(4,3,2) #number of clusters in each functional group
-list_pi = lapply(1:n_FG,function(q){v = rgamma(v_K[q],1,1); return(v/sum(v))})
-namesFG <- c('A','B','C')
-``` 
 
-We assume that we observe $4$ interactions matrices
-    - A-B : continuous weighted interactions
-    - B-C : binary interactions
-    - A-A : counting directed interactions
-    - C-C : binary non-directed interactions
+```{r loading dataset, eval=TRUE}
+load(file = 'MultiPartiteMutalistic.Rda')
+```
+These 3 networks are provided in 3 incidence matrices, the plants being in rows. *Note that the order of the individuals within the functional groups must be the same in all the matrices*.  
 
-```{r param net}
-E  <-  rbind(c(1,2),c(2,3),c(1,1),c(3,3))
-typeInter <- c( "inc",'inc',"diradj", "adj")
-v_distrib <- c('gaussian','bernoulli','poisson','bernoulli')
-list_theta <- list()
-list_theta[[1]] <- list()
-list_theta[[1]]$mean  <- matrix(round(rnorm(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-list_theta[[1]]$var  = matrix(round(rgamma(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-for (q in 2:4) {
-  list_theta[[q]] <- switch(v_distrib[q], 
-      bernoulli = matrix(rbeta(v_K[E[q,1]] * v_K[E[q,2]],2,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]]),
-      poisson = matrix(rgamma(v_K[E[q,1]] * v_K[E[q,2]],6,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]])
-  )
-}
-list_theta[[4]] =0.5 * (list_theta[[4]] + t(list_theta[[4]]))
 
-``` 
+GREMLIN requires  the global network  be encoded in separate matrices for each network. $3$ incidence matrices. We then format the data to be able to use our R package GREMLIN i.e. we transform the matrices into an list containing    the matrix, its type ( `inc`: incidence, `adj`: adjacency symmetric, `dir_adj`: adjacency non symmetric, the functional group in row, the functional group in col). 
 
-We are now ready to simulate the data
 
-```{r simul, eval = TRUE}
-dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, 
-                list_theta, seed = NULL, 
-                namesFG =namesFG,keepClassif  = TRUE)
-list_Net <- dataSim$list_Net
-length(list_Net)
+```{r transform dataset,  eval=TRUE}
+PlantFlovis = defineNetwork(Inc_plant_flovis,"inc","plants","flovis")
+PlantAnt = defineNetwork(Inc_plant_ant,"inc","plants","ants")
+PlantBird = defineNetwork(Inc_plant_bird,"inc","plants","birds")
+str(PlantBird)
+list_net <- list(PlantFlovis,PlantAnt,PlantBird)
 
 ```
 
+If one wants to keep a track of the names of the species, they should be used as rownames and colnames in the matrices. 
 
+```{r example of dataset, eval=TRUE}
+PlantFlovis$mat[1:2,1:2]
+
+```
 
 ## Estimation 
 
 The model selection and the estimation are performed with the function `multipartiteBM`.
 
-
 ```{r MBM, echo = FALSE, eval = TRUE}
-if (!file.exists('resMBM_Simu.Rda')) {
-  res_MBMsimu <- multipartiteBM(list_Net, 
-                      v_distrib = v_distrib, 
-                      v_Kmin = 1,
-                      v_Kmax = 10,
-                      v_Kinit = NULL,
-                      verbose = TRUE, 
-                      save=FALSE, initBM = TRUE)
-  save(RES_MBM,file="resMBM_Simu.Rda")
-} else {load("resMBM_Simu.Rda")}
+if (!file.exists('resMBM_Mutualistic.Rda')) {
+  RES_MBM = multipartiteBM(
+    list_Net = list(PlantFlovis, PlantAnt, PlantBird),
+    namesFG = c('plants','flovis','ants','birds'),
+    v_distrib  = c('bernoulli','bernoulli','bernoulli'),
+    initBM = TRUE,
+    save = TRUE)
+  save(RES_MBM,file="resMBM_Mutualistic.Rda")
+} else {load("resMBM_Mutualistic.Rda")}
 ```
 
 ```{r MBM eval false, echo = TRUE, eval = FALSE}
-  res_MBMsimu <- multipartiteBM(list_Net, 
-                      v_distrib = v_distrib, 
-                      v_Kmin = 1,
-                      v_Kmax = 10,
-                      v_Kinit = NULL,
-                      verbose = TRUE, 
-                      save=FALSE, initBM = TRUE)
+RES_MBM = multipartiteBM(
+    list_Net =list(PlantFlovis, PlantAnt, PlantBird),
+    namesFG = c('plants','flovis','ants','birds'),
+    v_distrib  = c('bernoulli','bernoulli','bernoulli'),
+    initBM = TRUE,save = TRUE)
 ```
 
-We can now get the estimated parameters and compare them to the true ones. 
-
-```{r estim param}
 
 
-res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AB$mean
-list_theta[[1]]$mean
+RES_MBM contains the estimated parameters of the models we run through during the search of the better number of blocks. 
+If one sets `save = FALSE`  in the `multipartiteBM` function then we only save the best model. 
 
+RES_MBM constains de dataset and the results.  
+```{r MBM what}
+names(RES_MBM)
+``` 
+
+The better model has the following numbers of blocks
+```{r MBM v_K }
+RES_MBM$fittedModel[[1]]$paramEstim$v_K
 ```
+
+To see the parameters estimated for the better model we use the following command `RES_MBM$fittedModel[[1]]$paramEstim$***`
+```{r MBM param }
+RES_MBM$fittedModel[[1]]$paramEstim$list_pi$plants
+RES_MBM$fittedModel[[1]]$paramEstim$list_theta$plantsflovis
+```
+
+The clustering  supplied by the better model  are in `RES_MBM$fittedModel[[1]]$paramEstim$Z$***`.
+
+```{r MBM Z }
+table(RES_MBM$fittedModel[[1]]$paramEstim$Z$plants)
+table(RES_MBM$fittedModel[[1]]$paramEstim$Z$ants)      
+``` 
 
 
 # References

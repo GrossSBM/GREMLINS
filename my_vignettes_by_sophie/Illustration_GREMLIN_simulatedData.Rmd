@@ -10,7 +10,7 @@ bibliography: biblio.bib
 link-citations: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{EconetworkSimu}
+  %\VignetteIndexEntry{Econetwork}
   %\VignetteEncoding{UTF-8}
 ---
 
