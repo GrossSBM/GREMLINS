@@ -36,36 +36,46 @@ Multipartite networks  consist in the joint observation of several networks impl
 In what follows, these groups will be referred to as  **functional groups**.
 
 
-# Installation
+## Installation
 
 You can install the released version of GREMLIN  from [GitHub](https://github.com/Demiperimetre/GREMLIN) with:
 
-```{r packages, eval=TRUE}
+```{r packages, echo = FALSE, eval=TRUE}
 #devtools::install_github("Demiperimetre/GREMLIN")
 library(GREMLIN)
 ```
 
-# Mathematical Background
+```{r packages2, eval=FALSE, echo=TRUE}
+library(devtools)
+devtools::install_github("Demiperimetre/GREMLIN")
+```
+
+
+## Mathematical Background
+
+The model is introduced and described in @Donnet. 
 
 ###  A collection of networks
 
-Assume that $Q$ functional groups of individuals are at stake; Let $n_q$ be  the number of individuals  in the $q$-th functional group.
+Assume that $Q$ functional groups of individuals are at stake; let $n_q$ be  the number of individuals  in the $q$-th functional group.
 
-A multipartite network is a collection of networks:  each network may be simple (relations inside  a   functional   group)   or bipartite  (relations between individuals of two  functional groups). We index the collection of networks by pairs of functional groups $(q,q')$. 
+**A multipartite network is a collection of networks**:  each network may be *simple* if it represents the relations inside  a   functional   group  or *bipartite* if it represent the relations between individuals of two  functional groups. We index the collection of networks by pairs of functional groups $(q,q')$. 
 
 The set $E$ denotes  the  list of pairs of  functional groups  for   which we observe an interaction network.
 
-For any pair $(q,q') \in E$, the interaction network is encoded in a matrix  $X^{qq'}$  :  $X^{qq'}_{ii'} \neq 0 $ if there is an edge from unit $i$ of functional group
-$q$ to unit $i'$ of functional group $q'$, $0$ otherwise.
-    - If $q \neq q'$,   $X^{qq'}$ is  said to be  an \emph{incidence matrix}.
-    - $X^{qq}$ is  an \emph{adjacency matrix}:   it is symmetric if the relation inside the functional group $q$  is non-oriented, non-symmetric otherwise.
+For any pair $(q,q') \in E$, **the interaction network is encoded in a matrix  $X^{qq'}$ **  such that  $X^{qq'}_{ii'} \neq 0$ if there is an edge from unit $i$ of functional group
+$q$ to unit $i'$ of functional group $q'$, $X^{qq'}_{ii'} = 0$ otherwise.
+
+For any $(q,q')$, $X^{qq'}_{ii'}$ may be in $\{0,1\}$ or a numeric for weigthed networks. 
+
+Note that,  if $q \neq q'$,   $X^{qq'}$ is  said to be  an **incidence matrix** (corresponding to a bipartite network). If $q = q'$, $X^{qq}$ is  an  **adjacency matrix**:   if the relation inside the functional group $q$  is non-oriented, $X^{qq}$ is symmetric. 
 
 ### A probabilistic latent variables model
 
 
-Assume that,   each functional group $q$  is  divided into $K_q$  blocks (or equivalently clusters).  $\forall q $ and  $ \forall i $, let $Z^{q}_i$ be
+Assume that,   each functional group $q$  is  divided into $K_q$  blocks (or equivalently clusters).  $\forall q$ and  $\forall i$, let $Z^{q}_i$ be
 the latent random variable  such that $Z^ q_i =k$  if individual $i$ of functional group $q$ belongs to cluster $k$.
-The random variables $Z^{q}_i$'s are assumed to be independent and  such that: $\forall k, \forall q , \forall i $:
+The random variables $Z^{q}_i$'s are assumed to be independent and  such that: $\forall (k,q,i)$:
 
 \begin{equation}\label{eq:mod2}
 \mathbb{P}(Z^{q}_i=k) = \pi^{q}_k,
@@ -74,12 +84,12 @@ with $\sum_{k=1}^{K_q}\pi^{q}_k=1$,  $\forall q$.
 
 
 
-Conditionally on the clustering,  the entries of the matrices   $   \left(X^{qq'}_{ii'}\right)$ are assumed to be independent and distributed as follows:
+Conditionally on the clustering,  the entries of the matrices   $\left(X^{qq'}_{ii'}\right)$ are assumed to be independent and distributed as follows:
 $\forall (i,i')$,
 \begin{equation}\label{eq:mod1}
-X^{qq'}_{ii'} | \{Z^{q}_i=k, Z^{q'}_{i'}=k'  \} \sim_{ind} \mathcal{F}_{qq'}(\theta^{qq'}_{kk'})\,
+X^{qq'}_{ii'} |  Z^{q}_i=k, Z^{q'}_{i'}=k'   \sim_{i.i.d} \mathcal{F}_{qq'}(\theta^{qq'}_{kk'})\,
 \end{equation}
-meaning that the probability of connection from $i$  of functional group $q$ to  $i'$ of functional group $q'$ only  depends on the clusters to which they belong to.\\
+meaning that the probability of connection from $i$  of functional group $q$ to  $i'$ of functional group $q'$ only  depends on the clusters to which they belong to.
 
 For any pair $(q,q')$, $\mathcal{F}_{qq'}(\cdot)$ is either: 
 
@@ -90,26 +100,41 @@ For any pair $(q,q')$, $\mathcal{F}_{qq'}(\cdot)$ is either:
     - Gaussian or Laplace for continuous weighted networks. 
 
 
+### Statistical inference
+
+
 The inference of the model consists in the selection of the number of clusters $(K_q)$ and the estimation of the parameters $(\theta_{qq'})$. The model selection is performed with the ICL, a penalized likelihood criterion. The parameters are estimated with a varitional version of the EM algorithm. The estimation procedure also provides a clustering of the entities at stake. 
 
 
 
 
-# Example of a mutualistic ecological network
+## Example of an ecological network
 
-## The dataset
-We apply our methodology to an ecological mutualistic multipartite network (see paper @Dattilo).
+### The dataset
+We apply our methodology to an ecological mutualistic multipartite network. The data were  provided in @Dattilo.
 
-In this example, the functional groups are plants, floral visitors, ants and birds. We observe binary interactions between plants and floralvisitor,  plants and ants, and plants and seed dispersal birds.  
+In this example, the functional groups are plants, floral visitors, ants and birds and one observes binary interactions between 1/ plants and florals visitor,  2/ plants and ants, and 3/ plants and seed dispersal birds, resulting into three bipartite networks.   
 
 
 ```{r loading dataset, eval=TRUE}
 data(MPEcoNetwork, package = "GREMLIN")
+ls()
+names(MPEconetwork)
 ```
-These 3 networks are provided in 3 incidence matrices, the plants being in rows. *Note that the order of the individuals within the functional groups must be the same in all the matrices*.  
 
+As required by GREMLIN, our mutlipartite Network  the global network  to be be encoded in separate matrices for each network (in our case the $3$ incidence matrices)
+So, here, our  3 networks are provided in 3 incidence matrices, the plants being in rows. *Note that the order of the individuals within the functional groups must be the same in all the matrices*.  
 
-GREMLIN requires  the global network  be encoded in separate matrices for each network. $3$ incidence matrices. We then format the data to be able to use our R package GREMLIN i.e. we transform the matrices into an list containing    the matrix, its type ( `inc`: incidence, `adj`: adjacency symmetric, `dir_adj`: adjacency non symmetric, the functional group in row, the functional group in col). 
+### Formatting the data
+We format the data to be able to use our R package GREMLIN i.e. we transform the matrices into an list containing    
+
+              * the matrix, 
+              * its type  
+                           - `inc`    : incidence 
+                           -  `adj`   : adjacency symetric 
+                           - `dir_adj`: adjacency non symetric  
+              * the name of functional group in row, 
+              * the name of functional group in column. 
 
 
 ```{r transform dataset,  eval=TRUE}
@@ -127,20 +152,20 @@ PlantFlovis$mat[1:2,1:2]
 
 ```
 
-## Estimation 
+### Inference 
 
 The model selection and the estimation are performed with the function `multipartiteBM`.
 
 ```{r MBM, echo = FALSE, eval = TRUE}
-if (!file.exists('resMBM_Mutualistic.Rda')) {
+if (!file.exists('resMBM_Mutualistic2.Rda')) {
   RES_MBM = multipartiteBM(
     list_Net = list(PlantFlovis, PlantAnt, PlantBird),
     namesFG = c('plants','flovis','ants','birds'),
     v_distrib  = c('bernoulli','bernoulli','bernoulli'),
     initBM = TRUE,
     save = TRUE)
-  save(RES_MBM,file="resMBM_Mutualistic.Rda")
-} else {load("resMBM_Mutualistic.Rda")}
+  save(RES_MBM,file="resMBM_Mutualistic2.Rda")
+} else {load("resMBM_Mutualistic2.Rda")}
 ```
 
 ```{r MBM eval false, echo = TRUE, eval = FALSE}
@@ -153,7 +178,7 @@ RES_MBM = multipartiteBM(
 
 
 
-RES_MBM contains the estimated parameters of the models we run through during the search of the better number of blocks. 
+RES_MBM contains the estimated parameters of the models we run through during the search of the better numbers of blocks. 
 If one sets `save = FALSE`  in the `multipartiteBM` function then we only save the best model. 
 
 RES_MBM constains de dataset and the results.  
@@ -179,5 +204,118 @@ table(RES_MBM$fittedModel[[1]]$paramEstim$Z$plants)
 table(RES_MBM$fittedModel[[1]]$paramEstim$Z$ants)      
 ``` 
 
+### Plots 
 
-# References
+## An example on a simulated dataset
+
+
+We use the function  `rMBM` provided in the package to simulate a  multipartite network involving $3$ functional groups ('A','B', and 'C') of respective sizes $n_A = 100$, $n_B = 50$ and $n_C = 60$. 
+
+A,B and C are  divided respectively into $4$, $3$ and $2$ blocks. The sizes of the blocks are generated randomly. For reproductibility, we set the random seed to an arbitrarily chosen value.  
+
+```{r param FG}
+set.seed(302718)
+n_FG <- 3 #number of functional groups
+v_NQ = c(100,50,60)
+v_K <- c(4,3,2) #number of clusters in each functional group
+list_pi = lapply(1:n_FG,function(q){v = rgamma(v_K[q],1,1); return(v/sum(v))})
+namesFG <- c('A','B','C')
+``` 
+
+We assume that we observe $4$ interactions matrices
+
+    - A-B : continuous weighted interactions
+    - B-C : binary interactions
+    - A-A : counting directed interactions
+    - C-C : binary non-directed interactions
+
+
+```{r param 1 net}
+E  <-  rbind(c(1,2),c(2,3),c(1,1),c(3,3))
+typeInter <- c( "inc",'inc',"diradj", "adj")
+v_distrib <- c('gaussian','bernoulli','poisson','bernoulli')
+```
+
+We generate randomly the  emission parameters $\theta$. 
+
+
+```{r param net}
+list_theta <- list()
+list_theta[[1]] <- list()
+list_theta[[1]]$mean  <- matrix(round(rnorm(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+list_theta[[1]]$var  = matrix(round(rgamma(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+for (q in 2:4) {
+  list_theta[[q]] <- switch(v_distrib[q], 
+      bernoulli = matrix(rbeta(v_K[E[q,1]] * v_K[E[q,2]],2,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]]),
+      poisson = matrix(rgamma(v_K[E[q,1]] * v_K[E[q,2]],6,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]])
+  )
+}
+list_theta[[4]] = 0.5 * (list_theta[[4]] + t(list_theta[[4]])) # for symetrisation
+``` 
+
+We are now ready to simulate the data
+
+
+
+```{r simul 2, eval = FALSE, echo = TRUE}
+dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, 
+                list_theta, seed = NULL, 
+                namesFG = namesFG,keepClassif  = TRUE)
+list_Net <- dataSim$list_Net
+length(list_Net)
+names(list_Net[[1]])
+list_Net[[1]]$typeInter
+list_Net[[1]]$rowFG
+list_Net[[1]]$colFG
+```
+
+```{r simul, eval = TRUE, echo =FALSE}
+load(file='MPSimuNetwork.Rda')
+length(list_Net)
+names(list_Net[[1]])
+list_Net[[1]]$typeInter
+list_Net[[1]]$rowFG
+list_Net[[1]]$colFG
+```
+
+
+
+## Estimation 
+
+The model selection and the estimation are performed with the function `multipartiteBM`.
+
+
+```{r MBM simul, echo = FALSE, eval = TRUE}
+ # if (!file.exists('resMBM_Simu.Rda')) {
+ #   res_MBMsimu <- multipartiteBM(list_Net, 
+ #                       v_distrib = v_distrib, 
+ #                       v_Kmin = 1,
+ #                       v_Kmax = 10,
+ #                       v_Kinit = NULL,
+ #                       verbose = TRUE, 
+ #                       save=FALSE, initBM = TRUE)
+ #   save(RES_MBM,file = "resMBM_Simu.Rda")
+ # } else {load("resMBM_Simu.Rda")}
+```
+
+```{r MBM simul eval false, echo = TRUE, eval = FALSE}
+  res_MBMsimu <- multipartiteBM(list_Net, 
+                      v_distrib = v_distrib, 
+                      v_Kmin = 1,
+                      v_Kmax = 10,
+                      v_Kinit = NULL,
+                      verbose = TRUE, 
+                      save=FALSE, initBM = TRUE)
+```
+
+We can now get the estimated parameters and compare them to the true ones. 
+
+```{r estim param, eval=FALSE}
+
+
+res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AB$mean
+list_theta[[1]]$mean
+
+```
+
+## References
