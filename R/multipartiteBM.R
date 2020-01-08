@@ -1,26 +1,47 @@
 #' Model selection and parameter estimation of MBM
 #'
-#' Select the number of blocks per functional group using a stepwise search and estimate parameters
+#' Select the number of blocks and identify the blocks per functional group using a variational EM algorithm
 #'
-#' @param list_Net A list of networks (defined via the function defineNetwork) i.e. multipartite networks
-#' @param namesFG Names of functional groups (FG) (must correspond to names in list_Net)
-#' @param v_distrib  Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
-#'                   Must give a vector whose length is the number of networks in list_Net
-#' @param v_Kmin A vector of minimal number of blocks per functional group provided in the same order as in namesFG.
-#'              v_Kmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
-#'              If v_Kmin is not specified,  v_Kmin = 1.
-#' @param v_Kmax A vector of maximal number of blocks per functional group provided in the same order as in namesFG.
-#'              v_Kmin can be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs
-#'              If v_Kmin is not specified,  v_Kmin = 1.
-#' @param v_Kinit A vector of initial number of blocks per functional group provided in the same order as in namesFG.
-#'               if v_Kinit is not specified, then   v_Kinit = v_Kmin
-#' @param initBM If initBM   =  TRUE, then an aditional initialisation is done using simple LBM or SBM on each network separatly. The default value is FALSE
-#' @param save Set to TRUE to save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput
-#' @param verbose Set to TRUE to display the current step of the search algorithm
-#' @param nbCores Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores
-#' @param maxiterVE  Maximum number of iterations in the VE step of the VEM algorithm. Default value  = 1000
-#' @param maxiterVEM  Maximum number of iterations of the VEM algorithm. Default value  = 1000
-#' @return a list of estimated parameters for the different models ordered by decreasing ICL. If save=FALSE, the length is of length 1
+#' @param list_Net a list of networks (defined via the function defineNetwork) i.e. a multipartite network
+#' @param v_distrib an optional vector of characters of length the number of networks and specifying the distribution used in each network (possible values \code{bernoulli,poisson,gaussian,laplace})
+#' @param namesFG  an optional vector of  characters containing the names of functional groups (FG) (If Specified, must correspond to the  names in \code{list_Net})
+#' @param v_Kmin an optional vector of integers, specifying the minimal number of blocks per functional group (must be provided in the same order as in \code{namesFG}).
+#'              v_Kmin may be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs.
+#'              Default value  \code{= 1}.
+#' @param v_Kmax an optional vector of integers specifying the maximal number of blocks per functional group provided in the same order as in \code{namesFG}.
+#'              v_Kmax may be a single value (same maximal number of blocks for all the FGs) or a vector with size equal to the number of FGs.
+#'              Default value  \code{= 10}.
+#' @param v_Kinit an optional vector of integers specifying initial numbers of blocks per FG provided in the same order as in \code{namesFG}.
+#'               if \code{v_Kinit} is not specified, then   \code{v_Kinit = v_Kmin}
+#' @param initBM an optional boolean. If initBM = TRUE  an aditional initialisation is done using simple LBM or SBM on each network separatly.
+#'               Default value  \code{= TRUE}
+#' @param save an optional boolean. If TRUE  save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.
+#' @param verbose an optional boolean. If  TRUE, display the current step of the search algorithm
+#' @param nbCores an optional integer specifying the number or cores used for the estimation. Not parallelized on windows. If \code{ncores = NULL}, then half of the cores are used.
+#' @param maxiterVE an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}
+#' @param maxiterVEM an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}
+#'
+#' @details The function \code{multipartiteBM} selects the better numbers of blocks in each FG (with a penalized likelihood criterion). The model selection is performed with a forward backward strategy and the likelihood of each model is maximized with a variational EM).
+
+#'
+#' @return a list of estimated parameters for the different models ordered by decreasing ICL. If save \code{= FALSE}, the length is of length 1 (only the better model is returned).
+#' \describe{
+#'   \item{\code{fittedModel}}{contains the results of the inference. \code{res$fittedModel[[1]]}  is a list with fields
+#'   \describe{
+#'   \item{\code{paramEstim}}{a MBMfit object.}
+#'   \item{\code{ICL}}{the penalized likelihood criterion ICL.}
+#'   \item{\code{vJ}}{the sequence of the varational bound of the likelihood through iterations of the VEM.}
+#'   \item{\code{convergence}}{TRUE if the VEM reached convergence.}
+#'   }
+#'   }
+#'   \item{\code{list_Net}}{ contains the data.}
+#'}
+#'
+#'
+#'
+#'
+#'
+#'
 #' @examples
 #' v_K <- c(3,2,2)
 #' n_FG <- 3
@@ -37,10 +58,10 @@
 #' v_NQ = c(100,50,40)
 #' dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'),keepClassif = FALSE)
 #' list_Net <- dataSim$list_Net
-#' res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 10,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
+#' res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson","poisson"))
 #' @export
 
-multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = TRUE , save=FALSE , verbose = TRUE,nbCores = NULL, maxiterVE = NULL , maxiterVEM = NULL)
+multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = TRUE , save=FALSE , verbose = TRUE, nbCores = NULL, maxiterVE = NULL , maxiterVEM = NULL)
 {
 
   if ( all(v_Kmin == v_Kmax)) {stop('v_Kmin = v_Kmax. Use the function "multipartiteBMFixedModel" instead')}

@@ -1,0 +1,154 @@
+---
+title: "Illustration on a simulated multipartite network"
+author: "Sophie Donnet, Pierre Barbillon"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+bibliography: biblio.bib
+link-citations: yes
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Simulated data}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+
+We present the performances of GREMLIN on a simulated multipartite network.  GREMLIN includes a function `rMBM` to simulate multipartite networks. 
+
+
+
+## Simulation of a complex multipartite newtwork. 
+
+
+We use the function  `rMBM` provided in the package to simulate a  multipartite network involving $3$ functional groups (namely A,B, and C) of respective sizes 
+$$n_A = 100, \quad, n_B = 50, \quad n_C = 60.$$ 
+
+A,B and C are  divided respectively into $4$, $3$ and $2$ blocks. The sizes of the blocks are generated randomly. For reproductibility, we fix the random seed to an arbitrarily chosen value.  
+
+```{r param FG}
+set.seed(302718)
+n_FG <- 3 #number of functional groups (FG)
+namesFG <- c('A','B','C')
+v_NQ <-  c(100,50,60) #size of each FG
+v_K  <- c(4,3,2) #number of clusters in each functional group
+list_pi = lapply(1:n_FG,function(q){v = rgamma(v_K[q],1,1); return(v/sum(v))}) 
+#proportion of each block in each  FG
+list_pi[[1]]
+``` 
+
+We assume that we observe $4$ interactions matrices
+
+    - A-B : continuous weighted interactions
+    - B-C : binary interactions
+    - A-A : counting directed interactions
+    - C-C : binary non-directed interactions
+
+
+```{r param 1 net}
+typeInter <- c( "inc",'inc',"diradj", "adj")
+v_distrib <- c('gaussian','bernoulli','poisson','bernoulli')
+```
+
+Note that the distributions may be `Bernoulli`, `Poisson`, `Gaussian` or `Laplace` (with null mean). For the Gaussian distribution, a mean and a variance must be given. 
+We generate randomly the  emission parameters $\theta$. 
+
+
+```{r param net}
+E  <-  rbind(c(1,2),c(2,3),c(1,1),c(3,3))
+list_theta <- list()
+list_theta[[1]] <- list()
+list_theta[[1]]$mean  <- matrix(round(rnorm(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+list_theta[[1]]$var  = matrix(round(rgamma(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+for (q in 2:4) {
+  list_theta[[q]] <- switch(v_distrib[q], 
+      bernoulli = matrix(rbeta(v_K[E[q,1]] * v_K[E[q,2]],2,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]]),
+      poisson = matrix(rgamma(v_K[E[q,1]] * v_K[E[q,2]],6,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]])
+  )
+}
+list_theta[[4]] = 0.5 * (list_theta[[4]] + t(list_theta[[4]])) # for symetrisation
+``` 
+
+We are now ready to simulate the data
+
+
+
+```{r simul 2, eval = FALSE, echo = TRUE}
+dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, 
+                list_theta, seed = NULL, 
+                namesFG = namesFG,keepClassif  = TRUE)
+list_Net <- dataSim$list_Net
+length(list_Net)
+names(list_Net[[1]])
+list_Net[[1]]$typeInter
+list_Net[[1]]$rowFG
+list_Net[[1]]$colFG
+```
+
+```{r simul, eval = TRUE, echo =FALSE}
+load(file='MPSimuNetwork.Rda')
+length(list_Net)
+names(list_Net[[1]])
+list_Net[[1]]$typeInter
+list_Net[[1]]$rowFG
+list_Net[[1]]$colFG
+```
+
+
+
+## Estimation 
+
+The model selection and the estimation are performed with the function `multipartiteBM`.
+
+
+```{r MBM simul, echo = FALSE, eval = TRUE}
+ # if (!file.exists('resMBM_Simu.Rda')) {
+ #   res_MBMsimu <- multipartiteBM(list_Net, 
+ #                       v_distrib = v_distrib, 
+ #                       v_Kmin = 1,
+ #                       v_Kmax = 10,
+ #                       v_Kinit = NULL,
+ #                       verbose = TRUE, 
+ #                       save=FALSE, initBM = TRUE)
+ #   save(RES_MBM,file = "resMBM_Simu.Rda")
+ # } else {load("resMBM_Simu.Rda")}
+```
+
+```{r MBM simul eval false, echo = TRUE, eval = FALSE}
+  res_MBMsimu <- multipartiteBM(list_Net, 
+                      v_distrib = v_distrib, 
+                      v_Kmin = 1,
+                      v_Kmax = 10,
+                      v_Kinit = NULL,
+                      verbose = TRUE, 
+                      save=FALSE, initBM = TRUE)
+```
+
+We can now get the estimated parameters and compare them to the true ones. 
+
+```{r estim param, eval=FALSE}
+
+
+res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AB$mean
+list_theta[[1]]$mean
+
+```
+
+## References
