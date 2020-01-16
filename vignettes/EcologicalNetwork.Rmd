@@ -57,7 +57,7 @@ The 3 networks contain   $753$  observed interactions of which $55\%$ are   plan
 library(GREMLIN)
 data(MPEcoNetwork, package = "GREMLIN")
 ls()
-names(MPEconetwork)
+names(MPEcoNetwork)
 ```
 
 As required by GREMLIN, our the global network has  to be encoded in separate matrices for each network (in our case the $3$ incidence matrices)
@@ -68,9 +68,9 @@ We format the data to be able to use our R package GREMLIN i.e. we transform the
 
 To do so, we use de the function `defineNetwork`. 
 ```{r transform dataset,  eval=TRUE}
-PlantFlovis = defineNetwork(MPEconetwork$Inc_plant_flovis,"inc","plants","flovis")
-PlantAnt = defineNetwork(MPEconetwork$Inc_plant_ant,"inc","plants","ants")
-PlantBird = defineNetwork(MPEconetwork$Inc_plant_bird,"inc","plants","birds")
+PlantFlovis = defineNetwork(MPEcoNetwork$Inc_plant_flovis,"inc","plants","flovis")
+PlantAnt = defineNetwork(MPEcoNetwork$Inc_plant_ant,"inc","plants","ants")
+PlantBird = defineNetwork(MPEcoNetwork$Inc_plant_bird,"inc","plants","birds")
 list_net <- list(PlantFlovis,PlantAnt,PlantBird)
 names(PlantFlovis)
 ```
