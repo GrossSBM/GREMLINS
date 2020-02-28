@@ -48,7 +48,7 @@ set.seed(302718)
 n_FG <- 3 #number of functional groups (FG)
 namesFG <- c('A','B','C')
 v_NQ <-  c(100,50,60) #size of each FG
-v_K  <- c(4,3,2) #number of clusters in each functional group
+v_K  <- c(4,3,2) #number of clusters in each functional group 
 list_pi = lapply(1:n_FG,function(q){v = rgamma(v_K[q],1,1); return(v/sum(v))}) 
 #proportion of each block in each  FG
 list_pi[[1]]
