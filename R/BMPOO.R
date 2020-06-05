@@ -139,7 +139,7 @@ MBMfit$set("public",'sim',
                           X_e <- matrix(rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = sqrt(list_theta_e$var[Z_fg1,Z_fg2])),self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                        ZIgaussian = {
-                         U <- rbinom(self$v_NQ[fg1] * self$v_NQ[fg2], 1, list_theta_e$p0[Z_fg1,Z_fg2])
+                         U <- rbinom(self$v_NQ[fg1] * self$v_NQ[fg2], 1, 1 - list_theta_e$p0[Z_fg1,Z_fg2])
                          Z <- rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = sqrt(list_theta_e$var[Z_fg1,Z_fg2]))
                          X_e <- matrix((U == 1) *  Z,self$v_NQ[fg1],self$v_NQ[fg2])
                           },

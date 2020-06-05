@@ -70,7 +70,6 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   #----------------- Formatting the data ---
   dataR6 = formattingData(list_Net,v_distrib)
 
-  #------------------- Messages  ----------
   if (verbose) {
     NBEntities <- dataR6$v_NQ;
     names(NBEntities) <- dataR6$namesFG;
@@ -222,6 +221,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
 
 
   #-------------------- cleaning the results
+
 
   res <- dataR6$cleanResults(R) # remove models that have been estimated twice or more to keep the estimation with the better J
 

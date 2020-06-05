@@ -1,8 +1,8 @@
 
-
+library(GREMLIN)
 
 ## ----param FG--------------------------------------------------------------------------------------------------------------------------------
-set.seed(302718)
+
 n_FG <- 1 #number of functional groups (FG)
 v_NQ <-  c(60) #size og each FG
 v_K  <- c(3) #number of clusters in each functional group
@@ -37,31 +37,20 @@ list_theta[[1]] = lapply(list_theta[[1]] , function(u){0.5 * (u + t(u))}) # for 
  list_Net[[1]]$colFG
 
 
-## ----simul, eval = TRUE, echo =FALSE---------------------------------------------------------------------------------------------------------
-Y <- list_Net[[1]]$mat
-Z <- dataSim$classif[[1]]
-theta_estim  = list(mean =  matrix(0,v_K[1],v_K[1]), var =  matrix(0,v_K[1],v_K[1]), p0  =  matrix(0,v_K[1],v_K[1]))
-
-for (k in v_K[1]){
-  for (l in v_K[1]){
-
-    theta_estim$mean[k,l] <-
-
-  }
-}
-
-
-## ----MBM simul, echo = FALSE, eval = TRUE----------------------------------------------------------------------------------------------------
- # if (!file.exists('resMBM_Simu.Rda')) {
- #   res_MBMsimu <- multipartiteBM(list_Net,
- #                       v_distrib = v_distrib,
- #                       v_Kmin = 1,
- #                       v_Kmax = 10,
- #                       v_Kinit = NULL,
- #                       verbose = TRUE,
- #                       save=FALSE, initBM = TRUE)
- #   save(RES_MBM,file = "resMBM_Simu.Rda")
- # } else {load("resMBM_Simu.Rda")}
+## ---- verif---------------------------------------------------------------------------------------------------------
+Y <- dataSim$list_Net[[1]]$mat
+Z = dataSim$classif[[1]]
+pi_true <- table(Z)/length(Z)
+tau_true <- matrix(0,v_NQ[1],v_K[1])
+for (i in 1:v_NQ[1]){tau_true[i,Z[i]] = 1}
+Unit <- matrix(1,)
+Denom <- crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+mu <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]])
+Zeros_e  <- Y == 0
+mean_true <- mu / crossprod(crossprod(1 - Zeros_e, tau[[gr]]), tau[[gc]])
+A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) /  crossprod(crossprod(1-Zeros_e, tau[[gr]]), tau[[gc]])
+list_theta_e$var <-  A - list_theta_e$mean^2
+list_theta_e$p0 <- crossprod(crossprod(Zeros_e, tau[[gr]]), tau[[gc]]) / Denom
 
 
 ## ----MBM simul eval false, echo = TRUE, eval = FALSE-----------------------------------------------------------------------------------------
@@ -71,13 +60,24 @@ for (k in v_K[1]){
                       v_Kmax = 10,
                       v_Kinit = NULL,
                       verbose = TRUE,
-                      save=FALSE, initBM = TRUE, nbCores = 1)
+                      maxiterVE =  100,maxiterVEM =  100,
+                      save=FALSE, initBM = TRUE)
 
 
 ## ----estim param, eval=FALSE-----------------------------------------------------------------------------------------------------------------
-##
-##
-## res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AB$mean
-## list_theta[[1]]$mean
+res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AA$mean
+list_theta[[1]]$mean
+
+res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AA$var
+list_theta[[1]]$var
+
+res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AA$p0
+list_theta[[1]]$p0
+
+res_MBMsimu$fittedModel[[1]]$paramEstim$list_pi
+pi_true
+
+table(res_MBMsimu$fittedModel[[1]]$paramEstim$Z[[1]],Z)
+
 ##
 

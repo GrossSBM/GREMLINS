@@ -17,7 +17,10 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
   n_q <- dataR6$v_NQ
   cardE <- dataR6$cardE
   matE <- dataR6$Ecode ### a remettre en public?????
-  list_Mat <- dataR6$mats
+  #list_Mat <- dataR6$mats
+  list_Unit <- lapply(dataR6$mats,function(m){1 * (1 - is.na(m))})
+  list_Mat <- lapply(dataR6$mats,function(m){m[is.na(m)] = 0})
+
   v_distrib <- dataR6$v_distrib
 
   #const_lik_poisson <- vapply(1:cardE, function(e){if (v_distrib[e] == 'poisson') {return(sum(lfactorial(c(list_Mat[[e]]))))} else {return(0)}},1)
@@ -45,8 +48,8 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
 
 
   #for computations when SBM putting 0 on the diagonal
-  indSBM <- which(matE[,2] < 1)
-  for (i in indSBM) {diag(list_Mat[[i]])  <- 0}
+  #indSBM <- which(matE[,2] < 1)
+  #for (i in indSBM) {diag(list_Mat[[i]])  <- 0}
 
 
   #entering VEM
@@ -90,19 +93,18 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
     list_theta  = lapply(1:cardE,function(e){
       gr <- matE[e,1]
       gc <- matE[e,2]
-      if (gc < 1) {  #for sbm sym or notsym
-        gc <- gr
-        #useful matrix
-        Unitmdiag <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
-        diag(Unitmdiag) <- 0
-        Unit <- Unitmdiag
-      }else{
-        Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
-      }
+      # if (gc < 1) {  #for sbm sym or notsym
+      #   gc <- gr
+      #   #useful matrix
+      #   Unitmdiag <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
+      #   diag(Unitmdiag) <- 0
+      #   Unit <- Unitmdiag
+      # }else{
+      #   Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
+      # }
 
-      Denom <- crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+      Denom <- crossprod(crossprod(list_Unit[[e]], tau[[gr]]), tau[[gc]])
       mu <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]])
-
 
       if (v_distrib[e] %in% c('poisson','bernoulli')) { #bernoulli or poisson distribution same expression for M step
         list_theta_e <- mu  / Denom
@@ -114,8 +116,11 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
         list_theta_e$var <-  A - list_theta_e$mean^2
       }
       if (v_distrib[e] == 'ZIgaussian') {
-        Zeros_e  <- list_Mat[[e]] == 0
-        list_theta_e$p0 <- crossprod(crossprod(Zeros_e, tau[[gr]]), tau[[gc]]) / Denom
+        NonZeros_e  <- list_Mat[[e]] != 0
+        list_theta_e$mean <- mu / crossprod(crossprod(NonZeros_e, tau[[gr]]), tau[[gc]])
+        A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) /  crossprod(crossprod(NonZeros_e, tau[[gr]]), tau[[gc]])
+        list_theta_e$var <-  A - list_theta_e$mean^2
+        list_theta_e$p0 <- 1 - crossprod(crossprod(NonZeros_e, tau[[gr]]), tau[[gc]]) / Denom
       }
       if (v_distrib[e] == 'laplace') {
           Omega <- list_Mat[[e]]
