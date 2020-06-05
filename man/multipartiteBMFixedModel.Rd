@@ -19,7 +19,7 @@ multipartiteBMFixedModel(
 \arguments{
 \item{list_Net}{A list of network (defined via the function DefineNetwork)}
 
-\item{v_distrib}{Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
+\item{v_distrib}{Type of proababilistic distributions in each network : if 0/1 then bernoulli, if counting then poisson, gaussian or Zero Inflated Gaussian (ZIgaussian) My default  = Bernoulli.
 Must give a vector whose length is the number of networks in list_Net}
 
 \item{namesFG}{Names of functional groups (must correspond to names in listNet)}

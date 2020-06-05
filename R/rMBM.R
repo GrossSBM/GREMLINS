@@ -5,7 +5,7 @@
 #' @param  v_NQ : number of individual in each Functional Group (FG)
 #' @param  E : define the architecture of the Multipartite.
 #' @param  typeInter : type of interaction in each network: undirected adjacency (adj), directed adjacency (diradj) or incidence (inc).  (vector of size equal to nrow(E) )
-#' @param  v_distrib : vector of the distributions  (bernoulli, poisson, gaussian or laplace for each network) ( vector of size equal to nrow(E) )
+#' @param  v_distrib : vector of the distributions  (bernoulli, poisson, gaussian, Zero inflated gaussian or laplace for each network) ( vector of size equal to nrow(E) )
 #' @param  list_pi  : parameters of the blocks distribution
 #' @param  list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and var, for Laplace a list with location and scale
 #' @param  namesFG : names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)

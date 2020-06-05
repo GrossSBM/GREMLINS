@@ -173,6 +173,11 @@ readjustTheta <- function(theta,eps, distrib)
     theta[theta > 1 - eps] = 1 - eps }
   if (distrib == 'poisson') { theta[theta < eps] = eps }
   if (distrib == 'gaussian'){ theta$var[theta$var < eps] = eps }
+  if (distrib == 'ZIgaussian'){
+    theta$var[theta$var < eps] = eps
+    theta$p0[theta$p0 < eps] = eps
+    theta$p0[theta$p0 > 1 - eps] = 1 - eps
+    }
   if (distrib == 'laplace') { theta[theta < eps] = eps }
   return(theta)
 }
@@ -182,7 +187,7 @@ readjustTheta <- function(theta,eps, distrib)
 compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
 {
 
-  #browser()
+
   cardE <- nrow(matE)
   Q <-  length(list_pi)
 
@@ -193,15 +198,15 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
     gc = matE[e,2]
     don = list_Mat[[e]]
     if (v_distrib[e] == 'bernoulli') {Unmdon = 1 - don}
-    if (v_distrib[e]  %in% c('poisson','laplace','gaussian')) { Unit = matrix(1,nrow = nrow(don),ncol = ncol(don))}
-
+    if (v_distrib[e]  %in% c('poisson','laplace','gaussian','ZIgaussian')) { Unit = matrix(1,nrow = nrow(don),ncol = ncol(don))}
+    if (v_distrib[e]  == 'ZIgaussian') { Zerosdon  = (don == 0)}
     facteur = 1
 
     if (gc < 1) #sbm or sbm sym
     {
       if (gc == 0)  facteur = 1/2 #sbm sym
       gc = gr
-      if (v_distrib[e] %in% c('poisson','laplace','gaussian')) {diag(Unit) = 0}
+      if (v_distrib[e] %in% c('poisson','laplace','gaussian','ZIgaussian')) {diag(Unit) = 0}
       if (v_distrib[e] == 'bernoulli') { diag(Unmdon) <- 0}
     }
     if (v_distrib[e] == 'bernoulli') {
@@ -227,6 +232,18 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
       prov3  = (tau[[gr]]) %*%  (list_theta[[e]]$mean/list_theta[[e]]$var)  %*% t(tau[[gc]])
       return((-sum(Unit * prov) - sum(don^2 * prov2) + sum(don  * prov3)) * facteur)
     }
+    if (v_distrib[e] == 'ZIgaussian') {
+      #browser()
+      prov = 0.5 * (tau[[gr]]) %*% (log(2 * pi * list_theta[[e]]$var) + list_theta[[e]]$mean^2/list_theta[[e]]$var) %*% t(tau[[gc]])
+      prov2 = 0.5 * (tau[[gr]]) %*%  (1 / list_theta[[e]]$var)  %*% t(tau[[gc]])
+      prov3  = (tau[[gr]]) %*%  (list_theta[[e]]$mean/list_theta[[e]]$var)  %*% t(tau[[gc]])
+      P1 <-  sum((-Unit * prov  -  don^2 * prov2 + don  * prov3) * (1 - Zerosdon))
+      prov4 = (tau[[gr]]) %*% log(list_theta[[e]]$p0 + (list_theta[[e]]$p0 == 0)) %*% t(tau[[gc]])
+      prov4m = (tau[[gr]]) %*% log(1 - list_theta[[e]]$p0 + (list_theta[[e]]$p0 == 1)) %*% t(tau[[gc]])
+      P2 <- sum(Zerosdon * prov4) + sum((1-Zerosdon) * prov4m)
+      return( (P1 + P2) * facteur)
+    }
+
 
   }
   )
@@ -246,17 +263,21 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
   {
     gr = matE[s,1]
     gc = matE[s,2]
+    nbparam_s = 1;
+    if (v_distrib[s] == 'gaussian' ) {nbparam_s = 2}
+    if (v_distrib[s] == 'ZIgaussian' ) {nbparam_s = 3}
+
     if (gc > 0) #LBM
     {
-      return(c(v_K[gr] * v_K[gc], prod(dim(list_Mat[[s]]))))
+      return(c(nbparam_s * v_K[gr] * v_K[gc], prod(dim(list_Mat[[s]]))))
     }
     if (gc == 0) #SBM sym
     {
-      return(c(v_K[gr] * (v_K[gr] + 1) / 2, nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)/2))
+      return(c(nbparam_s*v_K[gr] * (v_K[gr] + 1) / 2, nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)/2))
     }
     if (gc == -1) #SBM non sym
     {
-      return(c(v_K[gr] * (v_K[gr]), nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)))
+      return(c(nbparam_s*v_K[gr] * (v_K[gr]), nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)))
     }
 
   },c(1.0,2.0)

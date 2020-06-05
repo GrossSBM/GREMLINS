@@ -64,13 +64,12 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
     gr <- matE[e,1]
     gc <- matE[e,2]
     if (gc < 1) gc <- gr
-    if (v_distrib[e] == 'gaussian') {
-      return(list(mean=matrix(Inf,v_K[gr],v_K[gc]), var = matrix(Inf,v_K[gr],v_K[gc])))
-    }else{
-      return(matrix(Inf,v_K[gr],v_K[gc]))
-    }
-    }
-    )
+    if (v_distrib[e] == 'gaussian') {return(list(mean = matrix(Inf,v_K[gr],v_K[gc]), var = matrix(Inf,v_K[gr],v_K[gc])))}
+    if (v_distrib[e] == 'ZIgaussian') {
+      return(list(mean = matrix(Inf,v_K[gr],v_K[gc]), var = matrix(Inf,v_K[gr],v_K[gc]),p0 = matrix(Inf,v_K[gr],v_K[gc])))}
+    if (v_distrib[e] %in% c('bernoulli','poisson','laplace')) { return(matrix(Inf,v_K[gr],v_K[gc]))}
+  }
+  )
 
 
 
@@ -101,19 +100,27 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
         Unit <- matrix(1,nrow = n_q[gr],ncol = n_q[gc])
       }
 
+      Denom <- crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+      mu <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]])
+
+
       if (v_distrib[e] %in% c('poisson','bernoulli')) { #bernoulli or poisson distribution same expression for M step
-        list_theta_e <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+        list_theta_e <- mu  / Denom
       }
-      if (v_distrib[e] == 'gaussian') {
+      if (v_distrib[e]  %in% c('gaussian', 'ZIgaussian')) {
         list_theta_e <- list()
-        list_theta_e$mean <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
-        A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+        list_theta_e$mean <- mu / Denom
+        A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) / Denom
         list_theta_e$var <-  A - list_theta_e$mean^2
+      }
+      if (v_distrib[e] == 'ZIgaussian') {
+        Zeros_e  <- list_Mat[[e]] == 0
+        list_theta_e$p0 <- crossprod(crossprod(Zeros_e, tau[[gr]]), tau[[gc]]) / Denom
       }
       if (v_distrib[e] == 'laplace') {
           Omega <- list_Mat[[e]]
           diag(Omega) <- 0
-          list_theta_e <- crossprod(crossprod(abs(Omega), tau[[gr]]), tau[[gc]]) / crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+          list_theta_e <- crossprod(crossprod(abs(Omega), tau[[gr]]), tau[[gc]]) / Denom
       }
       return(list_theta_e)})
 
@@ -151,20 +158,23 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
             matlist_theta <- list_theta[[l[1]]]
             don <- list_Mat[[l[1]]]
             if (v_distrib[l[1]] == 'bernoulli' ) { Unmdon <- 1 - don }
-            if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian')) {Unit <- matrix(1,nrow(don),ncol(don))}
+            if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian','ZIgaussian')) {Unit <- matrix(1,nrow(don),ncol(don))}
+            if (v_distrib[l[1]] == 'ZIgaussian') { Zerosdon <- (don == 0) }
             #------------
             if (qprime < 1)   #if sbm
             {
               if (v_distrib[l[1]] == 'bernoulli' ) {diag(Unmdon) <- 0 }
-              if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian') ) {diag(Unit) <- 0 }
+              if (v_distrib[l[1]] %in% c('laplace','poisson','gaussian','ZIgaussian') ) {diag(Unit) <- 0 }
               qprime <- q
             }else{ # if lbm
               if (l[2] == 2) #functional group q at stake in rows
               {
                 don <- t(don)
                 if (v_distrib[l[1]] == 'bernoulli' ) {Unmdon <- t(Unmdon) }
-                if (v_distrib[l[1]]  %in% c('laplace','poisson','gaussian') ) {Unit <- t(Unit) }
-                if (v_distrib[l[1]] == 'gaussian' ) {matlist_theta <- lapply(matlist_theta,function(theta){t(theta)})}else{matlist_theta = t(matlist_theta)}
+                if (v_distrib[l[1]]  %in% c('laplace','poisson','gaussian','ZIgaussian') ) {Unit <- t(Unit) }
+                if (v_distrib[l[1]]  == 'ZIgaussian' ) {Zerosdon <- t(Zerosdon) }
+
+                if (v_distrib[l[1]] %in% c('gaussian','ZIgaussian' )) {matlist_theta <- lapply(matlist_theta,function(theta){t(theta)})}else{matlist_theta = t(matlist_theta)}
               }
             #------------
             }
@@ -174,7 +184,11 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
               bernoulli = {lik  = don %*% tcrossprod(tau[[qprime]],log(matlist_theta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta))},
               poisson = {lik  = -Unit %*% tcrossprod(tau[[qprime]], matlist_theta) + don %*% tcrossprod(tau[[qprime]],log(matlist_theta))},
               laplace  = {lik  = -Unit %*% tcrossprod(tau[[qprime]], log(2 * matlist_theta)) - abs(don) %*% tcrossprod(tau[[qprime]], 1/matlist_theta)},
-              gaussian  = {lik = -0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)}
+              gaussian  = {lik = -0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)},
+              ZIgaussian  = {
+                likGauss = -0.5 * ((1 - Zerosdon) * Unit) %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * ((1 - Zerosdon) * don^2) %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + ((1 - Zerosdon) * don) %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)
+                likZeros = Zerosdon %*% tcrossprod(tau[[qprime]],log(matlist_theta$p0)) + (1 - Zerosdon) %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta$p0))
+                lik  = likGauss + likZeros}
             )
 
 
@@ -183,8 +197,9 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
             {
               don <- t(don)
               if (v_distrib[l[1]] == 'bernoulli' ) { Unmdon <- t(Unmdon) }
-              if (v_distrib[l[1]]  %in% c('laplace','poisson','gaussian') ) {Unit <- t(Unit) }
-              if (v_distrib[l[1]] == 'gaussian' ) {
+              if (v_distrib[l[1]]  %in% c('laplace','poisson','gaussian','ZIgaussian') ) {Unit <- t(Unit) }
+              if (v_distrib[l[1]]  == 'ZIgaussian' ) {Zerosdon <- t(Zerosdon) }
+              if (v_distrib[l[1]] %in% c('gaussian', 'ZIgaussian' )) {
                 matlist_theta <- lapply(matlist_theta,function(theta){t(theta)})
               }else{matlist_theta <- t(matlist_theta)}
 
@@ -192,8 +207,12 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
                 bernoulli = {lik = lik + don %*% tcrossprod(tau[[qprime]],log(matlist_theta)) + Unmdon %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta))},
                 poisson =   {lik = lik - Unit %*% tcrossprod(tau[[qprime]], matlist_theta)  +   don %*% tcrossprod(tau[[qprime]],log(matlist_theta))},
                 laplace  =  {lik = lik - Unit %*% tcrossprod(tau[[qprime]], log(2 * matlist_theta)) - abs(don) %*% tcrossprod(tau[[qprime]], 1/matlist_theta)},
-                gaussian  = {lik = lik - 0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)
-                }
+                gaussian  = {lik = lik - 0.5 * Unit %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * don^2 %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + don %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)},
+                ZIgaussian  = {
+                  likGauss = -0.5 * ((1 - Zerosdon) * Unit) %*% tcrossprod(tau[[qprime]], log(2 * pi * matlist_theta$var) + matlist_theta$mean^2/matlist_theta$var) - 0.5 * ((1 - Zerosdon)* don^2) %*% tcrossprod(tau[[qprime]], 1/matlist_theta$var) + ((1 - Zerosdon)*don) %*% tcrossprod(tau[[qprime]], matlist_theta$mean/matlist_theta$var)
+                  likZeros = Zerosdon %*% tcrossprod(tau[[qprime]],log(matlist_theta$p0)) + (1 - Zerosdon) %*% tcrossprod(tau[[qprime]],log(1 - matlist_theta$p0))
+                  lik = lik + likGauss + likZeros
+                 }
               )
             }
             return(lik)

@@ -23,7 +23,7 @@ rMBM(
 
 \item{typeInter}{: type of interaction in each network: undirected adjacency (adj), directed adjacency (diradj) or incidence (inc).  (vector of size equal to nrow(E) )}
 
-\item{v_distrib}{: vector of the distributions  (bernoulli, poisson, gaussian or laplace for each network) ( vector of size equal to nrow(E) )}
+\item{v_distrib}{: vector of the distributions  (bernoulli, poisson, gaussian, Zero inflated gaussian or laplace for each network) ( vector of size equal to nrow(E) )}
 
 \item{list_pi}{: parameters of the blocks distribution}
 

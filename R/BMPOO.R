@@ -5,7 +5,7 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
             namesFG = NULL, #vector of names of fgs
             namesInd = NULL,
             typeInter = NULL, #vector of type of matrices (diradj=directed adjacency, adj, inc=incidence)
-            v_distrib = NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli...)
+            v_distrib = NULL, #vector of emission distribution (same length as number mats) (poisson, bernoulli, gaussian, laplace, ZIgaussian...)
             Q = NULL,     #number of functional groups
             cardE = NULL, #number of mats
             v_NQ = NULL, #number of individuals in fgs
@@ -34,7 +34,7 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
                 }
 
 
-                #chack adequation of v_distrib from data
+                #check adequation of v_distrib from data
                 v_distrib_guessed <- unlist(lapply(mats,function(Net){
                    support <- sort(unique(as.vector(Net)))
                    if (all(is.poswholenumber(support))) {
@@ -50,7 +50,7 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
 
                 if (length(w.continuous) > 0) {
                   check <- 1
-                  for (u in w.continuous) {check = check * as.numeric(v_distrib[u] %in% c('gaussian','laplace'))}
+                  for (u in w.continuous) {check = check * as.numeric(v_distrib[u] %in% c('gaussian','laplace','ZIgaussian'))}
                   if ( check == 0) {stop('Check distribution for continuous weighted network')}
                 }
                 if (length(w.noncontinuous) > 0) {
@@ -137,6 +137,11 @@ MBMfit$set("public",'sim',
                           },
                         gaussian  = {
                           X_e <- matrix(rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = sqrt(list_theta_e$var[Z_fg1,Z_fg2])),self$v_NQ[fg1],self$v_NQ[fg2])
+                          },
+                       ZIgaussian = {
+                         U <- rbinom(self$v_NQ[fg1] * self$v_NQ[fg2], 1, list_theta_e$p0[Z_fg1,Z_fg2])
+                         Z <- rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = sqrt(list_theta_e$var[Z_fg1,Z_fg2]))
+                         X_e <- matrix((U == 1) *  Z,self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                        laplace = {
                           X_e <- matrix(rlaplace(self$v_NQ[fg1] * self$v_NQ[fg2], location = 0, scale = list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
