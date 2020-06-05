@@ -30,6 +30,7 @@ list_theta[[1]] = lapply(list_theta[[1]] , function(u){0.5 * (u + t(u))}) # for 
                  list_theta, seed = NULL,
                  namesFG = namesFG,keepClassif  = TRUE)
  list_Net <- dataSim$list_Net
+ diag(list_Net[[1]]$mat) = NA
  length(list_Net)
  names(list_Net[[1]])
  list_Net[[1]]$typeInter
@@ -38,19 +39,19 @@ list_theta[[1]] = lapply(list_theta[[1]] , function(u){0.5 * (u + t(u))}) # for 
 
 
 ## ---- verif---------------------------------------------------------------------------------------------------------
-Y <- dataSim$list_Net[[1]]$mat
-Z = dataSim$classif[[1]]
-pi_true <- table(Z)/length(Z)
-tau_true <- matrix(0,v_NQ[1],v_K[1])
-for (i in 1:v_NQ[1]){tau_true[i,Z[i]] = 1}
-Unit <- matrix(1,)
-Denom <- crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
-mu <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]])
-Zeros_e  <- Y == 0
-mean_true <- mu / crossprod(crossprod(1 - Zeros_e, tau[[gr]]), tau[[gc]])
-A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) /  crossprod(crossprod(1-Zeros_e, tau[[gr]]), tau[[gc]])
-list_theta_e$var <-  A - list_theta_e$mean^2
-list_theta_e$p0 <- crossprod(crossprod(Zeros_e, tau[[gr]]), tau[[gc]]) / Denom
+# Y <- dataSim$list_Net[[1]]$mat
+# Z = dataSim$classif[[1]]
+# pi_true <- table(Z)/length(Z)
+# tau_true <- matrix(0,v_NQ[1],v_K[1])
+# for (i in 1:v_NQ[1]){tau_true[i,Z[i]] = 1}
+# Unit <- matrix(1,)
+# Denom <- crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
+# mu <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]])
+# Zeros_e  <- Y == 0
+# mean_true <- mu / crossprod(crossprod(1 - Zeros_e, tau[[gr]]), tau[[gc]])
+# A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) /  crossprod(crossprod(1-Zeros_e, tau[[gr]]), tau[[gc]])
+# list_theta_e$var <-  A - list_theta_e$mean^2
+# list_theta_e$p0 <- crossprod(crossprod(Zeros_e, tau[[gr]]), tau[[gc]]) / Denom
 
 
 ## ----MBM simul eval false, echo = TRUE, eval = FALSE-----------------------------------------------------------------------------------------
