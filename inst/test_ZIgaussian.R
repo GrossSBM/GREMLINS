@@ -23,7 +23,7 @@ list_theta[[1]]$mean  <- matrix(round(rnorm(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1)
 list_theta[[1]]$var  = matrix(round(rgamma(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
 list_theta[[1]]$p0  = matrix(round(rbeta(v_K[E[1,1]] * v_K[E[1,2]],2,2 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
 list_theta[[1]] = lapply(list_theta[[1]] , function(u){0.5 * (u + t(u))}) # for symetrisation
-
+list_theta_true <- list_theta
 
 # ----simul 2, eval = FALSE, echo = TRUE------------------------------------------------------------------------------------------------------
  dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi,
@@ -39,19 +39,23 @@ list_theta[[1]] = lapply(list_theta[[1]] , function(u){0.5 * (u + t(u))}) # for 
 
 
 ## ---- verif---------------------------------------------------------------------------------------------------------
-# Y <- dataSim$list_Net[[1]]$mat
-# Z = dataSim$classif[[1]]
-# pi_true <- table(Z)/length(Z)
-# tau_true <- matrix(0,v_NQ[1],v_K[1])
-# for (i in 1:v_NQ[1]){tau_true[i,Z[i]] = 1}
-# Unit <- matrix(1,)
-# Denom <- crossprod(crossprod(Unit, tau[[gr]]), tau[[gc]])
-# mu <- crossprod(crossprod(list_Mat[[e]], tau[[gr]]), tau[[gc]])
-# Zeros_e  <- Y == 0
-# mean_true <- mu / crossprod(crossprod(1 - Zeros_e, tau[[gr]]), tau[[gc]])
-# A <- crossprod(crossprod(list_Mat[[e]]^2, tau[[gr]]), tau[[gc]]) /  crossprod(crossprod(1-Zeros_e, tau[[gr]]), tau[[gc]])
-# list_theta_e$var <-  A - list_theta_e$mean^2
-# list_theta_e$p0 <- crossprod(crossprod(Zeros_e, tau[[gr]]), tau[[gc]]) / Denom
+Y <- list(mat = list(list_Net[[1]]$mat))
+Z = dataSim$classif[[1]]
+pi_true <- table(Z)/length(Z)
+tau_true <- matrix(0,v_NQ[1],v_K[1])
+for (i in 1:v_NQ[1]){tau_true[i,Z[i]] = 1}
+list_MaskNA <- lapply(Y$mat,function(m){1 * (1 - is.na(m))})
+list_Mat <- lapply(Y$mat,function(m){m[is.na(m)] = 0; m})
+
+Denom <- crossprod(crossprod(list_MaskNA[[1]], tau_true), tau_true)
+mu <- crossprod(crossprod(list_Mat[[1]], tau_true), tau_true)
+NonZeros_e  <- list_Mat[[1]] != 0
+list_theta_sim = list()
+list_theta_sim$mean <- mu / crossprod(crossprod(NonZeros_e, tau_true), tau_true)
+A <- crossprod(crossprod(list_Mat[[1]]^2, tau_true), tau_true) /  crossprod(crossprod(NonZeros_e, tau_true), tau_true)
+list_theta_sim$var <-  A - list_theta_sim$mean^2
+list_theta_sim$p0 <- 1 - crossprod(crossprod(NonZeros_e, tau_true), tau_true) / Denom
+
 
 
 ## ----MBM simul eval false, echo = TRUE, eval = FALSE-----------------------------------------------------------------------------------------
@@ -68,12 +72,17 @@ list_theta[[1]] = lapply(list_theta[[1]] , function(u){0.5 * (u + t(u))}) # for 
 ## ----estim param, eval=FALSE-----------------------------------------------------------------------------------------------------------------
 res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AA$mean
 list_theta[[1]]$mean
+list_theta_sim$mean
+
 
 res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AA$var
-list_theta[[1]]$var
+list_theta_true[[1]]$var
+list_theta_sim$var
 
 res_MBMsimu$fittedModel[[1]]$paramEstim$list_theta$AA$p0
-list_theta[[1]]$p0
+list_theta_true[[1]]$p0
+list_theta_sim$p0
+
 
 res_MBMsimu$fittedModel[[1]]$paramEstim$list_pi
 pi_true

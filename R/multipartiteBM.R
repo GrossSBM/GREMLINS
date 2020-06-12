@@ -210,7 +210,9 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
     if (length(collectionTestedClassifInit) > indRef) {
       for (i in (indRef + 1):length(collectionTestedClassifInit))
       {
-         R <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM))
+        R <<- c(R,dataR6$searchNbClusters(collectionTestedClassifInit[[i]],Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM))
+
+        #R <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM))
       }
     }
 

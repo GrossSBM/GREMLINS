@@ -383,7 +383,7 @@ cleanEstim <- function(dataR6,R){
 
   #### remove non convergent models
   conv <- which(sapply(R ,function(u){u$convergence}))
-  if (length(conv) != length(R)){
+  if (length(conv) != length(R)) {
     Rconv <- lapply(conv,function(l){R[[l]]})
   }else{
     Rconv <- R
@@ -391,15 +391,22 @@ cleanEstim <- function(dataR6,R){
   R <- Rconv;
 
 
+  if ( length(R) == 0 ){ return(NULL)}
+  else{
 
-  ### first  : for equal model keep the estimate wit the highest J
+  ### first  : for equal model keep the estimate with the highest J
   seq_J <- sapply(R ,function(u){max(u$vJ)})
   o <- order(seq_J,decreasing = TRUE)
+
   R.ordered.1 <- lapply(o,function(i){R[[i]]})
 
   if (dataR6$Q == 1) {
   seq_NbClust <- cbind((sapply(R.ordered.1,function(u){u$paramEstim$v_K})),seq_J[o],1:length(R))
   } else {
+
+    a1 <- nrow(t(sapply(R.ordered.1,function(u){u$paramEstim$v_K})))
+    a2 <- length(seq_J[o])
+    if (a1 != a2) { browser()}
   seq_NbClust <- cbind(t(sapply(R.ordered.1,function(u){u$paramEstim$v_K})),seq_J[o],1:length(R))
   }
 
@@ -415,7 +422,7 @@ cleanEstim <- function(dataR6,R){
   seq_ICL <- sapply(R,function(u){u$ICL})
   o <- order(seq_ICL,decreasing = TRUE)
   res <- lapply(o,function(i){R[[i]]})
-  return(res)
+  return(res)}
 }
 
 
