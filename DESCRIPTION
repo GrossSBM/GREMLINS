@@ -35,6 +35,7 @@ Collate:
       'rMBM.R'
       'comparClassif.R'
       'MPEcoNetwork.R'
+      'predictMBM.R'
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
