@@ -41,7 +41,7 @@ dataSim <- rMBM(v_NQ = v_NQ , E = E , typeInter = typeInter,
                 v_distrib = v_distrib, list_pi = list_pi,
                 list_theta = list_theta, namesFG,keepClassif = TRUE)
 list_Net <- dataSim$list_Net
-diag(list_net[[3]]$mat) = NA
+diag(list_Net[[3]]$mat) = NA
 classifTrue <- dataSim$classif
 
 

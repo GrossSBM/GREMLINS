@@ -264,7 +264,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
 
 
     #computing lik
-    pseudolik <- compLikICLInt(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
+    pseudolik <- compLikICLInt(tau,list_theta,list_pi,matE,list_Mat, list_MaskNA ,n_q,v_K,v_distrib)
     vJ[iterVEM] <- pseudolik$condLik + pseudolik$margLik + pseudolik$entr
   } # ------------ end of EM var
 
@@ -273,14 +273,14 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
 
 
   #computing ICL
-  likICL <- compLikICLInt(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
-
- ICL <-  likICL$condLik + likICL$margLik - 1/2 * likICL$pen
+  #likICL <- compLikICLInt(tau,list_theta,list_pi,matE,list_Mat,list_MaskNA,n_q,v_K,v_distrib)
+  likICL  <-  pseudolik
+  ICL <-  likICL$condLik + likICL$margLik - 1/2 * likICL$pen
 
   paramEstim   <- MBMfit$new(v_K = v_K, v_distrib = v_distrib, list_pi = list_pi,list_theta = list_theta);
   names(paramEstim$list_pi) = namesFG
 
-  names_mat <- sapply(1:nrow(dataR6$E),function(e){paste(namesFG[dataR6$E[e,1]],namesFG[dataR6$E[e,2]],sep='')})
+  names_mat <- sapply(1:nrow(dataR6$E),function(e){paste(namesFG[dataR6$E[e,1]],namesFG[dataR6$E[e,2]],sep = '')})
   names(paramEstim$list_theta) = names_mat
 
   paramEstim$tau <- tau

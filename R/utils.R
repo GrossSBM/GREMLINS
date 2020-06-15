@@ -184,7 +184,7 @@ readjustTheta <- function(theta,eps, distrib)
 
 
 #------------------- computing ICL and likelihood
-compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
+compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,list_MaskNA,n_q,v_K,v_distrib)
 {
 
 
@@ -197,17 +197,19 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
     gr = matE[e,1]
     gc = matE[e,2]
     don = list_Mat[[e]]
-    if (v_distrib[e] == 'bernoulli') {Unmdon = 1 - don}
-    if (v_distrib[e]  %in% c('poisson','laplace','gaussian','ZIgaussian')) { Unit = matrix(1,nrow = nrow(don),ncol = ncol(don))}
-    if (v_distrib[e]  == 'ZIgaussian') { Zerosdon  = (don == 0)}
+    maskNA = list_MaskNA[[e]]
+    if (v_distrib[e] == 'bernoulli') {Unmdon = (1 - don) * maskNA}
+    if (v_distrib[e] %in% c('laplace','poisson','gaussian','ZIgaussian')) {Unit <- maskNA}
+    if (v_distrib[e] == 'ZIgaussian') { NonZerosdon <- (don != 0); Zerosdon <- (don == 0) * maskNA }
     facteur = 1
 
     if (gc < 1) #sbm or sbm sym
     {
       if (gc == 0)  facteur = 1/2 #sbm sym
       gc = gr
-      if (v_distrib[e] %in% c('poisson','laplace','gaussian','ZIgaussian')) {diag(Unit) = 0}
-      if (v_distrib[e] == 'bernoulli') { diag(Unmdon) <- 0}
+
+      #if (v_distrib[e] %in% c('poisson','laplace','gaussian','ZIgaussian')) {diag(Unit) = 0}
+      #if (v_distrib[e] == 'bernoulli') { diag(Unmdon) <- 0}
     }
     if (v_distrib[e] == 'bernoulli') {
       prov = (tau[[gr]]) %*% log(list_theta[[e]]) %*% t(tau[[gc]])
@@ -240,7 +242,7 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
       P1 <-  sum((-Unit * prov  -  don^2 * prov2 + don  * prov3) * (1 - Zerosdon))
       prov4 = (tau[[gr]]) %*% log(list_theta[[e]]$p0 + (list_theta[[e]]$p0 == 0)) %*% t(tau[[gc]])
       prov4m = (tau[[gr]]) %*% log(1 - list_theta[[e]]$p0 + (list_theta[[e]]$p0 == 1)) %*% t(tau[[gc]])
-      P2 <- sum(Zerosdon * prov4) + sum((1-Zerosdon) * prov4m)
+      P2 <- sum(Zerosdon * prov4) + sum((1 - Zerosdon) * prov4m)
       return( (P1 + P2) * facteur)
     }
 
@@ -267,17 +269,22 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,n_q,v_K,v_distrib)
     if (v_distrib[s] == 'gaussian' ) {nbparam_s = 2}
     if (v_distrib[s] == 'ZIgaussian' ) {nbparam_s = 3}
 
+
+
     if (gc > 0) #LBM
     {
-      return(c(nbparam_s * v_K[gr] * v_K[gc], prod(dim(list_Mat[[s]]))))
+      dimData <- sum(list_MaskNA[[s]])
+      return(c(nbparam_s * v_K[gr] * v_K[gc], dimData))
     }
     if (gc == 0) #SBM sym
     {
-      return(c(nbparam_s*v_K[gr] * (v_K[gr] + 1) / 2, nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)/2))
+      dimData <- sum(upper.tri(list_MaskNA[[s]],diag = FALSE)) + sum(diag(list_MaskNA[[s]]))
+      return(c(nbparam_s*v_K[gr] * (v_K[gr] + 1) / 2, dimData))
     }
     if (gc == -1) #SBM non sym
     {
-      return(c(nbparam_s*v_K[gr] * (v_K[gr]), nrow(list_Mat[[s]]) * (nrow(list_Mat[[s]]) - 1)))
+      dimData <- sum(list_MaskNA[[s]])
+      return(c(nbparam_s*v_K[gr] * (v_K[gr]), dimData))
     }
 
   },c(1.0,2.0)
