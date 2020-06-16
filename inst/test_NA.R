@@ -53,7 +53,7 @@ classifTrue <- dataSim$classif
                       v_Kinit = NULL,
                       verbose = TRUE,
                       maxiterVE =  100,maxiterVEM =  100,
-                      save=FALSE, initBM = TRUE)
+                      save=FALSE, initBM = FALSE)
 
 for (i in 1:n_FG){print(table(res_MBMsimu$fittedModel[[1]]$paramEstim$Z[[i]],dataSim$classif[[i]]))}
 
