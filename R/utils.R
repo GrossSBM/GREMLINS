@@ -292,9 +292,9 @@ compLikICLInt = function(tau,list_theta,list_pi,matE,list_Mat,list_MaskNA,n_q,v_
 
 
   penICL = sum((v_K - 1) * log(n_q))  + sum(penMats[1,]) * log(sum(penMats[2,]))
+  penICL2 = sum((v_K - 1) * log(n_q))  + sum(penMats[1,]  * log(penMats[2,]))
 
-
-  return(list(condLik = condLik,margLik = margLik,entr = entro,pen = penICL))
+  return(list(condLik = condLik,margLik = margLik,entr = entro,pen = penICL2))
 
 }
 
