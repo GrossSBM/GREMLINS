@@ -1,4 +1,4 @@
-  ---
+---
 title: "GREMLIN. Quick Mathematical Background"
 author: "Sophie Donnet, Pierre Barbillon"
 date: "`r Sys.Date()`"
