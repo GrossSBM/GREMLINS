@@ -75,6 +75,24 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="articles/EcologicalNetwork.html">Analysis of a mutualistic multipartite ecological network with GREMLIN</a>
+    </li>
+    <li>
+      <a href="articles/Introduction.html">GREMLIN. Quick Mathematical Background</a>
+    </li>
+    <li>
+      <a href="articles/SimulatedNetwork.html">Illustration on a simulated multipartite network</a>
+    </li>
+  </ul>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -96,8 +114,35 @@
 
 <div id="gremlin" class="section level1">
 
-<p>An R package for adjusting Multipartite Blockmodels</p>
-<p>devtools::install_github(“<a href="https://github.com/Demiperimetre/GREMLIN" class="uri">https://github.com/Demiperimetre/GREMLIN</a>”)</p>
+<!-- badges: start -->
+<!-- badges: end -->
+<p>The goal of GREMLIN is to perform statistical analysis of multipartite networks through a block model approach.</p>
+<p>Multipartite networks consist in the joint observation of several networks implying some common individuals. The individuals (or entities represented by nodes) at stake are partitioned into groups defined by their nature. In what follows, these groups will be referred to as .</p>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>You can install the released version of GREMLIN <a href="https://github.com/">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#devtools::install_github("Demiperimetre/GREMLIN")</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(GREMLIN)</span></code></pre></div>
+</div>
+<div id="mathematical-background" class="section level2">
+<h2 class="hasAnchor">
+<a href="#mathematical-background" class="anchor"></a>Mathematical Background</h2>
+<div id="a-collection-of-networks" class="section level3">
+<h3 class="hasAnchor">
+<a href="#a-collection-of-networks" class="anchor"></a>A collection of networks</h3>
+<p>Assume that <em>Q</em> functional groups of individuals are at stake; Let <em>n</em><sub><em>q</em></sub> be the number of individuals in the <em>q</em>-th functional group.</p>
+<p>A multipartite network is a collection of networks: each network may be simple (relations inside a functional group) or bipartite (relations between individuals of two functional groups). We index the collection of networks by pairs of functional groups (<em>q</em>, <em>q</em>′).</p>
+<p>The set <em>E</em> denotes the list of pairs of functional groups for which we observe an interaction network.</p>
+<p>For any pair (<em>q</em>, <em>q</em>′) ∈ <em>E</em>, the interaction network is encoded in a matrix <em>X</em><sup>*q**q<em>′</em></sup> : $X^{qq’}_{ii’} 0 $ if there is an edge from unit i* of functional group <em>q</em> to unit <em>i</em>′ of functional group <em>q</em>′, 0 otherwise. - If <em>q</em> ≠ <em>q</em>′, <em>X</em><sup><em>q<strong>q<em>′</em></strong></em></sup> is said to be an . - X<em><sup></sup></em>qq is an : it is symmetric if the relation inside the functional group <em>q</em> is non-oriented, non-symmetric otherwise.</p>
+</div>
+<div id="a-block-model" class="section level3">
+<h3 class="hasAnchor">
+<a href="#a-block-model" class="anchor"></a>A block model</h3>
+<p>Assume that, each functional group <em>q</em> is divided into <em>K</em><sub><em>q</em></sub> blocks (or equivalently clusters). ∀<em>q</em> ∈ {1, …, <em>Q</em>} and $ i {1,,n_q}$, let <em>Z</em><sub><em>i</em></sub><sup><em>q</em></sup> be the latent random variable such that <em>Z</em><sub><em>i</em></sub><sup><em>q</em></sup> = <em>k</em> if individual <em>i</em> of functional group <em>q</em> belongs to cluster <em>k</em>. The random variables <em>Z</em><sub><em>i</em></sub><sup><em>q</em></sup>’s are assumed to be independent and such that: ∀<em>k</em> ∈ {1, …, <em>K</em><sub><em>q</em></sub>},∀<em>q</em> ∈ {1, …, <em>Q</em>},∀<em>i</em> ∈ {1, …, <em>n</em><sub><em>q</em></sub>}:</p>
+<p>with $\sum_{k=1}^{K_q}\pi^{q}_k=1$, ∀<em>q</em> ∈ {1, …, <em>Q</em>}. Let $\bZ = \left(Z^{q}_i\right)_{i\in \{1,\ldots,n_q\}, q \in \{1,\ldots,Q\}}$ denote the set of latent variables.</p>
+</div>
+</div>
 </div>
 
   </div>
@@ -107,7 +152,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by The package maintainer.</p>
+  <p>Developed by P. Barbillon.</p>
 </div>
 
 <div class="pkgdown">

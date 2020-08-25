@@ -3,6 +3,7 @@
 \docType{package}
 \name{GREMLIN}
 \alias{GREMLIN}
+\alias{GREMLIN-package}
 \title{Loading packages}
 \description{
 All required packages
