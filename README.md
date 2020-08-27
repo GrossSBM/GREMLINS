@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![R build
+status](https://github.com/Demiperimetre/GREMLIN/workflows/R-CMD-check/badge.svg)](https://github.com/Demiperimetre/GREMLIN/actions)
 <!-- badges: end -->
 
 The goal of GREMLIN is to perform statistical analysis of multipartite
