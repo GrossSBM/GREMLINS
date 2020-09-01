@@ -32,18 +32,22 @@
 plotMBM = function(resMBM,whichModel = 1, mycol = NULL, thres = 0.01,  cex=1, maxCurved=3){
 
   list_Net <- resMBM$list_Net
+  Q <- length(resMBM$fittedModel[[1]]$paramEstim$list_pi)
 
   dataR6 <- formattingData(list_Net,v_distrib = resMBM$fittedModel[[whichModel]]$paramEstim$v_distrib)
+  labelFG <- substr(dataR6$namesFG,1,1)
+  i = 1;
+  while ( length(unique(labelFG))<Q & (i <= Q)){i = i + 1; labelFG <- substr(dataR6$namesFG,1,i)}
 
   if ((length(resMBM$fittedModel) == 1) & (whichModel > 1)) {stop('Only one  fitted model in resMBM. You can not select a whichModel not equal to 1')}
 
-  Q <- length(resMBM$fittedModel[[1]]$paramEstim$list_pi)
+
 
   nbNet <- length(resMBM$fittedModel[[1]]$paramEstim$list_theta)
   param <- resMBM$fittedModel[[whichModel]]$paramEstim
   v_K <- param$v_K
 
-  labelNode <- lapply(1:Q,function(q){1:v_K[q]})
+  labelNode <- lapply(1:Q,function(q){paste(labelFG[q],1:v_K[q],sep='.')})
   if (is.null(mycol)) {mycol <-  palette("default");  mycol <- mycol[-1]}
   colNode <- lapply(1:Q,function(q){rep(mycol[q],v_K[q])})
   sizeNode <- lapply(1:Q,function(q){param$list_pi[[q]]})
@@ -77,12 +81,16 @@ plotMBM = function(resMBM,whichModel = 1, mycol = NULL, thres = 0.01,  cex=1, ma
   curved <- runif(length(allEdges[w,4] == "diradj"),0,maxCurved)*(allEdges[w,4] == "diradj")
 
 
+
   G <- make_empty_graph() + vertices(unlist(codeNode))
-  G <- G  %>% set_vertex_attr("label",value = unlist(labelNode)) %>% set_vertex_attr("color",value = unlist(colNode))
-  G <- G  %>% set_vertex_attr("size",value = sqrt(unlist(sizeNode)) * 20 + 4)
+  V(G)$label.cex = 1
+
+  G <- G  %>% set_vertex_attr("label",value = unlist(labelNode))
+  G <- G  %>% set_vertex_attr("color",value = unlist(colNode))
+  G <- G  %>% set_vertex_attr("size",value = sqrt(unlist(sizeNode)) * 40 + 2)
   G <- G  %>% set_edge_attr("width",value = allEdges[allEdges[,3] >= thres,3] )
   G <- G + edges(c(t(edges)))
-
+  G <- G  %>% set_graph_attr("layout" , layout_with_lgl)
   m <- max(allEdges[,3])
   plot(G,edge.width = allEdges[allEdges[,3] > thres,3] / m * 5 ,edge.curved = curved, edge.arrow.mode = allEdges$arrow_mode[w])
   legend("topleft", c(dataR6$namesFG), col = mycol[1:Q], border = "black", lty = 1, lwd = 4,cex = cex)

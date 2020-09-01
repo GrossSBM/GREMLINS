@@ -68,9 +68,9 @@ We format the data to be able to use our R package GREMLIN i.e. we transform the
 
 To do so, we use de the function `defineNetwork`. 
 ```{r transform dataset,  eval=TRUE}
-PlantFlovis = defineNetwork(MPEcoNetwork$Inc_plant_flovis,"inc","plants","flovis")
-PlantAnt = defineNetwork(MPEcoNetwork$Inc_plant_ant,"inc","plants","ants")
-PlantBird = defineNetwork(MPEcoNetwork$Inc_plant_bird,"inc","plants","birds")
+PlantFlovis = defineNetwork(MPEcoNetwork$Inc_plant_flovis,"inc","Plants","Flovis")
+PlantAnt = defineNetwork(MPEcoNetwork$Inc_plant_ant,"inc","Plants","Ants")
+PlantBird = defineNetwork(MPEcoNetwork$Inc_plant_bird,"inc","Plants","Birds")
 list_net <- list(PlantFlovis,PlantAnt,PlantBird)
 names(PlantFlovis)
 ```
@@ -90,7 +90,7 @@ The model selection and the estimation are performed with the function `multipar
 if (!file.exists('resMBM_Mutualistic2.Rda')) {
   RES_MBM = multipartiteBM(
     list_Net = list(PlantFlovis, PlantAnt, PlantBird),
-    namesFG = c('plants','flovis','ants','birds'),
+    namesFG = c('Plants','Flovis','Ants','Birds'),
     v_distrib  = c('bernoulli','bernoulli','bernoulli'),
     initBM = TRUE,
     save = TRUE)
@@ -101,7 +101,7 @@ if (!file.exists('resMBM_Mutualistic2.Rda')) {
 ```{r MBM eval false, echo = TRUE, eval = FALSE}
 RES_MBM = multipartiteBM(
     list_Net =list(PlantFlovis, PlantAnt, PlantBird),
-    namesFG = c('plants','flovis','ants','birds'),
+    namesFG = c('Plants','Flovis','Ants','Birds'),
     v_distrib  = c('bernoulli','bernoulli','bernoulli'),
     initBM = TRUE,save = TRUE)
 ```
@@ -135,7 +135,9 @@ table(RES_MBM$fittedModel[[1]]$paramEstim$Z$ants)
 ``` 
 
 ## Plots 
-
+```{r plot }
+plotMBM(RES_MBM,mycol= c("green", "gold", "tomato","blue"))   
+``` 
 
 ## References
 

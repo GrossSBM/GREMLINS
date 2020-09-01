@@ -4,10 +4,20 @@
 \alias{multipartiteBM}
 \title{Model selection and parameter estimation of MBM}
 \usage{
-multipartiteBM(list_Net, v_distrib = NULL, namesFG = NULL,
-  v_Kmin = 1, v_Kmax = 10, v_Kinit = NULL, initBM = TRUE,
-  save = FALSE, verbose = TRUE, nbCores = NULL, maxiterVE = NULL,
-  maxiterVEM = NULL)
+multipartiteBM(
+  list_Net,
+  v_distrib = NULL,
+  namesFG = NULL,
+  v_Kmin = 1,
+  v_Kmax = 10,
+  v_Kinit = NULL,
+  initBM = TRUE,
+  save = FALSE,
+  verbose = TRUE,
+  nbCores = NULL,
+  maxiterVE = NULL,
+  maxiterVEM = NULL
+)
 }
 \arguments{
 \item{list_Net}{a list of networks (defined via the function defineNetwork) i.e. a multipartite network}
