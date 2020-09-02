@@ -123,20 +123,20 @@ RES_MBM$fittedModel[[1]]$paramEstim$v_K
 
 To see the parameters estimated for the better model we use the following command `RES_MBM$fittedModel[[1]]$paramEstim$***`
 ```{r MBM param }
-RES_MBM$fittedModel[[1]]$paramEstim$list_pi$plants
-RES_MBM$fittedModel[[1]]$paramEstim$list_theta$plantsflovis
+RES_MBM$fittedModel[[1]]$paramEstim$list_pi$Plants
+RES_MBM$fittedModel[[1]]$paramEstim$list_theta$PlantsFlovis
 ```
 
 The clustering  supplied by the better model  are in `RES_MBM$fittedModel[[1]]$paramEstim$Z$***`.
 
 ```{r MBM Z }
-table(RES_MBM$fittedModel[[1]]$paramEstim$Z$plants)
-table(RES_MBM$fittedModel[[1]]$paramEstim$Z$ants)      
+table(RES_MBM$fittedModel[[1]]$paramEstim$Z$Plants)
+table(RES_MBM$fittedModel[[1]]$paramEstim$Z$Ants)      
 ``` 
 
 ## Plots 
-```{r plot }
-plotMBM(RES_MBM,mycol= c("green", "gold", "tomato","blue"))   
+```{r plot, eval = TRUE }
+plotMBM(RES_MBM,mycol= c("darkolivegreen3", "gold", "tomato","cadetblue3")) 
 ``` 
 
 ## References

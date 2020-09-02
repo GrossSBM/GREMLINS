@@ -277,6 +277,8 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
   likICL  <-  pseudolik
   ICL <-  likICL$condLik + likICL$margLik - 1/2 * likICL$pen
 
+
+
   paramEstim   <- MBMfit$new(v_K = v_K, v_distrib = v_distrib, list_pi = list_pi,list_theta = list_theta);
   names(paramEstim$list_pi) = namesFG
 
