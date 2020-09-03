@@ -75,13 +75,13 @@
 
       
 
-      </header><script src="EcologicalNetwork_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Analysis of a mutualistic multipartite ecological network with GREMLIN</h1>
                         <h4 class="author">Sophie Donnet, Pierre Barbillon</h4>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-02</h4>
       
       
       <div class="hidden name"><code>EcologicalNetwork.Rmd</code></div>
@@ -97,11 +97,11 @@
 <h2 class="hasAnchor">
 <a href="#the-dataset" class="anchor"></a>The dataset</h2>
 <p>We apply our methodology to an ecological mutualistic multipartite network.<br>
-The dataset –compiled and conducted by <span class="citation">Dáttilo et al. (<a href="#ref-Dattilo" role="doc-biblioref">2016</a>)</span> at Centro de Investigaciones Costeras La Mancha (CICOLMA), located on the central coast of the Gulf of Mexico, Veracruz, Mexico– involves three general types of plant-animal mutualistic interaction: pollination, seed dispersal by frugivorous birds, and protective mutualisms between ants and plants with extrafloral nectaries.</p>
+The dataset –compiled and conducted by <span class="citation">Dáttilo et al. (<a href="#ref-Dattilo">2016</a>)</span> at Centro de Investigaciones Costeras La Mancha (CICOLMA), located on the central coast of the Gulf of Mexico, Veracruz, Mexico– involves three general types of plant-animal mutualistic interaction: pollination, seed dispersal by frugivorous birds, and protective mutualisms between ants and plants with extrafloral nectaries.</p>
 <p>The dataset –which is one of the largest compiled so far with respect to species richness, number of interactions and sampling effort– includes 4 functional groups, namely plants, pollinator species (refered as floral visitors), ant species and frugivorous bird species. Three binary bipartite networks have been collected representing interactions between 1/ plants and florals visitor, 2/ plants and ants, and 3/ plants and seed dispersal birds, resulting into three bipartite networks.</p>
 <p>The FG are of respective sizes: <span class="math inline">\(n_1 = 141\)</span> plant species, <span class="math inline">\(n_2 = 173\)</span> pollinator species (refered as ), <span class="math inline">\(n_3 = 46\)</span> frugivorous bird species and <span class="math inline">\(n_4 = 30\)</span> ant species.</p>
 <p>The 3 networks contain <span class="math inline">\(753\)</span> observed interactions of which <span class="math inline">\(55\%\)</span> are plant-pollinator interactions, <span class="math inline">\(17\%\)</span> are plant-birds interactions and <span class="math inline">\(28\%\)</span> are plant-ant interactions.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">GREMLIN</span>)
+<div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">GREMLIN</span>)
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">MPEcoNetwork</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"GREMLIN"</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>()
 <span class="co">#&gt; [1] "MPEcoNetwork"</span>
@@ -114,14 +114,14 @@ The dataset –compiled and conducted by <span class="citation">Dáttilo et al. 
 <a href="#formatting-the-data" class="anchor"></a>Formatting the data</h2>
 <p>We format the data to be able to use our R package GREMLIN i.e. we transform the matrices into an list containing <em>the matrix</em>, <em>its type</em> : <code>inc</code> for incidence matrix, <code>adj</code> for adjacency symetric, and <code>diradj</code> for non symetric (oriented) adjacency matrix, the name of functional group in row and the name of functional group in column. The three matrices are gathered in a list.</p>
 <p>To do so, we use de the function <code>defineNetwork</code>.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">PlantFlovis</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_flovis</span>,<span class="st">"inc"</span>,<span class="st">"plants"</span>,<span class="st">"flovis"</span>)
-<span class="no">PlantAnt</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_ant</span>,<span class="st">"inc"</span>,<span class="st">"plants"</span>,<span class="st">"ants"</span>)
-<span class="no">PlantBird</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_bird</span>,<span class="st">"inc"</span>,<span class="st">"plants"</span>,<span class="st">"birds"</span>)
+<div class="sourceCode"><html><body><pre class="r"><span class="no">PlantFlovis</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_flovis</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Flovis"</span>)
+<span class="no">PlantAnt</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_ant</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Ants"</span>)
+<span class="no">PlantBird</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_bird</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Birds"</span>)
 <span class="no">list_net</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">PlantFlovis</span>,<span class="no">PlantAnt</span>,<span class="no">PlantBird</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">PlantFlovis</span>)
 <span class="co">#&gt; [1] "mat"       "typeInter" "rowFG"     "colFG"</span></pre></body></html></div>
 <p>If one wants to keep a track of the names of the species, they should be used as rownames and colnames in the matrices.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">PlantFlovis</span>$<span class="no">mat</span>[<span class="fl">1</span>:<span class="fl">2</span>,<span class="fl">1</span>:<span class="fl">2</span>]
+<div class="sourceCode"><html><body><pre class="r"><span class="no">PlantFlovis</span>$<span class="no">mat</span>[<span class="fl">1</span>:<span class="fl">2</span>,<span class="fl">1</span>:<span class="fl">2</span>]
 <span class="co">#&gt;                    Apis_melifera Lasioglossum_sp1</span>
 <span class="co">#&gt; Acacia_cornigera               0                1</span>
 <span class="co">#&gt; Acacia_macracantha             0                0</span></pre></body></html></div>
@@ -130,37 +130,37 @@ The dataset –compiled and conducted by <span class="citation">Dáttilo et al. 
 <h2 class="hasAnchor">
 <a href="#inference" class="anchor"></a>Inference</h2>
 <p>The model selection and the estimation are performed with the function <code>multipartiteBM</code>.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">RES_MBM</span> <span class="kw">=</span> <span class="fu"><a href="../reference/multipartiteBM.html">multipartiteBM</a></span>(
+<div class="sourceCode"><html><body><pre class="r"><span class="no">RES_MBM</span> <span class="kw">=</span> <span class="fu"><a href="../reference/multipartiteBM.html">multipartiteBM</a></span>(
     <span class="kw">list_Net</span> <span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">PlantFlovis</span>, <span class="no">PlantAnt</span>, <span class="no">PlantBird</span>),
-    <span class="kw">namesFG</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'plants'</span>,<span class="st">'flovis'</span>,<span class="st">'ants'</span>,<span class="st">'birds'</span>),
+    <span class="kw">namesFG</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'Plants'</span>,<span class="st">'Flovis'</span>,<span class="st">'Ants'</span>,<span class="st">'Birds'</span>),
     <span class="kw">v_distrib</span>  <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'bernoulli'</span>,<span class="st">'bernoulli'</span>,<span class="st">'bernoulli'</span>),
     <span class="kw">initBM</span> <span class="kw">=</span> <span class="fl">TRUE</span>,<span class="kw">save</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <p>RES_MBM contains the estimated parameters of the models we run through during the search of the better numbers of blocks. If one sets <code>save = FALSE</code> in the <code>multipartiteBM</code> function then we only save the best model.</p>
 <p>RES_MBM constains de dataset and the results.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">RES_MBM</span>)
+<div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">RES_MBM</span>)
 <span class="co">#&gt; [1] "fittedModel" "list_Net"</span></pre></body></html></div>
 <p>The better model has the following numbers of blocks</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">v_K</span>
-<span class="co">#&gt; plants flovis   ants  birds </span>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">v_K</span>
+<span class="co">#&gt; Plants Flovis   Ants  Birds </span>
 <span class="co">#&gt;      7      2      2      1</span></pre></body></html></div>
 <p>To see the parameters estimated for the better model we use the following command <code>RES_MBM$fittedModel[[1]]$paramEstim$***</code></p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">list_pi</span>$<span class="no">plants</span>
-<span class="co">#&gt; [1] 0.46752510 0.07840873 0.13507513 0.10614897 0.16063183 0.01418720 0.03802305</span>
-<span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">list_theta</span>$<span class="no">plantsflovis</span>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">list_pi</span>$<span class="no">Plants</span>
+<span class="co">#&gt; [1] 0.16063183 0.07840873 0.13507513 0.10614897 0.46752510 0.01418720 0.03802305</span>
+<span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">list_theta</span>$<span class="no">PlantsFlovis</span>
 <span class="co">#&gt;              [,1]         [,2]</span>
-<span class="co">#&gt; [1,] 9.573240e-02 7.490241e-03</span>
+<span class="co">#&gt; [1,] 4.173707e-03 8.566580e-08</span>
 <span class="co">#&gt; [2,] 1.651832e-01 3.427940e-02</span>
 <span class="co">#&gt; [3,] 8.826487e-07 3.317267e-04</span>
 <span class="co">#&gt; [4,] 1.917898e-01 6.378749e-02</span>
-<span class="co">#&gt; [5,] 4.173707e-03 8.566580e-08</span>
+<span class="co">#&gt; [5,] 9.573240e-02 7.490241e-03</span>
 <span class="co">#&gt; [6,] 2.464664e-15 4.440892e-16</span>
 <span class="co">#&gt; [7,] 1.001131e-15 4.440892e-16</span></pre></body></html></div>
 <p>The clustering supplied by the better model are in <code>RES_MBM$fittedModel[[1]]$paramEstim$Z$***</code>.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">Z</span>$<span class="no">plants</span>)
+<div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">Z</span>$<span class="no">Plants</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt;  1  2  3  4  5  6  7 </span>
-<span class="co">#&gt; 65 11 20 15 23  2  5</span>
-<span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">Z</span>$<span class="no">ants</span>)
+<span class="co">#&gt; 23 11 20 15 65  2  5</span>
+<span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">RES_MBM</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">Z</span>$<span class="no">Ants</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt;  1  2 </span>
 <span class="co">#&gt;  3 27</span></pre></body></html></div>
@@ -168,13 +168,15 @@ The dataset –compiled and conducted by <span class="citation">Dáttilo et al. 
 <div id="plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plots" class="anchor"></a>Plots</h2>
+<div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/plotMBM.html">plotMBM</a></span>(<span class="no">RES_MBM</span>,<span class="kw">mycol</span><span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"darkolivegreen3"</span>, <span class="st">"gold"</span>, <span class="st">"tomato"</span>,<span class="st">"cadetblue3"</span>))</pre></body></html></div>
+<p><img src="man/figures/README-plot-1.png" width="100%"></p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
 <div id="refs" class="references">
 <div id="ref-Dattilo">
-<p>Dáttilo, Wesley, Nubia Lara-Rodrı́guez, Pedro Jordano, Paulo R. Guimarães, John N. Thompson, Robert J. Marquis, Lucas P. Medeiros, Raul Ortiz-Pulido, Maria A. Marcos-Garcı́a, and Victor Rico-Gray. 2016. “Unravelling Darwin’s Entangled Bank: Architecture and Robustness of Mutualistic Networks with Multiple Interaction Types.” <em>Proceedings of the Royal Society of London B: Biological Sciences</em> 283 (1843).</p>
+<p>Dáttilo, Wesley, Nubia Lara-Rodríguez, Pedro Jordano, Paulo R. Guimarães, John N. Thompson, Robert J. Marquis, Lucas P. Medeiros, Raul Ortiz-Pulido, Maria A. Marcos-García, and Victor Rico-Gray. 2016. “Unravelling Darwins Entangled Bank: Architecture and Robustness of Mutualistic Networks with Multiple Interaction Types.” <em>Proceedings of the Royal Society of London B: Biological Sciences</em> 283 (1843). The Royal Society.</p>
 </div>
 </div>
 </div>

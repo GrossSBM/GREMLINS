@@ -75,13 +75,13 @@
 
       
 
-      </header><script src="Introduction_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>GREMLIN. Quick Mathematical Background</h1>
                         <h4 class="author">Sophie Donnet, Pierre Barbillon</h4>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-02</h4>
       
       
       <div class="hidden name"><code>Introduction.Rmd</code></div>
@@ -99,13 +99,13 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>You can install the released version of GREMLIN from <a href="https://github.com/Demiperimetre/GREMLIN">GitHub</a> with:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">devtools</span>)
-<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"Demiperimetre/GREMLIN"</span>)</pre></body></html></div>
+<div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">devtools</span>)
+<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"Demiperimetre/GREMLIN"</span>)</pre></body></html></div>
 </div>
 <div id="mathematical-background" class="section level2">
 <h2 class="hasAnchor">
 <a href="#mathematical-background" class="anchor"></a>Mathematical Background</h2>
-<p>The model is introduced and described in <span class="citation">Bar-Hen, Barbillon, and Donnet (<a href="#ref-Donnet" role="doc-biblioref">2018</a>)</span>.</p>
+<p>The model is introduced and described in <span class="citation">Bar-Hen, Barbillon, and Donnet (<a href="#ref-Donnet">2018</a>)</span>.</p>
 <div id="a-collection-of-networks" class="section level3">
 <h3 class="hasAnchor">
 <a href="#a-collection-of-networks" class="anchor"></a>A collection of networks</h3>
@@ -122,12 +122,15 @@
 <h3 class="hasAnchor">
 <a href="#a-probabilistic-latent-variables-model" class="anchor"></a>A probabilistic latent variables model</h3>
 <p>Let <span class="math inline">\(n_q\)</span> be the number of individuals in the <span class="math inline">\(q\)</span>-th functional group. Assume that, each functional group <span class="math inline">\(q\)</span> is divided into <span class="math inline">\(K_q\)</span> <strong>blocks or equivalently clusters</strong>. <span class="math inline">\(\forall q\)</span> and <span class="math inline">\(\forall i\)</span>, let <span class="math inline">\(Z^{q}_i\)</span> be the latent random variable such that <span class="math inline">\(Z^ q_i =k\)</span> if individual <span class="math inline">\(i\)</span> of functional group <span class="math inline">\(q\)</span> belongs to cluster <span class="math inline">\(k\)</span>. The random variables <span class="math inline">\(Z^{q}_i\)</span>’s are assumed to be independent and such that: <span class="math inline">\(\forall (i,k,q) \in \{1,\dots,n_q\} \times \{1,\dots,K_q\} \times \{1,\dots,Q\}\)</span>:</p>
-<p><span class="math display">\[\begin{equation}\label{eq:mod2}
+<span class="math display">\[\begin{equation}\label{eq:mod2}
 \mathbb{P}(Z^{q}_i=k) = \pi^{q}_k,
-\end{equation}\]</span> with <span class="math inline">\(\sum_{k=1}^{K_q}\pi^{q}_k=1\)</span>, <span class="math inline">\(\forall q=1,\dots, Q\)</span>.</p>
-<p>Conditionally on the clustering, the entries of the matrices <span class="math inline">\(\left(X^{qq'}_{ii'}\right)\)</span> are assumed to be independent and distributed as follows: <span class="math inline">\(\forall (i,i') \in \{1,\dots,n_q\} \times \{1,\dots,n_{q'}\}\)</span>, <span class="math display">\[\begin{equation}\label{eq:mod1}
+\end{equation}\]</span>
+<p>with <span class="math inline">\(\sum_{k=1}^{K_q}\pi^{q}_k=1\)</span>, <span class="math inline">\(\forall q=1,\dots, Q\)</span>.</p>
+Conditionally on the clustering, the entries of the matrices <span class="math inline">\(\left(X^{qq'}_{ii'}\right)\)</span> are assumed to be independent and distributed as follows: <span class="math inline">\(\forall (i,i') \in \{1,\dots,n_q\} \times \{1,\dots,n_{q'}\}\)</span>,
+<span class="math display">\[\begin{equation}\label{eq:mod1}
 X^{qq'}_{ii'}\;  |  \; Z^{q}_i=k, Z^{q'}_{i'}=k'   \sim_{i.i.d} \mathcal{F}_{qq'}(\theta^{qq'}_{kk'})\,
-\end{equation}\]</span> meaning that the probability of connection from <span class="math inline">\(i\)</span> of functional group <span class="math inline">\(q\)</span> to <span class="math inline">\(i'\)</span> of functional group <span class="math inline">\(q'\)</span> only depends on the clusters to which they belong to.</p>
+\end{equation}\]</span>
+<p>meaning that the probability of connection from <span class="math inline">\(i\)</span> of functional group <span class="math inline">\(q\)</span> to <span class="math inline">\(i'\)</span> of functional group <span class="math inline">\(q'\)</span> only depends on the clusters to which they belong to.</p>
 <p>For any pair <span class="math inline">\((q,q')\)</span>, <span class="math inline">\(\mathcal{F}_{qq'}(\cdot)\)</span> is either:</p>
 <pre><code>- Bernoulli, resulting into binary interactions
 
@@ -147,7 +150,7 @@ X^{qq'}_{ii'}\;  |  \; Z^{q}_i=k, Z^{q'}_{i'}=k'   \sim_{i.i.d} \mathcal{F}_{qq'
 <a href="#references" class="anchor"></a>References</h2>
 <div id="refs" class="references">
 <div id="ref-Donnet">
-<p>Bar-Hen, Avner, Pierre Barbillon, and Sophie Donnet. 2018. “Block models for multipartite networks.Applications in ecology and ethnobiology.” <em>arXiv E-Prints</em>, July, arXiv:1807.10138. <a href="http://arxiv.org/abs/1807.10138">http://arxiv.org/abs/1807.10138</a>.</p>
+<p>Bar-Hen, Avner, Pierre Barbillon, and Sophie Donnet. 2018. “Block models for multipartite networks.Applications in ecology and ethnobiology.” <em>arXiv E-Prints</em>, July, arXiv:1807.10138.</p>
 </div>
 </div>
 </div>

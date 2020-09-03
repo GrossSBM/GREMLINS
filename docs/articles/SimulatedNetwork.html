@@ -75,13 +75,13 @@
 
       
 
-      </header><script src="SimulatedNetwork_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Illustration on a simulated multipartite network</h1>
                         <h4 class="author">Sophie Donnet, Pierre Barbillon</h4>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-02</h4>
       
       
       <div class="hidden name"><code>SimulatedNetwork.Rmd</code></div>
@@ -99,7 +99,7 @@
 <a href="#simulation-of-a-complex-multipartite-newtwork-" class="anchor"></a>Simulation of a complex multipartite newtwork.</h2>
 <p>We use the function <code>rMBM</code> provided in the package to simulate a multipartite network involving <span class="math inline">\(3\)</span> functional groups (namely A,B, and C) of respective sizes <span class="math display">\[n_A = 100, \quad, n_B = 50, \quad n_C = 60.\]</span></p>
 <p>A,B and C are divided respectively into <span class="math inline">\(4\)</span>, <span class="math inline">\(3\)</span> and <span class="math inline">\(2\)</span> blocks. The sizes of the blocks are generated randomly. For reproductibility, we fix the random seed to an arbitrarily chosen value.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">302718</span>)
+<div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">302718</span>)
 <span class="no">n_FG</span> <span class="kw">&lt;-</span> <span class="fl">3</span> <span class="co">#number of functional groups (FG)</span>
 <span class="no">namesFG</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'A'</span>,<span class="st">'B'</span>,<span class="st">'C'</span>)
 <span class="no">v_NQ</span> <span class="kw">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">100</span>,<span class="fl">50</span>,<span class="fl">60</span>) <span class="co">#size of each FG</span>
@@ -113,10 +113,10 @@
 - B-C : binary interactions
 - A-A : counting directed interactions
 - C-C : binary non-directed interactions</code></pre>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">typeInter</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>( <span class="st">"inc"</span>,<span class="st">'inc'</span>,<span class="st">"diradj"</span>, <span class="st">"adj"</span>)
+<div class="sourceCode"><html><body><pre class="r"><span class="no">typeInter</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>( <span class="st">"inc"</span>,<span class="st">'inc'</span>,<span class="st">"diradj"</span>, <span class="st">"adj"</span>)
 <span class="no">v_distrib</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'gaussian'</span>,<span class="st">'bernoulli'</span>,<span class="st">'poisson'</span>,<span class="st">'bernoulli'</span>)</pre></body></html></div>
 <p>Note that the distributions may be <code>Bernoulli</code>, <code>Poisson</code>, <code>Gaussian</code> or <code>Laplace</code> (with null mean). For the Gaussian distribution, a mean and a variance must be given. We generate randomly the emission parameters <span class="math inline">\(\theta\)</span>.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">E</span>  <span class="kw">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>),<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">3</span>),<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">1</span>),<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">3</span>))
+<div class="sourceCode"><html><body><pre class="r"><span class="no">E</span>  <span class="kw">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>),<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">3</span>),<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">1</span>),<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">3</span>))
 <span class="no">list_theta</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
 <span class="no">list_theta</span><span class="kw">[[</span><span class="fl">1</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
 <span class="no">list_theta</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">mean</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">v_K</span>[<span class="no">E</span>[<span class="fl">1</span>,<span class="fl">1</span>]] * <span class="no">v_K</span>[<span class="no">E</span>[<span class="fl">1</span>,<span class="fl">2</span>]],<span class="fl">7.5</span>,<span class="fl">4</span> ),<span class="fl">1</span>),<span class="kw">nrow</span> <span class="kw">=</span> <span class="no">v_K</span>[<span class="no">E</span>[<span class="fl">1</span>,<span class="fl">1</span>]], <span class="kw">ncol</span> <span class="kw">=</span> <span class="no">v_K</span>[<span class="no">E</span>[<span class="fl">1</span>,<span class="fl">2</span>]] )
@@ -129,7 +129,7 @@
 }
 <span class="no">list_theta</span><span class="kw">[[</span><span class="fl">4</span>]] <span class="kw">=</span> <span class="fl">0.5</span> * (<span class="no">list_theta</span><span class="kw">[[</span><span class="fl">4</span>]] + <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="no">list_theta</span><span class="kw">[[</span><span class="fl">4</span>]])) <span class="co"># for symetrisation</span></pre></body></html></div>
 <p>We are now ready to simulate the data</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">dataSim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/rMBM.html">rMBM</a></span>(<span class="no">v_NQ</span> ,<span class="no">E</span> , <span class="no">typeInter</span>, <span class="no">v_distrib</span>, <span class="no">list_pi</span>,
+<div class="sourceCode"><html><body><pre class="r"><span class="no">dataSim</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/rMBM.html">rMBM</a></span>(<span class="no">v_NQ</span> ,<span class="no">E</span> , <span class="no">typeInter</span>, <span class="no">v_distrib</span>, <span class="no">list_pi</span>,
                 <span class="no">list_theta</span>, <span class="kw">seed</span> <span class="kw">=</span> <span class="kw">NULL</span>,
                 <span class="kw">namesFG</span> <span class="kw">=</span> <span class="no">namesFG</span>,<span class="kw">keepClassif</span>  <span class="kw">=</span> <span class="fl">TRUE</span>)
 <span class="no">list_Net</span> <span class="kw">&lt;-</span> <span class="no">dataSim</span>$<span class="no">list_Net</span>
@@ -148,7 +148,7 @@
 <h2 class="hasAnchor">
 <a href="#estimation" class="anchor"></a>Estimation</h2>
 <p>The model selection and the estimation are performed with the function <code>multipartiteBM</code>.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r">  <span class="no">res_MBMsimu</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/multipartiteBM.html">multipartiteBM</a></span>(<span class="no">list_Net</span>,
+<div class="sourceCode"><html><body><pre class="r">  <span class="no">res_MBMsimu</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/multipartiteBM.html">multipartiteBM</a></span>(<span class="no">list_Net</span>,
                       <span class="kw">v_distrib</span> <span class="kw">=</span> <span class="no">v_distrib</span>,
                       <span class="kw">v_Kmin</span> <span class="kw">=</span> <span class="fl">1</span>,
                       <span class="kw">v_Kmax</span> <span class="kw">=</span> <span class="fl">10</span>,
@@ -156,7 +156,7 @@
                       <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                       <span class="kw">save</span><span class="kw">=</span><span class="fl">FALSE</span>, <span class="kw">initBM</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <p>We can now get the estimated parameters and compare them to the true ones.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r">
+<div class="sourceCode"><html><body><pre class="r">
 
 <span class="no">res_MBMsimu</span>$<span class="no">fittedModel</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">paramEstim</span>$<span class="no">list_theta</span>$<span class="no">AB</span>$<span class="no">mean</span>
 <span class="no">list_theta</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">mean</span></pre></body></html></div>
