@@ -33,7 +33,7 @@
 #' @export
 
 
-multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K=NULL,  classifInit = NULL, nbCores = NULL, maxiterVE = NULL, maxiterVEM = NULL,verbose = TRUE){
+multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classifInit = NULL, nbCores = NULL, maxiterVE = NULL, maxiterVEM = NULL,verbose = TRUE){
 
 
 
