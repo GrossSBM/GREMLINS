@@ -12,7 +12,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
   #------
   vKinit = calcVK(classifInit)
   if (length(vKinit) != dataR6$Q) { stop('Length of vKinit incorrect') }
-  if (verbose) { print(paste(" ------ Searching the numbers of blocks starting from [",paste(as.character(vKinit),collapse = " "),"] clusters",sep = " "))}
+  if (verbose) { print(paste(" ------ Searching the numbers of blocks starting from [",paste(as.character(vKinit),collapse = " "),"] blocks",sep = " "))}
 
 
   #----------------------   Initialisation of the algorithm
@@ -39,7 +39,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
 
   if (verbose) {
     mess <- paste(round(c(calcVK(classifNew))),collapse = " " )
-    mess <- paste("ICL :",round(ICLNewprint,2),". Nb of clusters: [", mess, "]",sep = " ")
+    mess <- paste("ICL :",round(ICLNewprint,2),". Nb of blocks: [", mess, "]",sep = " ")
     if (!estimNew$convergence){
       mess = paste(mess,". Convergence was not reached here.")
     }
@@ -59,7 +59,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
     ICL.c <- ICLNew
     classifC <- classifNew
 
-    # list of new classif deriving from the plitting of one cluster or the merging of 2 clusters in cluterisation classifC
+    # list of new classif deriving from the plitting of one block or the merging of 2 blocks in cluterisation classifC
     # (These clusterisations will serve as initisalition of the EM algorithm for models)
     list_classif_init <- sequentialInitialize(classifC ,dataR6,Kmin,Kmax,os);
     L = length(list_classif_init)
@@ -91,7 +91,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
       classifNew <- paramNew$Z
       if (verbose) {
         mess <- paste(round(c(calcVK(classifNew))),collapse = " " )
-        print(paste("ICL :",round(ICLNew,2),". Nb of clusters: [", mess,"]",sep = " "))
+        print(paste("ICL :",round(ICLNew,2),". Nb of blocks: [", mess,"]",sep = " "))
       }
     }
 
