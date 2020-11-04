@@ -15,15 +15,12 @@ list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[
 v_NQ = c(50,40)
 dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B'),keepClassif = TRUE)
 list_Net <- dataSim$list_Net
-res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 5,v_Kinit = NULL,verbose = TRUE, save=FALSE, maxiterVE = NULL)
+res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 5,
+                      v_Kinit = NULL,nbCores  = 2, verbose = TRUE, save=FALSE, maxiterVE = NULL)
 
-#res$fittedModel[[1]]
+
 
 library(aricode)
-
-# ARI(res$fittedModel[[1]]$paramEstim$Z[[1]],dataSim$classif[[1]])
-# ARI(res$fittedModel[[1]]$paramEstim$Z[[2]],dataSim$classif[[2]])
-
 test_that("correct clustering 1st FG", {
   expect_gt(ARI(res$fittedModel[[1]]$paramEstim$Z[[1]],dataSim$classif[[1]]),.4)
 })
@@ -32,3 +29,11 @@ test_that("correct clustering 1st FG", {
 test_that("correct clustering 2nd FG", {
   expect_gt(ARI(res$fittedModel[[1]]$paramEstim$Z[[2]],dataSim$classif[[2]]),.4)
 })
+
+
+clust <- extractClustersMBM (res,whichModel = 1)
+test_that('extractClustersMBM',{
+  expect_equal(length(clust),n_FG)
+})
+
+

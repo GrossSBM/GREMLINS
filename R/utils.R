@@ -29,7 +29,7 @@ adjustedRandIndex <- function (x, y)
 rlaplace <- function(n, location = 0, scale = 1){
   mu <- c(location)
   b <- c(scale)
-  U <- runif(n,-0.5,0.5)
+  U <- stats::runif(n,-0.5,0.5)
   res <- mu - b * sign(U) * log(1 - 2 * abs(U))
   return(res)
 }
@@ -130,8 +130,6 @@ transfoE <- function(E, typeInter){
 
 formattingData <- function(list_Net,v_distrib = NULL)
 {
-
-
   mats = lapply(list_Net,function(net){return(net$mat)})
   intFG = lapply(list_Net,function(net){return(c(net$rowFG,net$colFG))})
   intFG = do.call(rbind,intFG)

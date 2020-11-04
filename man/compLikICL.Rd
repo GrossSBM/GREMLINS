@@ -20,6 +20,3 @@ Pseudo-Likelihood and penalty
 \description{
 compute the Integrated likeilhood and the ICL criteria for the MBM
 }
-\examples{
-
-}

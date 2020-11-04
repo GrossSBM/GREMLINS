@@ -18,8 +18,8 @@ initialize = function(dataR6 , param , method = "CAH", givenclassif = NULL)
       w_q <- where_q[[q]]
       dists <- lapply(as.list(as.data.frame(t(w_q))),function(l)
       {
-        if (l[2] == 1)   d <- dist(dataR6$mats[[l[1]]],"manhattan")
-        else  d <- dist(t(dataR6$mats[[l[1]]]),"manhattan")
+        if (l[2] == 1)   d <- stats::dist(dataR6$mats[[l[1]]],"manhattan")
+        else  d <- stats::dist(t(dataR6$mats[[l[1]]]),"manhattan")
         return(d)
       })
       totdist <- Reduce('+',dists)
@@ -27,8 +27,8 @@ initialize = function(dataR6 , param , method = "CAH", givenclassif = NULL)
       #if more than 1 element
        if (v_K[q] > 1)
        {
-        cah1 <- hclust(totdist,method = "ward.D")
-        gr1 <- cutree(cah1,v_K[q])
+        cah1 <- stats::hclust(totdist,method = "ward.D")
+        gr1 <- stats::cutree(cah1,v_K[q])
        }
        else {gr1 <- rep(1,dataR6$v_NQ[q])}
 
@@ -100,13 +100,13 @@ splitClassif =  function(classif,q,dataR6,Kmax_q){
 
       # on coupe les individus du groupe $k$ en utilisant CAH sur les distances
       dists <- lapply(as.list(as.data.frame(t(dataR6$where[[q]]))),function(l)
-        { if (l[2] == 1)   d <- dist(dataR6$mats[[l[1]]][classif_q == k,],"manhattan")
-          else  d <- dist(t(dataR6$mats[[l[1]]][,classif_q == k]),"manhattan")
+        { if (l[2] == 1)   d <- stats::dist(dataR6$mats[[l[1]]][classif_q == k,],"manhattan")
+          else  d <- stats::dist(t(dataR6$mats[[l[1]]][,classif_q == k]),"manhattan")
           return(d)
         })
       totdist <- Reduce('+',dists)
-      cah1 <- hclust(totdist,method = "ward.D")
-      gr1 <- cutree(cah1,2); gr <- gr1; gr[gr1 == 1] <- k; gr[gr1 == 2] <- K_q + 1
+      cah1 <- stats::hclust(totdist,method = "ward.D")
+      gr1 <- stats::cutree(cah1,2); gr <- gr1; gr[gr1 == 1] <- k; gr[gr1 == 2] <- K_q + 1
       classif_split_q_k[[q]][classif_q == k] <- gr #nqk = sum(classif_q==k); sample(c(k,K_q+1),nqk,replace=TRUE)
 
       return(classif_split_q_k)})
@@ -124,7 +124,7 @@ mergeClassif =  function(classif,q,Kmin_q){
   classif_q = match(classif_q, unique(sort(classif_q)))
   K_q <- max(classif_q)
   if (K_q > Kmin_q) {
-    couples_q <- t(combn(1:K_q, 2))
+    couples_q <- t(utils::combn(1:K_q, 2))
     R = K_q * (K_q - 1)/2
     newClassif <-  lapply(1:R,function(k){
       classif_merge_q_k1k2 = classif;   # nouvelle classif réunissant les cluster k1 et k2 du FG q

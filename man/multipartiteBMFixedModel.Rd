@@ -8,7 +8,7 @@ multipartiteBMFixedModel(
   list_Net,
   v_distrib,
   namesFG,
-  v_K = NULL,
+  v_K,
   classifInit = NULL,
   nbCores = NULL,
   maxiterVE = NULL,
@@ -43,19 +43,30 @@ Estimated parameters and a classification
 Estimate the parameters and give the clustering for given numbers of blocks
 }
 \examples{
-v_K <- c(3,2,2)
-n_FG <- 3
-list_pi <- vector("list", 3);
-list_pi[[1]] <- c(0.4,0.3,0.3); list_pi[[2]] <- c(0.6,0.4); list_pi[[3]]  <- c(0.6,0.4)
-E  = rbind(c(1,2),c(2,3),c(2,2))
-v_distrib <- c('bernoulli','poisson','poisson')
-typeInter <- c( "inc", "inc"  ,  "adj" )
+set.seed(302718)
+n_FG <- 2 #number of functional groups (FG)
+namesFG <- c('A','B')
+v_NQ <-  c(60,50) #size of each FG
+v_K  <- c(3,2) #number of clusters in each functional group
+list_pi = lapply(1:n_FG,function(q){v = rgamma(v_K[q],1,1); return(v/sum(v))})
+typeInter <- c( "inc","diradj", "adj")
+v_distrib <- c('gaussian','bernoulli','poisson')
+E  <-  rbind(c(1,2),c(2,2),c(1,1))
 list_theta <- list()
-list_theta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]])
-list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]])
-list_theta[[3]] <- matrix(rgamma(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 ),nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
-list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
-v_NQ = c(100,50,40)
-list_Net <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B','D'))$list_Net
-res <- multipartiteBMFixedModel(list_Net,namesFG = c('A','B','D'),v_distrib = v_distrib,v_K = c(3,2,2))
+list_theta[[1]] <- list()
+m1 <- rnorm(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 )
+v1 <- rgamma(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 )
+list_theta[[1]]$mean  <- matrix(m1,nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+list_theta[[1]]$var  <-  matrix(v1,nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+m2 <- rbeta(v_K[E[2,1]] * v_K[E[2,2]],2,2 )
+list_theta[[2]] <- matrix(m2,nrow = v_K[E[2,1]], ncol = v_K[E[2,2]])
+m3 <- rgamma(v_K[E[3,1]] * v_K[E[3,2]],6,2 )
+list_theta[[3]] <- matrix((m3 + t(m3))/2,nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
+list_Net <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi,
+                list_theta, namesFG = namesFG)$list_Net
+res_MBMsimu_fixed <- multipartiteBMFixedModel(list_Net,
+                                              v_distrib,
+                                              namesFG = namesFG,
+                                              v_K = c(3,2),
+                                              nbCores = 2)
 }

@@ -8,7 +8,6 @@
 #' when there are NAs an additional field \code{wNA} indicating where are the NAs.
 #' @export
 #'
-#' @examples
 predictMBM <- function(RESMBM)
 {
   data <- RESMBM$list_Net

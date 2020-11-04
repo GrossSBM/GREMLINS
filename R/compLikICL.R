@@ -5,7 +5,6 @@
 #' @param v_distrib  Type of proababilistic distributions in each network : if 0/1 then Bernoulli, if counting then Poisson. My default  = Bernoulli.
 #'                   Must give a vector whose length is the number of networks in list_Net
 #' @return Pseudo-Likelihood and penalty
-#' @examples
 #'
 #' @export
 
