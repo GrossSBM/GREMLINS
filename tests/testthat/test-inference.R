@@ -12,7 +12,7 @@ typeInter <- c( "inc", "adj" )
 list_theta <- list()
 list_theta[[1]] <- matrix(rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 ),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]])
 list_theta[[2]] <- matrix(rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 ),nrow = v_K[E[2,1]], ncol = v_K[E[2,2]])
-v_NQ = c(50,40)
+v_NQ = c(30,40)
 dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B'),keepClassif = TRUE)
 list_Net <- dataSim$list_Net
 res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 5,
@@ -35,5 +35,12 @@ clust <- extractClustersMBM (res,whichModel = 1)
 test_that('extractClustersMBM',{
   expect_equal(length(clust),n_FG)
 })
+
+test_that('pred',{
+  pred <- predictMBM(res,whichModel = 1 )
+  expect_equal(dim(pred[[1]]),dim(list_Net[[1]]$mat))
+  expect_equal(dim(pred[[2]]),dim(list_Net[[2]]$mat))
+})
+
 
 

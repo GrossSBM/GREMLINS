@@ -139,4 +139,44 @@ extractClustersMBM(res_MBMsimu_fixed)$A
 ```
 
 
+## Missing data. 
+
+GREMLIN is also able to handle missing data. In the following experiment, we artificially set missing data in the previously simulated matrices. 
+
+
+```{r sim NA}
+############# NA data at random in any matrix
+epsilon =  10/100
+list_Net_NA <- list_Net
+for (m in 1:nrow(E)){
+   U <-  sample(c(1,0),v_NQ[E[m,1]]*v_NQ[E[m,2]],replace=TRUE,prob  = c(epsilon, 1-epsilon))
+   matNA <- matrix(U,v_NQ[E[m,1]],v_NQ[E[m,2]])
+   list_Net_NA[[m]]$mat[matNA== 1] = NA
+   if (list_Net_NA[[m]]$typeInter == 'adj') {
+     M <- list_Net_NA[[m]]$mat
+     diag(M) <- NA
+     M[lower.tri(M)] = t(M)[lower.tri(M)]
+     list_Net_NA[[m]]$mat <- M
+     }
+}
+``` 
+
+```{r MBM simul NA, echo = TRUE, eval = TRUE}
+res_MBMsimuNA <- multipartiteBM(list_Net_NA, 
+                              v_distrib = v_distrib, 
+                              namesFG = c('A','B'),
+                              v_Kinit = c(2,2),
+                              nbCores = 2,
+                              save=FALSE)
+```
+
+We then have a function to predict the missing edges (probability is binary or intensity if weighted)
+
+```{r MBM predict NA, echo = TRUE, eval = TRUE}
+pred <- predictMBM(res_MBMsimuNA)
+```
+
+
+
+
 ## References

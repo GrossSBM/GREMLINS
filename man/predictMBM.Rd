@@ -4,19 +4,44 @@
 \alias{predictMBM}
 \title{Predict NAs in a Collection of Networks from a fitted MBM}
 \usage{
-predictMBM(RESMBM)
+predictMBM(RESMBM, whichModel = 1)
 }
 \arguments{
 \item{RESMBM}{a fitted multipartite blockmodel}
+
+\item{whichModel}{The index corresponding to the model used for prediction (default is 1, the best model)}
 }
 \value{
-the collection of networks where the NAs are replaced with predictions (only for Bernoulli model yet) and
-when there are NAs an additional field \code{wNA} indicating where are the NAs.
+the collection of matrices of predictions (probability for binary, intensity for weighted network) a
 }
 \description{
 Predict NAs in a Collection of Networks from a fitted MBM
 }
-\details{
-works only for Bernoulli distribution on all networks. Be sure to define adjacency matrices with NA on the
-diagonal if there are no loop.
+\examples{
+set.seed(302718)
+n_FG <- 2 #number of functional groups (FG)
+namesFG <- c('A','B')
+v_NQ <-  c(60,50) #size of each FG
+v_K  <- c(3,2) #number of clusters in each functional group
+list_pi = lapply(1:n_FG,function(q){v = rgamma(v_K[q],1,1); return(v/sum(v))})
+typeInter <- c( "inc","diradj", "adj")
+v_distrib <- c('gaussian','bernoulli','poisson')
+E  <-  rbind(c(1,2),c(2,2),c(1,1))
+list_theta <- list()
+list_theta[[1]] <- list()
+m1 <- rnorm(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 )
+v1 <- rgamma(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 )
+list_theta[[1]]$mean  <- matrix(m1,nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+list_theta[[1]]$var  <-  matrix(v1,nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
+m2 <- rbeta(v_K[E[2,1]] * v_K[E[2,2]],2,2 )
+list_theta[[2]] <- matrix(m2,nrow = v_K[E[2,1]], ncol = v_K[E[2,2]])
+m3 <- rgamma(v_K[E[3,1]] * v_K[E[3,2]],6,2 )
+list_theta[[3]] <- matrix((m3 + t(m3))/2,nrow = v_K[E[3,1]], ncol = v_K[E[3,2]])
+list_Net <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi,
+                list_theta, namesFG = namesFG)$list_Net
+res_MBMsimu <- multipartiteBM(list_Net,
+                              v_distrib,
+                              namesFG = c('A','B'),
+                              v_Kinit = c(2,2),nbCores = 2)
+pred <- predictMBM(res_MBMsimu)
 }
