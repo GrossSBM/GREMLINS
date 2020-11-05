@@ -5,42 +5,32 @@
 #' @param  v_NQ : number of individual in each Functional Group (FG)
 #' @param  E : define the architecture of the Multipartite.
 #' @param  typeInter : type of interaction in each network: undirected adjacency (adj), directed adjacency (diradj) or incidence (inc).  (vector of size equal to nrow(E) )
-#' @param  v_distrib : vector of the distributions  (bernoulli, poisson, gaussian, Zero inflated gaussian or laplace for each network) ( vector of size equal to nrow(E) )
+#' @param  v_distrib : vector of the distributions: 'bernoulli', 'poisson', 'gaussian', 'ZIgaussian' (for Zero inflated gaussian) or 'laplace'  ( vector of size equal to nrow(E) )
 #' @param  list_pi  : parameters of the blocks distribution
-#' @param  list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and var, for Laplace a list with location and scale
+#' @param  list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and var (plus p0 for ZIgaussian), for Laplace a list with location and scale
 #' @param  namesFG : names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)
 #' @param  keepClassif : equal to TRUE if you want to keep the simulated blocks/classification (default value  = FALSE).
 #' @param  seed : set the seed for the random simulation (default value  = NULL)
 #' @return A list of lists containing the networks (list_net) and if keepClassif = TRUE the classifications (classif)
 #'         Each element of  list_net corresponds to a network : each network is a list containing  the matrix (mat) , the type of network(diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
 #' @examples
-#' n_FG <- 3  #number of functional groups
-#' v_K <- c(3,2,2) #number of clusters in each functional group
-#' list_pi <- vector("list", 3); # parameters of clustering
-#' list_pi[[1]] <- c(0.4,0.3,0.3); list_pi[[2]] <- c(0.6,0.4); list_pi[[3]]  <- c(0.6,0.4)
-#' E  = rbind(c(1,2),c(2,3),c(2,2),c(1,3))
-#' v_distrib <- c('bernoulli','poisson','laplace','gaussian')
-#' typeInter <- c( "inc", "inc"  ,  "adj" ,"inc")
+#' namesFG <- c('A','B','C')
+#' list_pi = list(c(0.16 ,0.40 ,0.44),c(0.3,0.7),c(0.5,0.5))
+#' E  <-  rbind(c(1,2),c(2,3),c(1,1))
+#' typeInter <- c( "inc","inc", "adj")
+#' v_distrib <- c('ZIgaussian','bernoulli','poisson')
 #' list_theta <- list()
-#' theta1 <- rbeta(v_K[E[1,1]] * v_K[E[1,2]],1.5,1.5 )
-#' list_theta[[1]] <- matrix(theta1,nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-#' theta2 <- rgamma(v_K[E[2,1]] * v_K[E[2,2]],7.5,1 )
-#' list_theta[[2]] <- matrix(theta2,nrow = v_K[E[2,1]], ncol = v_K[E[2,2]] )
-#' list_theta[[3]] <- list()
-#' theta3 <- rnorm(v_K[E[3,1]] * v_K[E[3,2]],7.5,1 )
-#' list_theta[[3]] <- matrix(theta3, nrow = v_K[E[3,1]], ncol = v_K[E[3,2]] )
-#' list_theta[[3]] <- 0.5*(list_theta[[3]] + t(list_theta[[3]])) # symetrisation for network 3
-#' list_theta[[4]] <- list()
-#' theta4_mean <- rnorm(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
-#' theta4_var <- rgamma(v_K[E[4,1]] * v_K[E[4,2]],7.5,1 )
-#' list_theta[[4]]$mean <- matrix(theta4_mean,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
-#' list_theta[[4]]$var <- matrix(theta4_var,nrow = v_K[E[4,1]], ncol = v_K[E[4,2]] )
-#' v_NQ <-  c(100,50,40)
-#' namesFG <-  c('A','B','C')
-#' dataSim <- rMBM(v_NQ = v_NQ , E = E , typeInter = typeInter,
+#' list_theta[[1]] <- list()
+#' list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
+#' list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
+#' list_theta[[1]]$p0  <-  matrix(c(0.4, 0.1, 0.6, 0.5 , 0.2, 0),3, 2)
+#' list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
+#' m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
+#' list_theta[[3]] <- (m3 + t(m3))/2
+#' dataSim <- rMBM(v_NQ = c(100,50,40) , E = E , typeInter = typeInter,
 #'                 v_distrib = v_distrib, list_pi = list_pi,
 #'                 list_theta = list_theta, namesFG)
-#' list_net <- dataSim$list_net
+#' list_net <- dataSim$list_Net
 #' classifTrue <- dataSim$classif
 #' @export
 

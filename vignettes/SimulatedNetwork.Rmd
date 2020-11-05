@@ -46,13 +46,9 @@ $$n_A = 60, \quad, n_B = 50.$$
 A and B are  divided respectively into   $3$ and $2$ blocks. The sizes of the blocks are generated randomly. For reproductibility, we fix the random seed to an arbitrarily chosen value.  
 
 ```{r param FG}
-set.seed(302718)
-n_FG <- 2 #number of functional groups (FG)
 namesFG <- c('A','B')
 v_NQ <-  c(60,50) #size of each FG
-v_K  <- c(3,2) #number of clusters in each functional group 
-list_pi = lapply(1:n_FG,function(q){v = rgamma(v_K[q],1,1); return(v/sum(v))}) 
-#proportion of each block in each  FG
+list_pi = list(c(0.16 ,0.40 ,0.44),c(0.3,0.7)) #proportion of each block in each  FG
 list_pi[[1]]
 ``` 
 
@@ -64,8 +60,9 @@ We assume that we observe $3$ interactions matrices
   
 
 ```{r param 1 net}
+E  <-  rbind(c(1,2),c(2,2),c(1,1))
 typeInter <- c( "inc","diradj", "adj")
-v_distrib <- c('gaussian','bernoulli','poisson')
+v_distrib <- c('ZIgaussian','bernoulli','poisson')
 ```
 
 Note that the distributions may be `Bernoulli`, `Poisson`, `Gaussian` or `Laplace` (with null mean). For the Gaussian distribution, a mean and a variance must be given. 
@@ -73,18 +70,14 @@ We generate randomly the  emission parameters $\theta$.
 
 
 ```{r param net}
-E  <-  rbind(c(1,2),c(2,2),c(1,1))
 list_theta <- list()
 list_theta[[1]] <- list()
-list_theta[[1]]$mean  <- matrix(round(rnorm(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-list_theta[[1]]$var  = matrix(round(rgamma(v_K[E[1,1]] * v_K[E[1,2]],7.5,4 ),1),nrow = v_K[E[1,1]], ncol = v_K[E[1,2]] )
-for (q in 2:3) {
-  list_theta[[q]] <- switch(v_distrib[q], 
-      bernoulli = matrix(rbeta(v_K[E[q,1]] * v_K[E[q,2]],2,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]]),
-      poisson = matrix(rgamma(v_K[E[q,1]] * v_K[E[q,2]],6,2 ),nrow = v_K[E[q,1]], ncol = v_K[E[q,2]])
-  )
-}
-list_theta[[3]] = 0.5 * (list_theta[[3]] + t(list_theta[[3]])) # for symetrisation
+list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
+list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
+list_theta[[1]]$p0  <-  matrix(c(0.4, 0.1, 0.6, 0.5 , 0.2, 0),3, 2)
+list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
+m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
+list_theta[[3]] <- (m3 + t(m3))/2# for symetrisation
 ``` 
 
 We are now ready to simulate the data
@@ -93,9 +86,8 @@ We are now ready to simulate the data
 
 ```{r simul 2, eval = TRUE, echo = TRUE}
 library(GREMLIN)
-dataSim <- rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, 
-                list_theta, seed = NULL, 
-                namesFG = namesFG,keepClassif  = TRUE)
+dataSim <- rMBM(v_NQ,E , typeInter, v_distrib, list_pi,
+                list_theta, namesFG = namesFG, seed = 4,keepClassif  = TRUE)
 list_Net <- dataSim$list_Net
 length(list_Net)
 names(list_Net[[1]])
@@ -114,6 +106,7 @@ res_MBMsimu <- multipartiteBM(list_Net,
                               namesFG = c('A','B'),
                               v_Kinit = c(2,2),
                               nbCores = 2,
+                              initBM = FALSE,
                               save=FALSE)
 ```
 
@@ -139,7 +132,7 @@ extractClustersMBM(res_MBMsimu_fixed)$A
 ```
 
 
-## Missing data. 
+## Missing data 
 
 GREMLIN is also able to handle missing data. In the following experiment, we artificially set missing data in the previously simulated matrices. 
 
@@ -170,7 +163,7 @@ res_MBMsimuNA <- multipartiteBM(list_Net_NA,
                               save=FALSE)
 ```
 
-We then have a function to predict the missing edges (probability is binary or intensity if weighted)
+We then have a function to predict the missing edges (probability if binary or intensity if weighted)
 
 ```{r MBM predict NA, echo = TRUE, eval = TRUE}
 pred <- predictMBM(res_MBMsimuNA)
