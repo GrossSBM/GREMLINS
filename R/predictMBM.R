@@ -35,7 +35,7 @@ predictMBM <- function(RESMBM,whichModel = 1)
   theta <-  res$list_theta
   theta_mean <- lapply(1:nbNet,function(k){m_k <- switch (v_distrib[k],
                                                           gaussian = theta[[k]]$mean,
-                                                          ZIgaussian = theta[[k]]$mean ,
+                                                          ZIgaussian = (1-theta[[k]]$p0)*theta[[k]]$mean,
                                                           theta[[k]])})
   # where are NAs
   Pred <- lapply(1:nbNet, function(k){
