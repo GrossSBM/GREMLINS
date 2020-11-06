@@ -8,11 +8,12 @@
 #' list_pi = list(c(0.16 ,0.40 ,0.44),c(0.3,0.7))
 #' E  <-  rbind(c(1,2),c(2,2),c(1,1))
 #' typeInter <- c( "inc","diradj", "adj")
-#' v_distrib <- c('gaussian','bernoulli','poisson')
+#' v_distrib <- c('ZIgaussian','bernoulli','poisson')
 #' list_theta <- list()
 #' list_theta[[1]] <- list()
 #' list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
 #' list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
+#' list_theta[[1]]$p0  <-matrix(c(0.4, 0.1,  0.8 , 0.5 , 0.7, 0),3, 2)
 #' list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
 #' m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
 #' list_theta[[3]] <- (m3 + t(m3))/2
@@ -35,7 +36,7 @@ predictMBM <- function(RESMBM,whichModel = 1)
   theta <-  res$list_theta
   theta_mean <- lapply(1:nbNet,function(k){m_k <- switch (v_distrib[k],
                                                           gaussian = theta[[k]]$mean,
-                                                          ZIgaussian = (1-theta[[k]]$p0)*theta[[k]]$mean,
+                                                          ZIgaussian = ((1-theta[[k]]$p0)>0.5)*theta[[k]]$mean,
                                                           theta[[k]])})
   # where are NAs
   Pred <- lapply(1:nbNet, function(k){
