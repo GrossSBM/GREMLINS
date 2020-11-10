@@ -75,9 +75,9 @@ CollInteraction = R6Class("CollInteraction", ### classe objet pour décrire les 
                 },
             estime = function(classif,tau=NULL, maxiterVE = NULL,  maxiterVEM = NULL){varEMMBM(self,classif,tau = tau,maxiterVE  = maxiterVE , maxiterVEM = maxiterVEM)},
             cleanResults = function(R){cleanEstim(self,R)},
-            searchNbClusters = function(classifInit,Kmin,Kmax, nbCores = NULL, verbose = TRUE, maxiterVE = NULL, maxiterVEM = maxiterVEM)
+            searchNbClusters = function(classifInit,Kmin,Kmax, pastICL = c(),nbCores = NULL, verbose = TRUE, maxiterVE = NULL, maxiterVEM = maxiterVEM)
             {
-              searchKQ(dataR6 = self,classifInit = classifInit,Kmin = Kmin,Kmax = Kmax,nbCores = nbCores,verbose = verbose, maxiterVE = maxiterVE,  maxiterVEM = maxiterVEM)
+              searchKQ(dataR6 = self,classifInit = classifInit,pastICL = pastICL,Kmin = Kmin,Kmax = Kmax,nbCores = nbCores,verbose = verbose, maxiterVE = maxiterVE,  maxiterVEM = maxiterVEM)
             }
         ),
       private = list(
