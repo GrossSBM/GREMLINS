@@ -1,4 +1,4 @@
-#' Define a network
+#' Define a network providing its matrix of interactions and specifying the functions groups in row and col.
 #'
 #' @param mat An adjacency matrix (symmetric or not) or an incidence matrix
 #' @param typeInter Type of the matrix, choice between "inc" (incidence), "adj" (adjacency) and "diradj" (directed adjacency)

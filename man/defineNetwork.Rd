@@ -2,7 +2,7 @@
 % Please edit documentation in R/defineNetwork.R
 \name{defineNetwork}
 \alias{defineNetwork}
-\title{Define a network}
+\title{Define a network providing its matrix of interactions and specifying the functions groups in row and col.}
 \usage{
 defineNetwork(mat, typeInter, rowFG, colFG)
 }
@@ -19,7 +19,7 @@ defineNetwork(mat, typeInter, rowFG, colFG)
 a list object formatted for the GREMLIN package
 }
 \description{
-Define a network
+Define a network providing its matrix of interactions and specifying the functions groups in row and col.
 }
 \examples{
 A <- matrix(rbinom(100,1,.2),10,10)

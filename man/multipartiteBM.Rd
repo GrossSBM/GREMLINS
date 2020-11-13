@@ -22,9 +22,9 @@ multipartiteBM(
 \arguments{
 \item{list_Net}{a list of networks (defined via the function defineNetwork) i.e. a multipartite network}
 
-\item{v_distrib}{an optional vector of characters of length the number of networks and specifying the distribution used in each network (possible values \code{bernoulli,poisson,gaussian,laplace})}
+\item{v_distrib}{an optional vector of characters of length the number of networks and specifying the distribution used in each network (possible values \code{bernoulli,poisson,gaussian,laplace}).   If not provided, the model will be 'bernoulli' for all the interactions  matrices.}
 
-\item{namesFG}{an optional vector of  characters containing the names of functional groups (FG) (If Specified, must correspond to the  names in \code{list_Net})}
+\item{namesFG}{an optional vector of  characters containing the names of functional groups (FG) (If Specified, must correspond to the  names in \code{list_Net}).}
 
 \item{v_Kmin}{an optional vector of integers, specifying the minimal number of blocks per functional group (must be provided in the same order as in \code{namesFG}).
 v_Kmin may be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs.
