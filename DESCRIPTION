@@ -1,7 +1,7 @@
 Package: GREMLIN
 Type: Package
 Title: Inferring Multipartite Blockmodels
-Version: 0.1.1
+Version: 0.2.0
 Author: P. Barbillon and S. Donnet
 Maintainer: P. Barbillon and S. Donnet <pierre.barbillon@agroparistech.fr>
 Description: Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. The aim is to fit an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020).  
