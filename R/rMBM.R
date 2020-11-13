@@ -1,6 +1,6 @@
 #' Simulate datasets from  the multipartite block  model (MBM).
 #'
-#' \code{rMBM} simulates a collection of networks involving common functional groups of entities. The networks may be directed, undirected or bipartite. See the vignette for more information about the model
+#' \code{rMBM} simulates a collection of networks involving common functional groups of entities. The networks may be directed, undirected or bipartite. The emission distribution of the edges may be Bernoulli, Poisson, Gaussian, Zero-Inflated Gaussian, or Laplace. See the vignette for more information about the model.
 #'
 #' @param  v_NQ : number of individual in each Functional Group (FG)
 #' @param  E : define the architecture of the Multipartite.

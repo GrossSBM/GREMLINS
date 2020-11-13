@@ -40,7 +40,7 @@ A list of lists containing the networks (list_net) and if keepClassif = TRUE the
         Each element of  list_net corresponds to a network : each network is a list containing  the matrix (mat) , the type of network(diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
 }
 \description{
-\code{rMBM} simulates a collection of networks involving common functional groups of entities. The networks may be directed, undirected or bipartite. See the vignette for more information about the model
+\code{rMBM} simulates a collection of networks involving common functional groups of entities. The networks may be directed, undirected or bipartite. The emission distribution of the edges may be Bernoulli, Poisson, Gaussian, Zero-Inflated Gaussian, or Laplace. See the vignette for more information about the model.
 }
 \examples{
 namesFG <- c('A','B','C')

@@ -3,8 +3,8 @@
 #' Select the number of blocks and identify the blocks per functional group using a variational EM algorithm
 #'
 #' @param list_Net a list of networks (defined via the function defineNetwork) i.e. a multipartite network
-#' @param v_distrib an optional vector of characters of length the number of networks and specifying the distribution used in each network (possible values \code{bernoulli,poisson,gaussian,laplace})
-#' @param namesFG  an optional vector of  characters containing the names of functional groups (FG) (If Specified, must correspond to the  names in \code{list_Net})
+#' @param v_distrib an optional vector of characters of length the number of networks and specifying the distribution used in each network (possible values \code{bernoulli,poisson,gaussian,laplace}).   If not provided, the model will be 'bernoulli' for all the interactions  matrices.
+#' @param namesFG  an optional vector of  characters containing the names of functional groups (FG) (If Specified, must correspond to the  names in \code{list_Net}).
 #' @param v_Kmin an optional vector of integers, specifying the minimal number of blocks per functional group (must be provided in the same order as in \code{namesFG}).
 #'              v_Kmin may be a single value (same minimal number of blocks for all the FGs) or a vector with size equal to the number of FGs.
 #'              Default value  \code{= 1}.
@@ -20,7 +20,6 @@
 #' @param nbCores an optional integer specifying the number or cores used for the estimation. Not parallelized on windows. If \code{ncores = NULL}, then half of the cores are used.
 #' @param maxiterVE an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}
 #' @param maxiterVEM an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}
-#'
 #' @details The function \code{multipartiteBM} selects the better numbers of blocks in each FG (with a penalized likelihood criterion). The model selection is performed with a forward backward strategy and the likelihood of each model is maximized with a variational EM).
 
 #'
@@ -66,6 +65,7 @@
 
 multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = TRUE , save=FALSE , verbose = TRUE, nbCores = NULL, maxiterVE = NULL , maxiterVEM = NULL)
 {
+
 
   if ( all(v_Kmin == v_Kmax)) {stop('v_Kmin = v_Kmax. Use the function "multipartiteBMFixedModel" instead')}
 
@@ -157,10 +157,13 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   collectionTestedClassifInit <- list()
 
   paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]],v_distrib = dataR6$v_distrib)
-  classifInit = initialize(dataR6,paramInit,method = "CAH")$groups
-  R = dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)
-  indInit = 1
+  classifInit <- initialize(dataR6,paramInit,method = "CAH")$groups
+
+  R <- dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,pastICL = c(),verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)
+  indInit <- 1
   collectionTestedClassifInit[[indInit]] <-  classifInit
+  pastICL <- sapply(R,function(e){e$ICL})
+
 
 
   # vkinit_list[[2]] and further  :  init classif CAH + searching from that point
@@ -169,7 +172,8 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
     classifInit = initialize(dataR6,paramInit,method = "CAH")$groups
     indInit <- indInit +  1
     collectionTestedClassifInit[[indInit]] = classifInit
-    R <- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,  maxiterVEM = maxiterVEM))
+    R <- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,pastICL = pastICL,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,  maxiterVEM = maxiterVEM))
+    pastICL <- sapply(R,function(e){e$ICL})
   }
 
   indInit <- length(collectionTestedClassifInit)
@@ -214,8 +218,9 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
       for (i in (indRef + 1):length(collectionTestedClassifInit))
       {
         #browser()
-        R1 <- dataR6$searchNbClusters(collectionTestedClassifInit[[i]],Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM)
+        R1 <- dataR6$searchNbClusters(collectionTestedClassifInit[[i]],Kmin = v_Kmin,Kmax = v_Kmax,pastICL = pastICL,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM)
         R <- c(R,R1)
+        pastICL <- c(pastICL,sapply(R1,function(e){e$ICL}))
         #<- <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM))
       }
     }

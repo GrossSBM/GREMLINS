@@ -1,4 +1,4 @@
-searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, verbose = TRUE, maxiterVE = NULL, maxiterVEM = NULL){
+searchKQ <- function(dataR6, classifInit, pastICL = c(), Kmin=NULL, Kmax=NULL, nbCores=NULL, verbose = TRUE, maxiterVE = NULL, maxiterVEM = NULL){
   #
 
 
@@ -51,7 +51,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
   RES[[niterSearch + 1]] <- estimNew;
 
   #----------------------------------------------  ALGORITHM
-  while ((ICLNew > ICL.c) & (niterSearch < 1000)) {
+  while ( (ICLNew > ICL.c) & !(ICLNew %in% pastICL) & (niterSearch < 1000)) {
     #
     niterSearch <- niterSearch + 1;
 
@@ -74,7 +74,7 @@ searchKQ <- function(dataR6, classifInit, Kmin=NULL, Kmax=NULL, nbCores=NULL, ve
 
 
     all_estim <- dataR6$cleanResults(allEstim)
-    if (length(all_estim) > 0){ICLNew <- all_estim[[1]]$ICL}else{ICLNew = -Inf}
+    if (length(all_estim) > 0){ICLNew <- all_estim[[1]]$ICL}else{ICLNew = -Inf} # meilleur ICL
     vec.ICL <- c(vec.ICL,ICLNew)
 
     if (ICLNew > ICL.c) {
