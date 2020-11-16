@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 
 
 
-We present the performances of GREMLIN on a simulated multipartite network.  GREMLIN includes a function `rMBM` to simulate multipartite networks.  Mathematical details can be found in @multipartite. 
+We present the performances of GREMLINS on a simulated multipartite network.  GREMLINS includes a function `rMBM` to simulate multipartite networks.  Mathematical details can be found in @multipartite. 
 
 
 
@@ -85,7 +85,7 @@ We are now ready to simulate the data
 
 
 ```{r simul 2, eval = TRUE, echo = TRUE}
-library(GREMLIN)
+library(GREMLINS)
 dataSim <- rMBM(v_NQ,E , typeInter, v_distrib, list_pi,
                 list_theta, namesFG = namesFG, seed = 4,keepClassif  = TRUE)
 list_Net <- dataSim$list_Net
@@ -134,7 +134,7 @@ extractClustersMBM(res_MBMsimu_fixed)$A
 
 ## Missing data 
 
-GREMLIN is also able to handle missing data. In the following experiment, we artificially set missing data in the previously simulated matrices. 
+GREMLINS is also able to handle missing data. In the following experiment, we artificially set missing data in the previously simulated matrices. 
 
 
 ```{r sim NA}

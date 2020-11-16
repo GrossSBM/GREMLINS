@@ -119,8 +119,10 @@ MBMfit$set("public",'sim',
                self$v_NQ <- v_NQ;
                self$typeInter <- typeInter;
                self$Q <- length(unique(c(E)))
-               if (!is.null(seed)) {set.seed(seed)}
-               Z <- lapply(1:self$Q,function(q){Zq <- sample(1:self$v_K[q],self$v_NQ[q],replace = TRUE,prob = self$list_pi[[q]])})
+
+               Z <- lapply(1:self$Q,function(q){if
+                 (!is.null(seed)) {set.seed(seed + q)}
+                 Zq <- sample(1:self$v_K[q],self$v_NQ[q],replace = TRUE,prob = self$list_pi[[q]])})
                self$Z = Z
                mats <- lapply(1:nrow(self$E),function(e){
                  fg1 <- self$E[e,1]
@@ -130,20 +132,25 @@ MBMfit$set("public",'sim',
                  Z_fg2 <- self$Z[[fg2]]
                  switch(self$v_distrib[e],
                         bernoulli = {
+                          if (!is.null(seed)) {set.seed(seed + e)}
                           X_e <- matrix(rbinom(self$v_NQ[fg1] * self$v_NQ[fg2],1,list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
                           diag(X_e) <- 0;                              },
                         poisson = {
+                          if (!is.null(seed)) {set.seed(seed + e)}
                           X_e <- matrix(rpois(self$v_NQ[fg1] * self$v_NQ[fg2],list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                         gaussian  = {
+                          if (!is.null(seed)) {set.seed(seed + e)}
                           X_e <- matrix(rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = sqrt(list_theta_e$var[Z_fg1,Z_fg2])),self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                        ZIgaussian = {
+                         if (!is.null(seed)) {set.seed(seed + e)}
                          U <- rbinom(self$v_NQ[fg1] * self$v_NQ[fg2], 1, 1 - list_theta_e$p0[Z_fg1,Z_fg2])
                          Z <- rnorm(self$v_NQ[fg1] * self$v_NQ[fg2],mean = list_theta_e$mean[Z_fg1,Z_fg2], sd = sqrt(list_theta_e$var[Z_fg1,Z_fg2]))
                          X_e <- matrix((U == 1) *  Z,self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                        laplace = {
+                         if (!is.null(seed)) {set.seed(seed + e)}
                           X_e <- matrix(rlaplace(self$v_NQ[fg1] * self$v_NQ[fg2], location = 0, scale = list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
                           },
                       stop("Enter a valid distribution (poisson or bernoulli or laplace or gaussian)!"))

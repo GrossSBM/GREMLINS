@@ -1,4 +1,4 @@
 library(testthat)
-library(GREMLIN)
+library(GREMLINS)
 
-test_check("GREMLIN")
+test_check("GREMLINS")

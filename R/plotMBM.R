@@ -23,7 +23,7 @@
 #' list_theta[[3]] <- (m3 + t(m3))/2
 #' list_Net <- rMBM(v_NQ = c(60,50),E , typeInter, v_distrib, list_pi,
 #'                 list_theta, namesFG = namesFG, seed = 2)$list_Net
-#'res_MBMsimu <- multipartiteBM(list_Net, v_distrib,
+#' res_MBMsimu <- multipartiteBM(list_Net, v_distrib,
 #'                              namesFG = c('A','B'), v_Kinit = c(2,2),
 #'                              nbCores = 2,initBM = FALSE)
 #' plotMBM(res_MBMsimu)

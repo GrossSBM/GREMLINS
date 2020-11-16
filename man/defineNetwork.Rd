@@ -16,7 +16,7 @@ defineNetwork(mat, typeInter, rowFG, colFG)
 \item{colFG}{Name of the function group in column}
 }
 \value{
-a list object formatted for the GREMLIN package
+a list object formatted for the GREMLINS package
 }
 \description{
 Define a network providing its matrix of interactions and specifying the functions groups in row and col.

@@ -1,7 +1,7 @@
 #' Adjusting an extended SBM to Multipartite networks
 #'
 #' Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. GREMLIM adjusts an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020)
-#' The GREMLIN package provides the following top-level  major functions:
+#' The GREMLINS package provides the following top-level  major functions:
 #'\itemize{
 #'   \item{\code{\link{defineNetwork}}}{ a function to define carefully a single network.}
 #'   \item{\code{\link{rMBM}}}{ a function to simulate a collection of networks involving common functional groups of entities (with various emission distributions).}
@@ -23,6 +23,6 @@
 #' @references Bar-Hen, A. and Barbillon, P. & Donnet S. (2020), "Block models for multipartite networks. Applications in ecology and  ethnobiology. Journal of Statistical Modelling (to appear)
 #' @importFrom R6 R6Class
 #' @import parallel igraph blockmodels aricode
-#' @name GREMLIN
+#' @name GREMLINS
 NULL
 

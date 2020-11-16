@@ -1,5 +1,5 @@
 ---
-title: "GREMLIN. Quick Mathematical Background"
+title: "GREMLINS. Quick Mathematical Background"
 author: "Sophie Donnet, Pierre Barbillon"
 date: "`r Sys.Date()`"
 output: 
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of GREMLIN is to perform statistical analysis of multipartite networks through a block model approach. 
+The goal of GREMLINS is to perform statistical analysis of multipartite networks through a block model approach. 
 
 Multipartite networks  consist in the joint observation of several networks implying some common individuals. The individuals (or entities represented by nodes)  at stake are partitioned into groups defined by their nature.
 In what follows, these groups will be referred to as  **functional groups**.
@@ -38,16 +38,16 @@ In what follows, these groups will be referred to as  **functional groups**.
 
 ## Installation
 
-You can install the released version of GREMLIN  from [GitHub](https://github.com/Demiperimetre/GREMLIN) with:
+You can install the released version of GREMLINS  from [GitHub](https://github.com/Demiperimetre/GREMLINS) with:
 
 ```{r packages, echo = FALSE, eval=TRUE}
-#devtools::install_github("Demiperimetre/GREMLIN")
-library(GREMLIN)
+#devtools::install_github("Demiperimetre/GREMLINS")
+library(GREMLINS)
 ```
 
 ```{r packages2, eval=FALSE, echo=TRUE}
 library(devtools)
-devtools::install_github("Demiperimetre/GREMLIN")
+devtools::install_github("Demiperimetre/GREMLINS")
 ```
 
 

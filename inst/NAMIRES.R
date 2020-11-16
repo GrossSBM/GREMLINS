@@ -1,7 +1,7 @@
 
 # package and data --------------------------------------------------------
 
-library(GREMLIN)
+library(GREMLINS)
 library(alluvial)
 library(pROC)
 library(parallel)
@@ -27,7 +27,7 @@ rownames(adj_relations)==rownames(species)
 
 
 
-# formatting data for GREMLIN ---------------------------------------------
+# formatting data for GREMLINS ---------------------------------------------
 
 
 Relation = defineNetwork(adj_relations,"diradj","ind","ind")

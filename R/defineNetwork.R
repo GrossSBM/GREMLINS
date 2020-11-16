@@ -4,7 +4,7 @@
 #' @param typeInter Type of the matrix, choice between "inc" (incidence), "adj" (adjacency) and "diradj" (directed adjacency)
 #' @param rowFG Name of the functional group in row
 #' @param colFG Name of the function group in column
-#' @return a list object formatted for the GREMLIN package
+#' @return a list object formatted for the GREMLINS package
 #' @examples
 #' A <- matrix(rbinom(100,1,.2),10,10)
 #' type <- "diradj"

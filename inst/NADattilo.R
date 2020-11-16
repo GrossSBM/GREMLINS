@@ -1,7 +1,7 @@
 
 # package and data --------------------------------------------------------
 
-library(GREMLIN)
+library(GREMLINS)
 library(alluvial)
 library(pROC)
 library(parallel)
@@ -32,7 +32,7 @@ rownames(Adj_seed) = plantnames
 Adj_seed = as.matrix(Adj_seed)
 
 
-# formatting data for GREMLIN ---------------------------------------------
+# formatting data for GREMLINS ---------------------------------------------
 
 PlantFlovis = defineNetwork(Adj_flovis,"inc","plants","flovis")
 PlantAnt = defineNetwork(Adj_ant,"inc","plants","ants")
