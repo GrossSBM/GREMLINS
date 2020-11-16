@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Define a network — defineNetwork • GREMLIN</title>
+<title>Define a network providing its matrix of interactions and specifying the functions groups in row and col. — defineNetwork • GREMLINS</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Define a network — defineNetwork" />
-<meta property="og:description" content="Define a network" />
+<meta property="og:title" content="Define a network providing its matrix of interactions and specifying the functions groups in row and col. — defineNetwork" />
+<meta property="og:description" content="Define a network providing its matrix of interactions and specifying the functions groups in row and col." />
 
 
 
@@ -71,8 +71,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">GREMLIN</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <a class="navbar-link" href="../index.html">GREMLINS</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -95,10 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/EcologicalNetwork.html">Analysis of a mutualistic multipartite ecological network with GREMLIN</a>
+      <a href="../articles/EcologicalNetwork.html">Analysis of a mutualistic multipartite ecological network with GREMLINS</a>
     </li>
     <li>
-      <a href="../articles/Introduction.html">GREMLIN. Quick Mathematical Background</a>
+      <a href="../articles/Introduction.html">GREMLINS. Quick Mathematical Background</a>
     </li>
     <li>
       <a href="../articles/SimulatedNetwork.html">Illustration on a simulated multipartite network</a>
@@ -107,7 +107,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/demiperimetre/GREMLINS/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -121,13 +126,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Define a network</h1>
-    
+    <h1>Define a network providing its matrix of interactions and specifying the functions groups in row and col.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/demiperimetre/GREMLINS/blob/master/R/defineNetwork.R'><code>R/defineNetwork.R</code></a></small>
     <div class="hidden name"><code>defineNetwork.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Define a network</p>
+    <p>Define a network providing its matrix of interactions and specifying the functions groups in row and col.</p>
     </div>
 
     <pre class="usage"><span class='fu'>defineNetwork</span>(<span class='no'>mat</span>, <span class='no'>typeInter</span>, <span class='no'>rowFG</span>, <span class='no'>colFG</span>)</pre>
@@ -155,7 +160,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a list object formatted for the GREMLIN package</p>
+    <p>a list object formatted for the GREMLINS package</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>A</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='fl'>100</span>,<span class='fl'>1</span>,<span class='fl'>.2</span>),<span class='fl'>10</span>,<span class='fl'>10</span>)
@@ -193,11 +198,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by P. Barbillon.</p>
+  <p>Developed by Sophie Donnet, Pierre Barbillon.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>

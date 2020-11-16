@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Multipartite network of mutualistic interactions between   plants and pollinators, plants and birds  and plants and ants. — MPEcoNetwork • GREMLINS</title>
+<title>Adjusting an extended SBM to Multipartite networks — GREMLINS • GREMLINS</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,15 @@
 
 
 
-<meta property="og:title" content="Multipartite network of mutualistic interactions between   plants and pollinators, plants and birds  and plants and ants. — MPEcoNetwork" />
-<meta property="og:description" content="Multipartite network of mutualistic interactions between   plants and pollinators, plants and birds  and plants and ants." />
+<meta property="og:title" content="Adjusting an extended SBM to Multipartite networks — GREMLINS" />
+<meta property="og:description" content="Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. GREMLIM adjusts an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020)
+The GREMLINS package provides the following top-level  major functions:
+defineNetwork a function to define carefully a single network.
+rMBM a function to simulate a collection of networks involving common functional groups of entities (with various emission distributions).
+multipartiteBM a function to perform inference (model selection and estimation ) of SBM for a multipartite network.
+multipartiteBMFixedModel a function to estimate the parameters of SBM for a multipartite network for fixed numbers of blocks
+
+" />
 
 
 
@@ -126,31 +133,37 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Multipartite network of mutualistic interactions between   plants and pollinators, plants and birds  and plants and ants.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/demiperimetre/GREMLINS/blob/master/R/MPEcoNetwork.R'><code>R/MPEcoNetwork.R</code></a></small>
-    <div class="hidden name"><code>MPEcoNetwork.Rd</code></div>
+    <h1>Adjusting an extended SBM to Multipartite networks</h1>
+    <small class="dont-index">Source: <a href='https://github.com/demiperimetre/GREMLINS/blob/master/R/GREMLINS_package.R'><code>R/GREMLINS_package.R</code></a></small>
+    <div class="hidden name"><code>GREMLINS.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Multipartite network of mutualistic interactions between   plants and pollinators, plants and birds  and plants and ants.</p>
+    <p>Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. GREMLIM adjusts an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020)
+The GREMLINS package provides the following top-level  major functions:</p><ul>
+<li><p><code>defineNetwork</code> a function to define carefully a single network.</p></li>
+<li><p><code>rMBM</code> a function to simulate a collection of networks involving common functional groups of entities (with various emission distributions).</p></li>
+<li><p><code>multipartiteBM</code> a function to perform inference (model selection and estimation ) of SBM for a multipartite network.</p></li>
+<li><p><code>multipartiteBMFixedModel</code> a function to estimate the parameters of SBM for a multipartite network for fixed numbers of blocks</p></li>
+</ul>
+
     </div>
 
-    <pre class="usage"><span class='no'>MPEcoNetwork</span></pre>
 
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>A list a 3 binary  incidence matrices</p><dl'>
-<dt>Inc_plant_ant</dt><dd><p>Interactions between plants (rows) and ants (cols). Matrix with 141 rows and 30 columns</p></dd>
-<dt>Inc_plant_bird</dt><dd><p>Interactions between plants (rows) and birds (cols). Matrix with141 rows and 46 columns</p></dd>
-<dt>Inc_plant_flovis</dt><dd><p>Interactions between plants (rows) and pollinators (cols). Matrix with 141 rows and 173 columns</p></dd>
-...
+    <p>We also provide some additional functions useful to analyze the results:</p><ul>
+<li><p><code>extractClustersMBM</code> a function to extract the clusters in each functional group</p></li>
+<li><p><code>comparClassif</code> a function to compute the Adjusted Rand Index (ARI) between two classifications</p></li>
+<li><p><code>plotMBM</code> a function to Plot the mesoscopic view of the estimated MBM</p></li>
+<li><p><code>predictMBM</code> a function to compute the predictions once the model has been fitted</p></li>
+<li><p><code>compLikICL</code> a function to	compute the Integrated Likelihood and the ICL criteria for the MBM</p></li>
+</ul>
 
-</dl>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
-
-    <p>Dataset  compiled and conducted at Centro de Investigaciones Costeras La Mancha (CICOLMA), located on the central coast of the Gulf of Mexico, Veracruz, Mexico. <a href='https://royalsocietypublishing.org/doi/full/10.1098/rspb.2016.1564'>https://royalsocietypublishing.org/doi/full/10.1098/rspb.2016.1564</a> <a href='https://github.com/lucaspdmedeiros/multi-network_core_removal/tree/master/data'>https://github.com/lucaspdmedeiros/multi-network_core_removal/tree/master/data</a></p>
+    <p>Bar-Hen, A. and Barbillon, P. &amp; Donnet S. (2020), "Block models for multipartite networks. Applications in ecology and  ethnobiology. Journal of Statistical Modelling (to appear)</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

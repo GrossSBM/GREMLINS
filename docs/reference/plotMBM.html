@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot the mesoscopic view  of the estimated MBM — plotMBM • GREMLIN</title>
+<title>Plot the mesoscopic view  of the estimated MBM — plotMBM • GREMLINS</title>
 
 
 <!-- jquery -->
@@ -71,8 +71,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">GREMLIN</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <a class="navbar-link" href="../index.html">GREMLINS</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -95,10 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/EcologicalNetwork.html">Analysis of a mutualistic multipartite ecological network with GREMLIN</a>
+      <a href="../articles/EcologicalNetwork.html">Analysis of a mutualistic multipartite ecological network with GREMLINS</a>
     </li>
     <li>
-      <a href="../articles/Introduction.html">GREMLIN. Quick Mathematical Background</a>
+      <a href="../articles/Introduction.html">GREMLINS. Quick Mathematical Background</a>
     </li>
     <li>
       <a href="../articles/SimulatedNetwork.html">Illustration on a simulated multipartite network</a>
@@ -107,7 +107,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/demiperimetre/GREMLINS/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -122,7 +127,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot the mesoscopic view  of the estimated MBM</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/demiperimetre/GREMLINS/blob/master/R/plotMBM.R'><code>R/plotMBM.R</code></a></small>
     <div class="hidden name"><code>plotMBM.Rd</code></div>
     </div>
 
@@ -130,8 +135,7 @@
     <p>Plot the mesocopic view of the multipartite network obtained by the Genreliazed block models. resMBM is the results of of MBM fitting (output of multipartiteBMFixedModel for given numbers of clusters or multipartiteBM if the number of clusters is selected)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotMBM</span>(<span class='no'>resMBM</span>, <span class='kw'>whichModel</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mycol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>thres</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
-  <span class='kw'>cex</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>maxCurved</span> <span class='kw'>=</span> <span class='fl'>3</span>)</pre>
+    <pre class="usage"><span class='fu'>plotMBM</span>(<span class='no'>resMBM</span>, <span class='kw'>whichModel</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mycol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>thres</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='kw'>maxCurved</span> <span class='kw'>=</span> <span class='fl'>3</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,10 +157,6 @@
       <td><p>A threshold under which edges correponding to probability of connections are not plotted</p></td>
     </tr>
     <tr>
-      <th>cex</th>
-      <td><p>graphical parameter:</p></td>
-    </tr>
-    <tr>
       <th>maxCurved</th>
       <td><p>graphical parameter : curvature of the edges</p></td>
     </tr>
@@ -164,25 +164,32 @@
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>v_K</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>,<span class='fl'>2</span>,<span class='fl'>2</span>)
-<span class='no'>n_FG</span> <span class='kw'>&lt;-</span> <span class='fl'>3</span>
-<span class='no'>list_pi</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/vector.html'>vector</a></span>(<span class='st'>"list"</span>, <span class='fl'>3</span>);
-<span class='no'>list_pi</span><span class='kw'>[[</span><span class='fl'>1</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.4</span>,<span class='fl'>0.3</span>,<span class='fl'>0.3</span>); <span class='no'>list_pi</span><span class='kw'>[[</span><span class='fl'>2</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.6</span>,<span class='fl'>0.4</span>); <span class='no'>list_pi</span><span class='kw'>[[</span><span class='fl'>3</span>]]  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.6</span>,<span class='fl'>0.4</span>)
-<span class='no'>E</span>  <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>,<span class='fl'>3</span>),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>,<span class='fl'>2</span>))
-<span class='no'>v_distrib</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'bernoulli'</span>,<span class='st'>'poisson'</span>,<span class='st'>'poisson'</span>)
-<span class='no'>typeInter</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>( <span class='st'>"inc"</span>, <span class='st'>"inc"</span>  ,  <span class='st'>"adj"</span> )
+    <pre class="examples"><div class='input'><span class='no'>namesFG</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'A'</span>,<span class='st'>'B'</span>)
+<span class='no'>list_pi</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.16</span> ,<span class='fl'>0.40</span> ,<span class='fl'>0.44</span>),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.3</span>,<span class='fl'>0.7</span>))
+<span class='no'>E</span>  <span class='kw'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>,<span class='fl'>2</span>),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>1</span>))
+<span class='no'>typeInter</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>( <span class='st'>"inc"</span>,<span class='st'>"diradj"</span>, <span class='st'>"adj"</span>)
+<span class='no'>v_distrib</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'gaussian'</span>,<span class='st'>'bernoulli'</span>,<span class='st'>'poisson'</span>)
 <span class='no'>list_theta</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>()
-<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>1</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>1</span>,<span class='fl'>1</span>]] * <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>1</span>,<span class='fl'>2</span>]],<span class='fl'>1.5</span>,<span class='fl'>1.5</span> ),<span class='kw'>nrow</span> <span class='kw'>=</span> <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>1</span>,<span class='fl'>1</span>]], <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>1</span>,<span class='fl'>2</span>]])
-<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>2</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/GammaDist.html'>rgamma</a></span>(<span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>2</span>,<span class='fl'>1</span>]] * <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>2</span>,<span class='fl'>2</span>]],<span class='fl'>7.5</span>,<span class='fl'>1</span> ),<span class='kw'>nrow</span> <span class='kw'>=</span> <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>2</span>,<span class='fl'>1</span>]], <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>2</span>,<span class='fl'>2</span>]])
-<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>3</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/GammaDist.html'>rgamma</a></span>(<span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>3</span>,<span class='fl'>1</span>]] * <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>3</span>,<span class='fl'>2</span>]],<span class='fl'>7.5</span>,<span class='fl'>1</span> ),<span class='kw'>nrow</span> <span class='kw'>=</span> <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>3</span>,<span class='fl'>1</span>]], <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='no'>v_K</span>[<span class='no'>E</span>[<span class='fl'>3</span>,<span class='fl'>2</span>]])
-<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>3</span>]] <span class='kw'>&lt;-</span> <span class='fl'>0.5</span>*(<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>3</span>]] + <span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span>(<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>3</span>]])) <span class='co'># symetrisation for network 3</span>
-<span class='no'>v_NQ</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>100</span>,<span class='fl'>50</span>,<span class='fl'>40</span>)
-<span class='no'>dataSim</span> <span class='kw'>&lt;-</span>  <span class='fu'><a href='rMBM.html'>rMBM</a></span>(<span class='no'>v_NQ</span> ,<span class='no'>E</span> , <span class='no'>typeInter</span>, <span class='no'>v_distrib</span>, <span class='no'>list_pi</span>, <span class='no'>list_theta</span>, <span class='kw'>seed</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>namesFG</span><span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'A'</span>,<span class='st'>'B'</span>,<span class='st'>'D'</span>),<span class='kw'>keepClassif</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='no'>list_Net</span> <span class='kw'>&lt;-</span> <span class='no'>dataSim</span>$<span class='no'>list_Net</span>
-<span class='no'>resMBM</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='multipartiteBMFixedModel.html'>multipartiteBMFixedModel</a></span>(<span class='no'>list_Net</span>,<span class='kw'>namesFG</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'A'</span>,<span class='st'>'B'</span>,<span class='st'>'D'</span>), <span class='kw'>v_K</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>,<span class='fl'>2</span>,<span class='fl'>2</span>),<span class='kw'>v_distrib</span> <span class='kw'>=</span> <span class='no'>v_distrib</span>)</div><div class='output co'>#&gt; [1] "====================== First Forward Step =================="
-#&gt; [1] "====================== First Backward Step =================="
-#&gt; [1] "====================== Last Forward Step =================="
-#&gt; [1] "====================== Last Backward Step =================="</div><div class='input'><span class='fu'>plotMBM</span>(<span class='no'>resMBM</span>,<span class='kw'>mycol</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'magenta'</span>,<span class='st'>'cyan'</span>,<span class='st'>'yellow'</span>))</div><div class='img'><img src='plotMBM-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>1</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>()
+<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='no'>mean</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>6.1</span>, <span class='fl'>8.9</span>, <span class='fl'>6.6</span>, <span class='fl'>9.8</span>, <span class='fl'>2.6</span>, <span class='fl'>1.0</span>), <span class='fl'>3</span>, <span class='fl'>2</span>)
+<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='no'>var</span>  <span class='kw'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1.6</span>, <span class='fl'>1.6</span>, <span class='fl'>1.8</span>, <span class='fl'>1.7</span> ,<span class='fl'>2.3</span>, <span class='fl'>1.5</span>),<span class='fl'>3</span>, <span class='fl'>2</span>)
+<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>2</span>]] <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.7</span>,<span class='fl'>1.0</span>, <span class='fl'>0.4</span>, <span class='fl'>0.6</span>),<span class='fl'>2</span>, <span class='fl'>2</span>)
+<span class='no'>m3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2.5</span>, <span class='fl'>2.6</span> ,<span class='fl'>2.2</span> ,<span class='fl'>2.2</span>, <span class='fl'>2.7</span> ,<span class='fl'>3.0</span> ,<span class='fl'>3.6</span>, <span class='fl'>3.5</span>, <span class='fl'>3.3</span>),<span class='fl'>3</span>,<span class='fl'>3</span> )
+<span class='no'>list_theta</span><span class='kw'>[[</span><span class='fl'>3</span>]] <span class='kw'>&lt;-</span> (<span class='no'>m3</span> + <span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span>(<span class='no'>m3</span>))/<span class='fl'>2</span>
+<span class='no'>list_Net</span> <span class='kw'>&lt;-</span> <span class='fu'>rMBM</span>(<span class='kw'>v_NQ</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>60</span>,<span class='fl'>50</span>),<span class='no'>E</span> , <span class='no'>typeInter</span>, <span class='no'>v_distrib</span>, <span class='no'>list_pi</span>,
+                <span class='no'>list_theta</span>, <span class='kw'>namesFG</span> <span class='kw'>=</span> <span class='no'>namesFG</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>2</span>)$<span class='no'>list_Net</span>
+<span class='no'>res_MBMsimu</span> <span class='kw'>&lt;-</span> <span class='fu'>multipartiteBM</span>(<span class='no'>list_Net</span>, <span class='no'>v_distrib</span>,
+                             <span class='kw'>namesFG</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'A'</span>,<span class='st'>'B'</span>), <span class='kw'>v_Kinit</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>,<span class='fl'>2</span>),
+                             <span class='kw'>nbCores</span> <span class='kw'>=</span> <span class='fl'>2</span>,<span class='kw'>initBM</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [1] "------------Nb of entities in each functional group--------------"
+#&gt;  A  B 
+#&gt; 60 50 
+#&gt; [1] "------------Probability distributions on each network--------------"
+#&gt; [1] "gaussian"  "bernoulli" "poisson"  
+#&gt; [1] "-------------------------------------------------------------------"
+#&gt; [1] " ------ Searching the numbers of blocks starting from [ 2 2 ] blocks"
+#&gt; [1] "ICL : -6247.51 . Nb of blocks: [ 2 2 ]"
+#&gt; [1] "ICL : -5727.89 . Nb of blocks: [ 3 2 ]"
+#&gt; [1] "Best model------ ICL : -5727.89 . Nb of clusters: [ 3 2 ] for [ A , B ] respectively"</div><div class='input'><span class='fu'>plotMBM</span>(<span class='no'>res_MBMsimu</span>)</div><div class='img'><img src='plotMBM-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -194,11 +201,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by P. Barbillon.</p>
+  <p>Developed by Sophie Donnet, Pierre Barbillon.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
 </div>
 
       </footer>
