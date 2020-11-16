@@ -10,7 +10,7 @@ bibliography: references.bib
 link-citations: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Simulated data}
+  %\VignetteIndexEntry{Illustration on a simulated multipartite network}
   %\VignetteEncoding{UTF-8}
 ---
 

@@ -1,15 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# GREMLIN
+# GREMLINS
 
 <!-- badges: start -->
 
 [![R build
-status](https://github.com/Demiperimetre/GREMLIN/workflows/R-CMD-check/badge.svg)](https://github.com/Demiperimetre/GREMLIN/actions)
+status](https://github.com/Demiperimetre/GREMLINS/workflows/R-CMD-check/badge.svg)](https://github.com/Demiperimetre/GREMLINS/actions)
 <!-- badges: end -->
 
-The goal of GREMLIN is to perform statistical analysis of multipartite
+The goal of GREMLINS is to perform statistical analysis of multipartite
 networks through a block model approach.
 
 Multipartite networks consist in the joint observation of several
@@ -19,12 +19,12 @@ their nature. In what follows, these groups will be referred to as .
 
 ## Installation
 
-You can install the released version of GREMLIN
+You can install the released version of GREMLINS
 [GitHub](https://github.com/) with:
 
 ``` r
-#devtools::install_github("Demiperimetre/GREMLIN")
-library(GREMLIN)
+#devtools::install_github("Demiperimetre/GREMLINS")
+library(GREMLINS)
 ```
 
 ## Mathematical Background

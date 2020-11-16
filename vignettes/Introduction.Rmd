@@ -10,7 +10,7 @@ bibliography: biblio.bib
 link-citations: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Mathematical Background}
+  %\VignetteIndexEntry{GREMLINS. Quick Mathematical Background}
   %\VignetteEncoding{UTF-8}
 ---
 

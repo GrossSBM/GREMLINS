@@ -10,7 +10,7 @@ bibliography: biblio.bib
 link-citations: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Mutualistic multipartite ecological networ}
+  %\VignetteIndexEntry{Analysis of a mutualistic multipartite ecological network with GREMLINS}
   %\VignetteEncoding{UTF-8}
 ---
 
