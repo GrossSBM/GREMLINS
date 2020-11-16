@@ -53,15 +53,15 @@ Default value  \code{= TRUE}}
 \value{
 a list of estimated parameters for the different models ordered by decreasing ICL. If save \code{= FALSE}, the length is of length 1 (only the better model is returned).
 \describe{
-  \item{\code{fittedModel}}{contains the results of the inference. \code{res$fittedModel[[1]]}  is a list with fields
-  \describe{
-  \item{\code{paramEstim}}{a MBMfit object.}
-  \item{\code{ICL}}{the penalized likelihood criterion ICL.}
-  \item{\code{vJ}}{the sequence of the varational bound of the likelihood through iterations of the VEM.}
-  \item{\code{convergence}}{TRUE if the VEM reached convergence.}
-  }
-  }
-  \item{\code{list_Net}}{ contains the data.}
+\item{\code{fittedModel}}{contains the results of the inference. \code{res$fittedModel[[1]]}  is a list with fields
+\describe{
+\item{\code{paramEstim}}{a MBMfit object.}
+\item{\code{ICL}}{the penalized likelihood criterion ICL.}
+\item{\code{vJ}}{the sequence of the varational bound of the likelihood through iterations of the VEM.}
+\item{\code{convergence}}{TRUE if the VEM reached convergence.}
+}
+}
+\item{\code{list_Net}}{ contains the data.}
 }
 }
 \description{

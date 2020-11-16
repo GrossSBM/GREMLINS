@@ -1,15 +1,25 @@
 Package: GREMLINS
 Type: Package
-Title: Inferring Multipartite Blockmodels
+Title: GeneRalizEd MuLtipartIte NetworkS
 Version: 0.2.0
-Author: P. Barbillon and S. Donnet
-Maintainer: P. Barbillon and S. Donnet <sophie.donnet@inrae.fr>
+Author@R:  c(
+          person(given = "Sophie", family = "Donnet", role = c("aut", "cre"), email = "sophie.donnet@inrae.fr", comment = c(ORCID = "000-0003-4370-7316"))
+          person(given = "Pierre", family = "Barbillon", role = c("aut"), email = "pierre.barbillon@agroparistech.fr",comment = c(ORCID = "0000-0002-7766-7693"))
+          )
 Description: Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. The aim is to fit an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020).  
-Depends: R (>= 3.5.0)
+URL: https://demiperimetre.github.io/GREMLINS/
+BugReports: https://github.com/demiperimetre/GREMLINS/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Suggests: 
+    testthat (>= 2.1.0),
+    spelling,
+    knitr,
+    rmarkdown
+Language: en-US
 Imports: 
     R6,
     parallel,
@@ -39,8 +49,5 @@ Collate:
       'comparClassif.R'
       'MPEcoNetwork.R'
       'predictMBM.R'
-Suggests: 
-    testthat (>= 2.1.0),
-    knitr,
-    rmarkdown
 VignetteBuilder: knitr
+Depends: R (>= 3.5.0)

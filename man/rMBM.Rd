@@ -27,7 +27,7 @@ rMBM(
 
 \item{list_pi}{: parameters of the blocks distribution}
 
-\item{list_theta}{: parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and var (plus p0 for ZIgaussian), for Laplace a list with location and scale}
+\item{list_theta}{: parameters of the interactions distribution. For bernoulli numbers between \link{0,1}, for Poisson positive real number, for Gaussian a list specifying mean and var (plus p0 for ZIgaussian), for Laplace a list with location and scale}
 
 \item{namesFG}{: names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)}
 
@@ -37,7 +37,7 @@ rMBM(
 }
 \value{
 A list of lists containing the networks (list_net) and if keepClassif = TRUE the classifications (classif)
-        Each element of  list_net corresponds to a network : each network is a list containing  the matrix (mat) , the type of network(diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
+Each element of  list_net corresponds to a network : each network is a list containing  the matrix (mat) , the type of network(diradj, adj, inc), the functional group in row (rowFG) and the functional group in columns (colFG)
 }
 \description{
 \code{rMBM} simulates a collection of networks involving common functional groups of entities. The networks may be directed, undirected or bipartite. The emission distribution of the edges may be Bernoulli, Poisson, Gaussian, Zero-Inflated Gaussian, or Laplace. See the vignette for more information about the model.
