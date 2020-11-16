@@ -7,7 +7,7 @@
 #' @param  typeInter : type of interaction in each network: undirected adjacency (adj), directed adjacency (diradj) or incidence (inc).  (vector of size equal to nrow(E) )
 #' @param  v_distrib : vector of the distributions: 'bernoulli', 'poisson', 'gaussian', 'ZIgaussian' (for Zero inflated gaussian) or 'laplace'  ( vector of size equal to nrow(E) )
 #' @param  list_pi  : parameters of the blocks distribution
-#' @param  list_theta : parameters of the interactions distribution. For bernoulli numbers between [0,1], for Poisson positive real number, for Gaussian a list specifying mean and var (plus p0 for ZIgaussian), for Laplace a list with location and scale
+#' @param  list_theta : parameters of the interactions distribution. For Bernoulli a probability, for Poisson positive real number, for Gaussian a list specifying mean and var (plus p0 for ZIgaussian), for Laplace a list with location and scale
 #' @param  namesFG : names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)
 #' @param  keepClassif : equal to TRUE if you want to keep the simulated blocks/classification (default value  = FALSE).
 #' @param  seed : set the seed for the random simulation (default value  = NULL)

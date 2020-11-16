@@ -27,7 +27,7 @@ rMBM(
 
 \item{list_pi}{: parameters of the blocks distribution}
 
-\item{list_theta}{: parameters of the interactions distribution. For bernoulli numbers between \link{0,1}, for Poisson positive real number, for Gaussian a list specifying mean and var (plus p0 for ZIgaussian), for Laplace a list with location and scale}
+\item{list_theta}{: parameters of the interactions distribution. For Bernoulli a probability, for Poisson positive real number, for Gaussian a list specifying mean and var (plus p0 for ZIgaussian), for Laplace a list with location and scale}
 
 \item{namesFG}{: names of the FG.  (default value  = NULL, then the functional groups are labelled FG1, FG2, etc)}
 

@@ -2,8 +2,8 @@ Package: GREMLINS
 Type: Package
 Title: GeneRalizEd MuLtipartIte NetworkS
 Version: 0.2.0
-Author@R:  c(
-          person(given = "Sophie", family = "Donnet", role = c("aut", "cre"), email = "sophie.donnet@inrae.fr", comment = c(ORCID = "000-0003-4370-7316"))
+Authors@R:  c(
+          person(given = "Sophie", family = "Donnet", role = c("aut", "cre"), email = "sophie.donnet@inrae.fr", comment = c(ORCID = "0000-0003-4370-7316")),
           person(given = "Pierre", family = "Barbillon", role = c("aut"), email = "pierre.barbillon@agroparistech.fr",comment = c(ORCID = "0000-0002-7766-7693"))
           )
 Description: Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. The aim is to fit an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020).  
