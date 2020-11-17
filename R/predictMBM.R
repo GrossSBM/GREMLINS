@@ -5,23 +5,20 @@
 #' @return the collection of matrices of predictions (probability for binary, intensity for weighted network) a
 #' @examples
 #' namesFG <- c('A','B')
-#' list_pi = list(c(0.16 ,0.40 ,0.44),c(0.3,0.7))
-#' E  <-  rbind(c(1,2),c(2,2),c(1,1))
-#' typeInter <- c( "inc","diradj", "adj")
-#' v_distrib <- c('ZIgaussian','bernoulli','poisson')
+#' list_pi <- list(c(0.5,0.5),c(0.3,0.7)) # prop of blocks in each FG
+#' E  <-  rbind(c(1,2),c(2,2)) # architecture of the multipartite net.
+#' typeInter <- c( "inc","diradj")
+#' v_distrib <- c('gaussian','bernoulli')
 #' list_theta <- list()
 #' list_theta[[1]] <- list()
-#' list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
-#' list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
-#' list_theta[[1]]$p0  <-matrix(c(0.4, 0.1,  0.8 , 0.5 , 0.7, 0),3, 2)
+#' list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 3), 2, 2)
+#' list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.5),2, 2)
 #' list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
-#' m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
-#' list_theta[[3]] <- (m3 + t(m3))/2
-#' list_Net <- rMBM(v_NQ = c(60,50),E , typeInter, v_distrib, list_pi,
+#' list_Net <- rMBM(v_NQ = c(30,30),E , typeInter, v_distrib, list_pi,
 #'                 list_theta, namesFG = namesFG, seed = 2)$list_Net
-#'res_MBMsimu <- multipartiteBM(list_Net, v_distrib,
-#'                              namesFG = c('A','B'), v_Kinit = c(2,2),
-#'                              nbCores = 2,initBM = FALSE)
+#' res_MBMsimu <- multipartiteBM(list_Net, v_distrib,
+#'                               namesFG = c('A','B'), v_Kinit = c(2,2),
+#'                               nbCores = 2,initBM = FALSE)
 #' pred <- predictMBM(res_MBMsimu)
 #' @export
 #'

@@ -16,24 +16,19 @@
 #' @return Estimated parameters and a classification
 #' @examples
 #' namesFG <- c('A','B')
-#' list_pi = list(c(0.16 ,0.40 ,0.44),c(0.3,0.7))
-#' E  <-  rbind(c(1,2),c(2,2),c(1,1))
-#' typeInter <- c( "inc","diradj", "adj")
-#' v_distrib <- c('gaussian','bernoulli','poisson')
+#' list_pi <- list(c(0.5,0.5),c(0.3,0.7)) # prop of blocks in each FG
+#' E  <-  rbind(c(1,2),c(2,2)) # architecture of the multipartite net.
+#' typeInter <- c( "inc","diradj")
+#' v_distrib <- c('poisson','bernoulli')
 #' list_theta <- list()
-#' list_theta[[1]] <- list()
-#' list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
-#' list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
+#' list_theta[[1]]   <- matrix(c(6.1, 8.9, 6.6, 3), 2, 2)
 #' list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
-#' m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
-#' list_theta[[3]] <- (m3 + t(m3))/2
-#' list_Net <- rMBM(v_NQ = c(60,50),E , typeInter, v_distrib, list_pi,
+#' list_Net <- rMBM(v_NQ = c(20,20),E , typeInter, v_distrib, list_pi,
 #'                 list_theta, namesFG = namesFG, seed = 2)$list_Net
-#' res_MBMsimu_fixed <- multipartiteBMFixedModel(list_Net,
-#'                                               v_distrib,
-#'                                               namesFG = namesFG,
-#'                                               v_K = c(3,2),
-#'                                               nbCores = 2)
+#' #res_MBMsimu_fixed <- multipartiteBMFixedModel(list_Net, v_distrib,
+#' #                                               namesFG = namesFG,
+#' #                                               v_K = c(1,2),
+#' #                                               nbCores = 2)
 #' @export
 
 
@@ -48,14 +43,10 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
 
 
   os <- Sys.info()["sysname"]
-  if ((os != 'Windows') & (is.null(nbCores))) {nbCores <- detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
-  if (os  == "Windows") {nbCores = 1}
-
+  if (is.null(nbCores)) {nbCores <- detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
 
   # Check names FG and permute ----------------------------------------------
   if ((is.null(namesFG) == FALSE)  & (setequal(namesFG,dataR6$namesFG) == FALSE)) {stop("Unmatching names of Functional Groups")}
-
-
   if ((is.null(v_K)) & is.null(classifInit)) {stop("one of v_K or classifInit have to be defined")}
   if (!is.null(classifInit))
   {
@@ -72,14 +63,11 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
   if (!is.null(classifInit)) {classifInit = classifInit[permut_vector]}
 
   #------------------------  Initialisation of the number of clusters and the classification.
-
   if (is.null(classifInit))
   {
     paramInit <- MBMfit$new(v_K = v_K,v_distrib = v_distrib)
     classifInit <- initialize(dataR6,paramInit,method = "CAH")$groups
   }
-
-
 
   #----------------------   Initialisation of the algorithm
   estim0 <- dataR6$estime(classifInit,maxiterVE = maxiterVE, maxiterVEM = maxiterVEM);
@@ -91,10 +79,6 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
       names(Z_q) <- dataR6$namesInd[[q]];
       return(Z_q)}
   )
-
-  #ICL0 <- estim0$ICL
-
-
 
   #----------------------------------------------  ALGORITHM
 
@@ -109,12 +93,27 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
   for (q in 1:dataR6$Q) { list_ClassifInitForward <- do.call(c,list(list_ClassifInitForward,Func_Forward_q(q)))}
 
 
-  if (verbose) {
+
+
+
+  if (os != 'Windows'){
+    if (verbose) {
       mess <- '====================== First Forward Step =================='
       print(mess)
-    allEstimForward <- pbmcapply::pbmclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+      allEstimForward <- pbmcapply::pbmclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }else{
+      allEstimForward <- mclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }
   }else{
-    allEstimForward <- mclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    if (verbose) {
+      mess <- '====================== First Forward Step =================='
+      print(mess)
+    }
+    L <- length(list_ClassifInitForward)
+    cl <- parallel::makeCluster(nbCores)
+    parallel::clusterExport(cl, c("dataR6","list_ClassifInitForward", "maxiterVE", "maxiterVEM","L"),envir = environment())
+    allEstimForward <- parallel::parLapply(cl, 1:L, function(l){estim.c.l <- dataR6$estime(list_ClassifInitForward[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
+    parallel::stopCluster(cl)
   }
 
 
@@ -129,14 +128,25 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
   list_ClassifInitBackward = list()
   for (q in 1:dataR6$Q) { list_ClassifInitBackward <- do.call(c,list(list_ClassifInitBackward,Func_Backward_q(q)))}
 
+  if (os != 'Windows'){
+    if (verbose) {
+      mess <- '====================== First Backward Step =================='
+      print(mess)
 
-  if (verbose) {
-    mess <- '====================== First Backward Step =================='
-    print(mess)
-
-    allEstimBackward <- pbmcapply::pbmclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+      allEstimBackward <- pbmcapply::pbmclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }else{
+      allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }
   }else{
-    allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    if (verbose) {
+      mess <- '====================== First Backward Step =================='
+      print(mess)
+    }
+    L <- length(list_ClassifInitBackward)
+    cl <- parallel::makeCluster(nbCores)
+    parallel::clusterExport(cl, c("dataR6","list_ClassifInitBackward", "maxiterVE", "maxiterVEM","L"),envir = environment())
+    allEstimBackward <- parallel::parLapply(cl, 1:L, function(l){estim.c.l <- dataR6$estime(list_ClassifInitBackward[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
+    parallel::stopCluster(cl)
   }
 
   allEstimBackward = dataR6$cleanResults(allEstimBackward)
@@ -152,16 +162,26 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
 
   qForward <- which(paramNew.forward$v_K != v_K)
   initForward <- mergeClassif(classifNew.forward,qForward,1)
-  if (verbose) {
-    mess <- '====================== Last Forward Step =================='
-    print(mess)
 
-    lastEstimForward <- pbmcapply::pbmclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+  if (os != 'Windows'){
+    if (verbose) {
+      mess <- '====================== Last Forward Step =================='
+      print(mess)
+      lastEstimForward <- pbmcapply::pbmclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }else{
+      lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }
   }else{
-    lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    if (verbose) {
+      mess <- '====================== Last Forward Step =================='
+      print(mess)
+    }
+    L <- length(initForward)
+    cl <- parallel::makeCluster(nbCores)
+    parallel::clusterExport(cl, c("dataR6","initForward", "maxiterVE", "maxiterVEM","L"),envir = environment())
+    lastEstimForward  <- parallel::parLapply(cl, 1:L, function(l){estim.c.l <- dataR6$estime(initForward[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
+    parallel::stopCluster(cl)
   }
-
-
 
   ###########################""
   estimNewBackward <- allEstimBackward[[1]]
@@ -172,12 +192,24 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
 
   qBackward <- which(paramNewBackward$v_K != v_K)
   initBackward <- splitClassif(classifNewBackward,qBackward,dataR6,100)
-  if (verbose) {
-    mess <- '====================== Last Backward Step =================='
-    print(mess)
-    lastEstimBackward <- pbmcapply::pbmclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+  if (os != 'Windows'){
+    if (verbose) {
+      mess <- '====================== Last Backward Step =================='
+      print(mess)
+      lastEstimBackward <- pbmcapply::pbmclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }else{
+      lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    }
   }else{
-    lastEstimBackward <- mclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+    if (verbose) {
+      mess <- '====================== Last Backward Step =================='
+      print(mess)
+    }
+    L <- length(initBackward)
+    cl <- parallel::makeCluster(nbCores)
+    parallel::clusterExport(cl, c("dataR6","initBackward", "maxiterVE", "maxiterVEM","L"),envir = environment())
+    lastEstimBackward <- parallel::parLapply(cl, 1:L, function(l){estim.c.l <- dataR6$estime(initBackward[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
+    parallel::stopCluster(cl)
   }
 
 

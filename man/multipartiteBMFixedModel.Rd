@@ -44,22 +44,17 @@ Estimate the parameters and give the clustering for given numbers of blocks
 }
 \examples{
 namesFG <- c('A','B')
-list_pi = list(c(0.16 ,0.40 ,0.44),c(0.3,0.7))
-E  <-  rbind(c(1,2),c(2,2),c(1,1))
-typeInter <- c( "inc","diradj", "adj")
-v_distrib <- c('gaussian','bernoulli','poisson')
+list_pi <- list(c(0.5,0.5),c(0.3,0.7)) # prop of blocks in each FG
+E  <-  rbind(c(1,2),c(2,2)) # architecture of the multipartite net.
+typeInter <- c( "inc","diradj")
+v_distrib <- c('poisson','bernoulli')
 list_theta <- list()
-list_theta[[1]] <- list()
-list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
-list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
+list_theta[[1]]   <- matrix(c(6.1, 8.9, 6.6, 3), 2, 2)
 list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
-m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
-list_theta[[3]] <- (m3 + t(m3))/2
-list_Net <- rMBM(v_NQ = c(60,50),E , typeInter, v_distrib, list_pi,
+list_Net <- rMBM(v_NQ = c(20,20),E , typeInter, v_distrib, list_pi,
                 list_theta, namesFG = namesFG, seed = 2)$list_Net
-res_MBMsimu_fixed <- multipartiteBMFixedModel(list_Net,
-                                              v_distrib,
-                                              namesFG = namesFG,
-                                              v_K = c(3,2),
-                                              nbCores = 2)
+#res_MBMsimu_fixed <- multipartiteBMFixedModel(list_Net, v_distrib,
+#                                               namesFG = namesFG,
+#                                               v_K = c(1,2),
+#                                               nbCores = 2)
 }
