@@ -21,7 +21,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
+ # fig.path = "man/figures/README-",
   out.width = "100%"
 )
 ```
@@ -37,7 +37,7 @@ We present the performances of GREMLINS on a simulated multipartite network.  GR
 
 
 
-## Simulation of a complex multipartite newtwork. 
+## Simulation of a complex multipartite network. 
 
 
 We use the function  `rMBM` provided in the package to simulate a  multipartite network involving $2$ functional groups (namely A and B) of respective sizes 

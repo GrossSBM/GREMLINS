@@ -88,7 +88,7 @@
       <h1 data-toc-skip>Analysis of a mutualistic multipartite ecological network with GREMLINS</h1>
                         <h4 class="author">Sophie Donnet, Pierre Barbillon</h4>
             
-            <h4 class="date">2020-11-16</h4>
+            <h4 class="date">2020-11-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/demiperimetre/GREMLINS/blob/master/vignettes/EcologicalNetwork.Rmd"><code>vignettes/EcologicalNetwork.Rmd</code></a></small>
       <div class="hidden name"><code>EcologicalNetwork.Rmd</code></div>
@@ -121,9 +121,9 @@ The dataset –compiled and conducted by <span class="citation">Dáttilo et al. 
 <a href="#formatting-the-data" class="anchor"></a>Formatting the data</h2>
 <p>We format the data to be able to use our R package GREMLINS i.e. we transform the matrices into an list containing <em>the matrix</em>, <em>its type</em> : <code>inc</code> for incidence matrix, <code>adj</code> for adjacency symetric, and <code>diradj</code> for non symetric (oriented) adjacency matrix, the name of functional group in row and the name of functional group in column. The three matrices are gathered in a list.</p>
 <p>To do so, we use de the function <code>defineNetwork</code>.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">PlantFlovis</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/GREMLINS/man/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_flovis</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Flovis"</span>)
-<span class="no">PlantAnt</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/GREMLINS/man/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_ant</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Ants"</span>)
-<span class="no">PlantBird</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/GREMLINS/man/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_bird</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Birds"</span>)
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">PlantFlovis</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_flovis</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Flovis"</span>)
+<span class="no">PlantAnt</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_ant</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Ants"</span>)
+<span class="no">PlantBird</span> <span class="kw">=</span> <span class="fu"><a href="../reference/defineNetwork.html">defineNetwork</a></span>(<span class="no">MPEcoNetwork</span>$<span class="no">Inc_plant_bird</span>,<span class="st">"inc"</span>,<span class="st">"Plants"</span>,<span class="st">"Birds"</span>)
 <span class="no">list_net</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">PlantFlovis</span>,<span class="no">PlantAnt</span>,<span class="no">PlantBird</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">PlantFlovis</span>)
 <span class="co">#&gt; [1] "mat"       "typeInter" "rowFG"     "colFG"</span></pre></body></html></div>
@@ -137,7 +137,7 @@ The dataset –compiled and conducted by <span class="citation">Dáttilo et al. 
 <h2 class="hasAnchor">
 <a href="#inference" class="anchor"></a>Inference</h2>
 <p>The model selection and the estimation are performed with the function <code>multipartiteBM</code>.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">RES_MBM</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/GREMLINS/man/multipartiteBM.html">multipartiteBM</a></span>(
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">RES_MBM</span> <span class="kw">=</span> <span class="fu"><a href="../reference/multipartiteBM.html">multipartiteBM</a></span>(
     <span class="kw">list_Net</span> <span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">PlantFlovis</span>, <span class="no">PlantAnt</span>, <span class="no">PlantBird</span>),
     <span class="kw">namesFG</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'Plants'</span>,<span class="st">'Flovis'</span>,<span class="st">'Ants'</span>,<span class="st">'Birds'</span>),
     <span class="kw">v_distrib</span>  <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'bernoulli'</span>,<span class="st">'bernoulli'</span>,<span class="st">'bernoulli'</span>),
@@ -175,8 +175,9 @@ The dataset –compiled and conducted by <span class="citation">Dáttilo et al. 
 <div id="plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plots" class="anchor"></a>Plots</h2>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/pkg/GREMLINS/man/plotMBM.html">plotMBM</a></span>(<span class="no">RES_MBM</span>,<span class="kw">mycol</span><span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"darkolivegreen3"</span>, <span class="st">"gold"</span>, <span class="st">"tomato"</span>,<span class="st">"cadetblue3"</span>))</pre></body></html></div>
-<p><img src="man/figures/README-plot-1.png" width="100%"></p>
+<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">cex</span><span class="kw">=</span><span class="fl">.5</span>)
+<span class="fu"><a href="../reference/plotMBM.html">plotMBM</a></span>(<span class="no">RES_MBM</span>,<span class="kw">mycol</span><span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"darkolivegreen3"</span>, <span class="st">"gold"</span>, <span class="st">"tomato"</span>,<span class="st">"cadetblue3"</span>))</pre></body></html></div>
+<p><img src="EcologicalNetwork_files/figure-html/plot-1.png" width="100%"></p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">

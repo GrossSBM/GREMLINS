@@ -21,7 +21,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
+#  fig.path = "man/figures/README-",
   out.width = "100%"
 )
 ```
@@ -135,7 +135,8 @@ table(RES_MBM$fittedModel[[1]]$paramEstim$Z$Ants)
 ``` 
 
 ## Plots 
-```{r plot, eval = TRUE }
+```{r plot, eval = TRUE}
+par(cex=.5)
 plotMBM(RES_MBM,mycol= c("darkolivegreen3", "gold", "tomato","cadetblue3")) 
 ``` 
 
