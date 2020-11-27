@@ -56,7 +56,6 @@ The 3 networks contain   $753$  observed interactions of which $55\%$ are   plan
 ```{r loading dataset, eval=TRUE}
 library(GREMLINS)
 data(MPEcoNetwork, package = "GREMLINS")
-ls()
 names(MPEcoNetwork)
 ```
 
@@ -86,30 +85,22 @@ PlantFlovis$mat[1:2,1:2]
 
 The model selection and the estimation are performed with the function `multipartiteBM`.
 
-```{r MBM, echo = FALSE, eval = TRUE}
-if (!file.exists('resMBM_Mutualistic2.Rda')) {
-  RES_MBM = multipartiteBM(
+```{r MBM, echo = TRUE, eval = FALSE}
+RES_MBM = multipartiteBM(
     list_Net = list(PlantFlovis, PlantAnt, PlantBird),
     namesFG = c('Plants','Flovis','Ants','Birds'),
     v_distrib  = c('bernoulli','bernoulli','bernoulli'),
     initBM = TRUE,
-    save = TRUE)
-  save(RES_MBM,file="resMBM_Mutualistic2.Rda")
-} else {load("resMBM_Mutualistic2.Rda")}
+    keep = TRUE,
+    nbCores = 2)
 ```
 
-```{r MBM eval false, echo = TRUE, eval = FALSE}
-RES_MBM = multipartiteBM(
-    list_Net =list(PlantFlovis, PlantAnt, PlantBird),
-    namesFG = c('Plants','Flovis','Ants','Birds'),
-    v_distrib  = c('bernoulli','bernoulli','bernoulli'),
-    initBM = TRUE,save = TRUE)
+```{r MBM load, echo = FALSE, eval = TRUE}
+load(file='res_EcologicalNetwork.Rda')
 ```
-
-
 
 RES_MBM contains the estimated parameters of the models we run through during the search of the better numbers of blocks. 
-If one sets `save = FALSE`  in the `multipartiteBM` function then we only save the best model. 
+If one sets `keep = FALSE`  in the `multipartiteBM` function then we only save the best model. 
 
 RES_MBM constains de dataset and the results.  
 ```{r MBM what}

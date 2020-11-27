@@ -36,18 +36,10 @@ Multipartite networks  consist in the joint observation of several networks impl
 In what follows, these groups will be referred to as  **functional groups**.
 
 
-## Installation
 
-You can install the released version of GREMLINS  from [GitHub](https://github.com/Demiperimetre/GREMLINS) with:
 
-```{r packages, echo = FALSE, eval=TRUE}
-#devtools::install_github("Demiperimetre/GREMLINS")
+```{r packages, echo = TRUE, eval=TRUE}
 library(GREMLINS)
-```
-
-```{r packages2, eval=FALSE, echo=TRUE}
-library(devtools)
-devtools::install_github("Demiperimetre/GREMLINS")
 ```
 
 

@@ -12,7 +12,7 @@ multipartiteBM(
   v_Kmax = 10,
   v_Kinit = NULL,
   initBM = TRUE,
-  save = FALSE,
+  keep = FALSE,
   verbose = TRUE,
   nbCores = NULL,
   maxiterVE = NULL,
@@ -40,7 +40,7 @@ if \code{v_Kinit} is not specified, then   \code{v_Kinit = v_Kmin}}
 \item{initBM}{an optional boolean. If initBM = TRUE  an aditional initialisation is done using simple LBM or SBM on each network separatly.
 Default value  \code{= TRUE}}
 
-\item{save}{an optional boolean. If TRUE  save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.}
+\item{keep}{an optional boolean. If TRUE  return the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.}
 
 \item{verbose}{an optional boolean. If  TRUE, display the current step of the search algorithm}
 
@@ -51,7 +51,7 @@ Default value  \code{= TRUE}}
 \item{maxiterVEM}{an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}}
 }
 \value{
-a list of estimated parameters for the different models ordered by decreasing ICL. If save \code{= FALSE}, the length is of length 1 (only the better model is returned).
+a list of estimated parameters for the different models ordered by decreasing ICL. If keep \code{= FALSE}, the length is of length 1 (only the better model is returned).
 \describe{
 \item{\code{fittedModel}}{contains the results of the inference. \code{res$fittedModel[[1]]}  is a list with fields
 \describe{
@@ -72,18 +72,16 @@ The function \code{multipartiteBM} selects the better numbers of blocks in each 
 }
 \examples{
 namesFG <- c('A','B')
-list_pi <- list(c(0.16 ,0.40 ,0.44),c(0.3,0.7)) # prop of blocks in each FG
-E  <-  rbind(c(1,2),c(2,2),c(1,1)) # architecture of the multipartite net.
-typeInter <- c( "inc","diradj", "adj") # type of each network
-v_distrib <- c('gaussian','bernoulli','poisson')
+list_pi <- list(c(0.5,0.5),c(0.3,0.7)) # prop of blocks in each FG
+E  <-  rbind(c(1,2),c(2,2)) # architecture of the multipartite net.
+typeInter <- c( "inc","diradj")
+v_distrib <- c('gaussian','bernoulli')
 list_theta <- list()
 list_theta[[1]] <- list()
-list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
-list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
+list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 3), 2, 2)
+list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.5),2, 2)
 list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
-m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
-list_theta[[3]] <- (m3 + t(m3))/2
-list_Net <- rMBM(v_NQ = c(60,50),E , typeInter, v_distrib, list_pi,
+list_Net <- rMBM(v_NQ = c(30,30),E , typeInter, v_distrib, list_pi,
                 list_theta, namesFG = namesFG, seed = 2)$list_Net
 res_MBMsimu <- multipartiteBM(list_Net, v_distrib,
                               namesFG = c('A','B'), v_Kinit = c(2,2),

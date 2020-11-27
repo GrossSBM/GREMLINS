@@ -53,8 +53,8 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
 
 
   #entering VEM
-  if (is.null(maxiterVE)) { maxiterVE = 1000}
-  if (is.null(maxiterVEM)) { maxiterVEM  =  1000}
+  if (is.null(maxiterVE)) { maxiterVE = 100}
+  if (is.null(maxiterVEM)) { maxiterVEM  =  100}
   maxiter <- maxiterVEM
   stopcrit <- 0
   iterVEM <- 0

@@ -16,7 +16,7 @@ v_NQ = c(30,40)
 dataSim <-  rMBM(v_NQ ,E , typeInter, v_distrib, list_pi, list_theta, seed=NULL, namesFG= c('A','B'),keepClassif = TRUE)
 list_Net <- dataSim$list_Net
 res <- multipartiteBM(list_Net, v_distrib = c("bernoulli","poisson"), namesFG = NULL, v_Kmin = 1,v_Kmax = 5,
-                      v_Kinit = NULL,nbCores  = 2, verbose = TRUE, save=FALSE, maxiterVE = NULL)
+                      v_Kinit = NULL,nbCores  = 2, verbose = TRUE, keep = FALSE, maxiterVE = NULL)
 
 
 

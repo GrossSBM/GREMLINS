@@ -15,7 +15,7 @@
 #'               if \code{v_Kinit} is not specified, then   \code{v_Kinit = v_Kmin}
 #' @param initBM an optional boolean. If initBM = TRUE  an aditional initialisation is done using simple LBM or SBM on each network separatly.
 #'               Default value  \code{= TRUE}
-#' @param save an optional boolean. If TRUE  save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.
+#' @param keep an optional boolean. If TRUE  return the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.
 #' @param verbose an optional boolean. If  TRUE, display the current step of the search algorithm
 #' @param nbCores an optional integer specifying the number or cores used for the estimation. Not parallelized on windows. If \code{ncores = NULL}, then half of the cores are used.
 #' @param maxiterVE an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}
@@ -23,7 +23,7 @@
 #' @details The function \code{multipartiteBM} selects the better numbers of blocks in each FG (with a penalized likelihood criterion). The model selection is performed with a forward backward strategy and the likelihood of each model is maximized with a variational EM).
 
 #'
-#' @return a list of estimated parameters for the different models ordered by decreasing ICL. If save \code{= FALSE}, the length is of length 1 (only the better model is returned).
+#' @return a list of estimated parameters for the different models ordered by decreasing ICL. If keep \code{= FALSE}, the length is of length 1 (only the better model is returned).
 #' \describe{
 #'   \item{\code{fittedModel}}{contains the results of the inference. \code{res$fittedModel[[1]]}  is a list with fields
 #'   \describe{
@@ -44,18 +44,16 @@
 #' @examples
 
 #' namesFG <- c('A','B')
-#' list_pi <- list(c(0.16 ,0.40 ,0.44),c(0.3,0.7)) # prop of blocks in each FG
-#' E  <-  rbind(c(1,2),c(2,2),c(1,1)) # architecture of the multipartite net.
-#' typeInter <- c( "inc","diradj", "adj") # type of each network
-#' v_distrib <- c('gaussian','bernoulli','poisson')
+#' list_pi <- list(c(0.5,0.5),c(0.3,0.7)) # prop of blocks in each FG
+#' E  <-  rbind(c(1,2),c(2,2)) # architecture of the multipartite net.
+#' typeInter <- c( "inc","diradj")
+#' v_distrib <- c('gaussian','bernoulli')
 #' list_theta <- list()
 #' list_theta[[1]] <- list()
-#' list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 9.8, 2.6, 1.0), 3, 2)
-#' list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.7 ,2.3, 1.5),3, 2)
+#' list_theta[[1]]$mean  <- matrix(c(6.1, 8.9, 6.6, 3), 2, 2)
+#' list_theta[[1]]$var  <-  matrix(c(1.6, 1.6, 1.8, 1.5),2, 2)
 #' list_theta[[2]] <- matrix(c(0.7,1.0, 0.4, 0.6),2, 2)
-#' m3 <- matrix(c(2.5, 2.6 ,2.2 ,2.2, 2.7 ,3.0 ,3.6, 3.5, 3.3),3,3 )
-#' list_theta[[3]] <- (m3 + t(m3))/2
-#' list_Net <- rMBM(v_NQ = c(60,50),E , typeInter, v_distrib, list_pi,
+#' list_Net <- rMBM(v_NQ = c(30,30),E , typeInter, v_distrib, list_pi,
 #'                 list_theta, namesFG = namesFG, seed = 2)$list_Net
 #' res_MBMsimu <- multipartiteBM(list_Net, v_distrib,
 #'                               namesFG = c('A','B'), v_Kinit = c(2,2),
@@ -63,7 +61,7 @@
 
 #' @export
 
-multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = TRUE , save=FALSE , verbose = TRUE, nbCores = NULL, maxiterVE = NULL , maxiterVEM = NULL)
+multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = TRUE , keep = FALSE , verbose = TRUE, nbCores = NULL, maxiterVE = NULL , maxiterVEM = NULL)
 {
 
 
@@ -187,17 +185,19 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
       list_classifInitBM = lapply(1:dataR6$Q,function(q){list()})
       names(list_classifInitBM) = dataR6$namesFG
 
-      lapply(1:dataR6$cardE, function(e){
+      for (e in 1:dataR6$cardE){
         if (dataR6$typeInter[e] == "inc") { indFG = dataR6$E[e,]} else {indFG = dataR6$E[e,1]}
+        #------------ esim SBM ou LSB on one network
         estim = multipartiteBM(list(list_Net[[e]]),namesFG = dataR6$namesFG[indFG] ,  v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG] ,v_Kmax = v_Kmax[indFG] ,v_Kinit = v_Kmin[indFG],  initBM = FALSE, verbose = FALSE,  nbCores = nbCores, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)
         if (dataR6$typeInter[e] == "inc")
         {
-          list_classifInitBM[[dataR6$E[e,1]]] <<- c(list_classifInitBM[[dataR6$E[e,1]]],list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
-          list_classifInitBM[[dataR6$E[e,2]]] <<- c(list_classifInitBM[[dataR6$E[e,2]]],list(estim$fittedModel[[1]]$paramEstim$Z[[2]]))
+          list_classifInitBM[[dataR6$E[e,1]]] <- c(list_classifInitBM[[dataR6$E[e,1]]],list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
+          list_classifInitBM[[dataR6$E[e,2]]] <- c(list_classifInitBM[[dataR6$E[e,2]]],list(estim$fittedModel[[1]]$paramEstim$Z[[2]]))
         } else {
-          list_classifInitBM[[dataR6$E[e,1]]] <<- c(list_classifInitBM[[dataR6$E[e,1]]],list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
+          list_classifInitBM[[dataR6$E[e,1]]] <- c(list_classifInitBM[[dataR6$E[e,1]]],list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
       }
-     })
+     }
+
 
 
 
@@ -221,8 +221,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
         R1 <- dataR6$searchNbClusters(collectionTestedClassifInit[[i]],Kmin = v_Kmin,Kmax = v_Kmax,pastICL = pastICL,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM)
         R <- c(R,R1)
         pastICL <- c(pastICL,sapply(R1,function(e){e$ICL}))
-        #<- <<- c(R,dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE ,   maxiterVEM = maxiterVEM))
-      }
+       }
     }
 
   }
@@ -236,7 +235,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
 
   res <- dataR6$cleanResults(R) # remove models that have been estimated twice or more to keep the estimation with the better J
 
-  lapply(1:length(res),function(k){names(res[[k]]$paramEstim$v_K) <<- namesFG})
+  for (k in 1:length(res)){names(res[[k]]$paramEstim$v_K) <- namesFG}
 
 
 
@@ -250,7 +249,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
   }
 
   ############# RESULTATS #############################"
-  if (save) {return(list(fittedModel = res ,list_Net = list_Net))}else{return(list(fittedModel = list(res[[1]]) ,list_Net = list_Net))}
+  if (keep) {return(list(fittedModel = res ,list_Net = list_Net))}else{return(list(fittedModel = list(res[[1]]) ,list_Net = list_Net))}
 
 }
 
