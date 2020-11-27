@@ -12,7 +12,7 @@ multipartiteBM(
   v_Kmax = 10,
   v_Kinit = NULL,
   initBM = TRUE,
-  save = FALSE,
+  keep = FALSE,
   verbose = TRUE,
   nbCores = NULL,
   maxiterVE = NULL,
@@ -40,7 +40,7 @@ if \code{v_Kinit} is not specified, then   \code{v_Kinit = v_Kmin}}
 \item{initBM}{an optional boolean. If initBM = TRUE  an aditional initialisation is done using simple LBM or SBM on each network separatly.
 Default value  \code{= TRUE}}
 
-\item{save}{an optional boolean. If TRUE  save the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.}
+\item{keep}{an optional boolean. If TRUE  return the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.}
 
 \item{verbose}{an optional boolean. If  TRUE, display the current step of the search algorithm}
 
@@ -51,7 +51,7 @@ Default value  \code{= TRUE}}
 \item{maxiterVEM}{an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}}
 }
 \value{
-a list of estimated parameters for the different models ordered by decreasing ICL. If save \code{= FALSE}, the length is of length 1 (only the better model is returned).
+a list of estimated parameters for the different models ordered by decreasing ICL. If keep \code{= FALSE}, the length is of length 1 (only the better model is returned).
 \describe{
 \item{\code{fittedModel}}{contains the results of the inference. \code{res$fittedModel[[1]]}  is a list with fields
 \describe{

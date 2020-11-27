@@ -107,7 +107,7 @@ res_MBMsimu <- multipartiteBM(list_Net,
                               v_Kinit = c(2,2),
                               nbCores = 2,
                               initBM = FALSE,
-                              save=FALSE)
+                              keep = FALSE)
 ```
 
 We can now get the estimated parameters. 
@@ -160,7 +160,7 @@ res_MBMsimuNA <- multipartiteBM(list_Net_NA,
                               namesFG = c('A','B'),
                               v_Kinit = c(2,2),
                               nbCores = 2,
-                              save=FALSE)
+                              keep = FALSE)
 ```
 
 We then have a function to predict the missing edges (probability if binary or intensity if weighted)

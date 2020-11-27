@@ -54,7 +54,7 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
     if (is.null(v_K)) {v_K <-  v_Kprov}
     else {if (sum(v_K != v_Kprov) > 0) {stop("unconsistent initial classification and v_K")}}
   }
-  #browser()
+
   permut_vector = numeric(length(v_K))
   for (q in 1:dataR6$Q) {
     permut_vector[q] = which(dataR6$namesFG == namesFG[q])

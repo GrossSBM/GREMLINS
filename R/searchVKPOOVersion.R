@@ -5,6 +5,7 @@ searchKQ <- function(dataR6, classifInit, pastICL = c(), Kmin=NULL, Kmax=NULL, n
 
 
   os <- Sys.info()["sysname"]
+  #os  = "Windows"
   if (is.null(nbCores)) {nbCores <- detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
   #if ((os != 'Windows') &
   #if (os  == "Windows") {nbCores = 1}
@@ -36,7 +37,7 @@ searchKQ <- function(dataR6, classifInit, pastICL = c(), Kmin=NULL, Kmax=NULL, n
 
   estimNew$paramEstim$Z = classifNew
   ICLNew <- estimNew$ICL
-  if (!estimNew$convergence){ ICLNewprint = -Inf}else{ ICLNewprint <- ICLNew }
+  if (!estimNew$convergence){ICLNewprint = -Inf}else{ ICLNewprint <- ICLNew }
 
   if (verbose) {
     mess <- paste(round(c(calcVK(classifNew))),collapse = " " )
@@ -60,7 +61,7 @@ searchKQ <- function(dataR6, classifInit, pastICL = c(), Kmin=NULL, Kmax=NULL, n
     ICL.c <- ICLNew
     classifC <- classifNew
 
-    # list of new classif deriving from the plitting of one block or the merging of 2 blocks in cluterisation classifC
+    # list of new classif deriving from the splitting of one block or the merging of 2 blocks in clustering classifC
     # (These clusterisations will serve as initisalition of the EM algorithm for models)
     list_classif_init <- sequentialInitialize(classifC ,dataR6,Kmin,Kmax,os);
     L = length(list_classif_init)
