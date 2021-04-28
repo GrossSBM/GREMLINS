@@ -27,6 +27,7 @@ initialize = function(dataR6 , param , method = "CAH", givenclassif = NULL)
       #if more than 1 element
        if (v_K[q] > 1)
        {
+        set.seed(1)
         cah1 <- stats::hclust(totdist,method = "ward.D")
         gr1 <- stats::cutree(cah1,v_K[q])
        }
