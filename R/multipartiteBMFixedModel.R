@@ -12,7 +12,7 @@
 #' @param nbCores Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores
 #' @param maxiterVE  Maximum number of iterations in the VE step of the VEM algorithm. Default value  = 1000
 #' @param maxiterVEM  Maximum number of iterations of the VEM algorithm. Default value  = 1000
-
+#'
 #' @return Estimated parameters and a classification
 #' @examples
 #' namesFG <- c('A','B')
@@ -91,10 +91,6 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
     return(res)}
   list_ClassifInitForward = list()
   for (q in 1:dataR6$Q) { list_ClassifInitForward <- do.call(c,list(list_ClassifInitForward,Func_Forward_q(q)))}
-
-
-
-
 
   if (os != 'Windows'){
     if (verbose) {

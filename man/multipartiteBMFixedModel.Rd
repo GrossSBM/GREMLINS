@@ -13,7 +13,8 @@ multipartiteBMFixedModel(
   nbCores = NULL,
   maxiterVE = NULL,
   maxiterVEM = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  seed = 1
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ Must give a vector whose length is the number of networks in list_Net}
 \item{maxiterVEM}{Maximum number of iterations of the VEM algorithm. Default value  = 1000}
 
 \item{verbose}{Set to TRUE to display the current step of the search algorithm}
+
+\item{seed}{an optional integer  specifying the seed used for the hierarchical clustering in the initialisations.  Default value  \code{= 1}}
 }
 \value{
 Estimated parameters and a classification

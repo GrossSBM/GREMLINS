@@ -16,7 +16,8 @@ multipartiteBM(
   verbose = TRUE,
   nbCores = NULL,
   maxiterVE = NULL,
-  maxiterVEM = NULL
+  maxiterVEM = NULL,
+  seed = 1
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ Default value  \code{= TRUE}}
 \item{maxiterVE}{an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}}
 
 \item{maxiterVEM}{an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}}
+
+\item{seed}{an optional integer  specifying the seed used for the hierarchical clustering in the initialisations.  Default value  \code{= 1}}
 }
 \value{
 a list of estimated parameters for the different models ordered by decreasing ICL. If keep \code{= FALSE}, the length is of length 1 (only the better model is returned).
