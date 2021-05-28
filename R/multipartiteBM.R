@@ -235,6 +235,7 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
 
   res <- dataR6$cleanResults(R) # remove models that have been estimated twice or more to keep the estimation with the better J
 
+  if(length(res) == 0){stop('Convergence was not reached. Increase the number of iterations of the VEM or of the VE')}
   for (k in 1:length(res)){names(res[[k]]$paramEstim$v_K) <- namesFG}
 
 
