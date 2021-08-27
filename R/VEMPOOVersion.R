@@ -33,7 +33,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
 
 
   ##  initialisation
-  v_K <- calcVK(classifInit)
+  v_K <- calcVK(classifInit) #v_K <- GREMLINS:::calcVK(classifInit)
   tau <- tauInit
   if (is.null(tau)) {
     tau <-  lapply(1:dataR6$Q,function(j){
@@ -238,8 +238,8 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
 
           B <- L + matrix(log(list_pi[[q]]),nrow = nrow(tau[[q]]),ncol = v_K[q],byrow = TRUE)
           #B <- B - max(B)
-          B <- B - matrix(apply(B,1,mean),nrow = n_q[q],ncol = v_K[q],byrow = FALSE)
-          B[B > 709] = 709
+          B <- B - matrix(apply(B,1,max),nrow = n_q[q],ncol = v_K[q],byrow = FALSE)
+          #B[B > 709] = 709
 
 
           temp <- exp(B)
