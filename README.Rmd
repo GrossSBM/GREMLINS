@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 [![R build status](https://github.com/Demiperimetre/GREMLINS/workflows/R-CMD-check/badge.svg)](https://github.com/Demiperimetre/GREMLINS/actions)
 <!-- badges: end -->
 
-The goal of GREMLINS is to perform statistical analysis of multipartite networks through a block model approach. 
+The goal of GREMLINS is to perform statistical analysis of multipartite networks through a block model approach. Note that we encourage you to prefer using the package `sbm` which depends on GREMLINS but includes many more models, plot functions and examples... 
 
 Multipartite networks  consist in the joint observation of several networks implying some common individuals. The individuals (or entities represented by nodes)  at stake are partitioned into groups defined by their nature.
 In what follows, these groups will be referred to as  \emph{functional groups}.

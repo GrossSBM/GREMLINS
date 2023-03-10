@@ -19,7 +19,6 @@ We also provide some additional functions useful to analyze the results:
 \itemize{
 \item{\code{\link{extractClustersMBM}}}{ a function to extract the clusters in each functional group}
 \item{\code{\link{comparClassif}}}{ a function to compute the Adjusted Rand Index (ARI) between two classifications}
-\item{\code{\link{plotMBM}}}{ a function to Plot the mesoscopic view of the estimated MBM}
 \item{\code{\link{predictMBM}}}{ a function to compute the predictions once the model has been fitted}
 \item{\code{\link{compLikICL}}}{ a function to	compute the Integrated Likelihood and the ICL criteria for the MBM}
 }

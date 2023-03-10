@@ -25,7 +25,6 @@
 #'                               namesFG = c('A','B'), v_Kinit = c(2,2),
 #'                               nbCores = 2,initBM = FALSE)
 #' plotMBM(res_MBMsimu)
-#' @export
 
 plotMBM = function(resMBM,whichModel = 1, mycol = NULL, thres = 0.01, maxCurved=3){
 

@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 
 
  
-
+Note that the `sbm` package is much more easy to use (but implements the same inference methods and algorithm). The same dataset is presented in a vignette. 
 
  
 
@@ -126,10 +126,7 @@ table(RES_MBM$fittedModel[[1]]$paramEstim$Z$Ants)
 ``` 
 
 ## Plots 
-```{r plot, eval = TRUE}
-par(cex=.5)
-plotMBM(RES_MBM,mycol= c("darkolivegreen3", "gold", "tomato","cadetblue3")) 
-``` 
+Please use the plot functions included in the R package `sbm`. 
 
 ## References
 
