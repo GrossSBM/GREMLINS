@@ -71,7 +71,7 @@ searchKQ <- function(dataR6, classifInit, pastICL = c(), Kmin=NULL, Kmax=NULL, n
       if (verbose) {
         allEstim <- pbmcapply::pbmclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
       }else{
-        allEstim <- mclapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
+        allEstim <- future.apply::future_lapply(1:L,function(l){estim.c.l <- dataR6$estime(list_classif_init[[l]],maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
       }
     }else{
 
