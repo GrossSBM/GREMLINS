@@ -17,7 +17,9 @@
 #'   \item{\code{\link{compLikICL}}}{ a function to	compute the Integrated Likelihood and the ICL criteria for the MBM}
 #' }
 #'
-#' @docType package
+#' @name GREMLINS
+#' @keywords internal
+"_PACKAGE"
 #' @author Pierre Barbillon, Sophie Donnet
 #' @references Bar-Hen, A. and Barbillon, P. & Donnet S. (2020), "Block models for multipartite networks. Applications in ecology and  ethnobiology. Journal of Statistical Modelling (to appear)
 #' @importFrom R6 R6Class
