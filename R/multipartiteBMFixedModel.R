@@ -43,7 +43,7 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
 
 
   os <- Sys.info()["sysname"]
-  if (is.null(nbCores)) {nbCores <- detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
+  if (is.null(nbCores)) {nbCores <-future::availableCores()%/% 2}
 
   # Check names FG and permute ----------------------------------------------
   if ((is.null(namesFG) == FALSE)  & (setequal(namesFG,dataR6$namesFG) == FALSE)) {stop("Unmatching names of Functional Groups")}
@@ -95,15 +95,21 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
   if (verbose) {
       mess <- '====================== First Forward Step =================='
       print(mess)
-      allEstimForward <- pbmcapply::pbmclapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
-   }else{
+      progressr::handlers("progress")
+      L <- length(list_ClassifInitForward)
+      allEstimForward <- progressr::with_progress({
+        p <- progressr::progressor(along = 1:L)
+        future.apply::future_lapply(1:L, function(l) {
+          p(sprintf("init=%g", l))  # Update progress
+          estim.c.l <- dataR6$estime(list_ClassifInitForward[[l]], maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
+          return(estim.c.l)
+        })
+      })
+      }else{
       allEstimForward <- future.apply::future_lapply(list_ClassifInitForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
    }
-
-
-
-
   allEstimForward = dataR6$cleanResults(allEstimForward)
+
   #----------------------------------- ## step 2 -> M(-1)
 
   Func_Backward_q <-  function(q){
@@ -115,14 +121,21 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
 
 
   if (verbose) {
-      mess <- '====================== First Backward Step =================='
-      print(mess)
-
-      allEstimBackward <- pbmcapply::pbmclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)},mc.cores = nbCores)
-    }else{
-      allEstimBackward <- mclapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
-    }
-
+    mess <- '====================== First Backward Step =================='
+    print(mess)
+    progressr::handlers("progress")
+    L <- length(list_ClassifInitBackward)
+    allEstimBackward <- progressr::with_progress({
+      p <- progressr::progressor(along = 1:L)
+      future.apply::future_lapply(1:L, function(l) {
+        p(sprintf("init=%g", l))  # Update progress
+        estim.c.l <- dataR6$estime(list_ClassifInitBackward[[l]], maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
+        return(estim.c.l)
+      })
+    })
+  }else{
+    allEstimBackward <- future.apply::future_lapply(list_ClassifInitBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
+  }
   allEstimBackward = dataR6$cleanResults(allEstimBackward)
 
 
@@ -140,10 +153,19 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
   if (verbose) {
       mess <- '====================== Last Forward Step =================='
       print(mess)
-      lastEstimForward <- pbmcapply::pbmclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
-  }else{
-      lastEstimForward <- mclapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
-  }
+      progressr::handlers("progress")
+      L <- length(initForward)
+      lastEstimForward <- progressr::with_progress({
+        p <- progressr::progressor(along = 1:L)
+        future.apply::future_lapply(1:L, function(l) {
+          p(sprintf("init=%g", l))  # Update progress
+          estim.c.l <- dataR6$estime(initForward[[l]], maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
+          return(estim.c.l)
+          })
+        })
+      }else{
+      lastEstimForward <-  future.apply::future_lapply(initForward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)})
+      }
 
 
   ###########################""
@@ -158,8 +180,16 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
   if (verbose) {
       mess <- '====================== Last Backward Step =================='
       print(mess)
-      lastEstimBackward <- pbmcapply::pbmclapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)},mc.cores = nbCores)
-  }else{
+      L <- length(initBackward)
+      lastEstimBackward <- progressr::with_progress({
+        p <- progressr::progressor(along = 1:L)
+        future.apply::future_lapply(1:L, function(l) {
+          p(sprintf("init=%g", l))  # Update progress
+          estim.c.l <- dataR6$estime(initBackward[[l]], maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
+          return(estim.c.l)
+        })
+      })
+      }else{
       lastEstimBackward <- future.apply::future_lapply(initBackward,function(init){estim.c.l <- dataR6$estime(init, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)})
   }
 

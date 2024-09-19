@@ -6,7 +6,7 @@ searchKQ <- function(dataR6, classifInit, pastICL = c(), Kmin=NULL, Kmax=NULL, n
 
   os <- Sys.info()["sysname"]
   #os  = "Windows"
-  if (is.null(nbCores)) {nbCores <- detectCores(all.tests = FALSE, logical = TRUE) %/% 2}
+  if (is.null(nbCores)) {nbCores <- future::availableCores() %/% 2}
 
   #------
   vKinit = calcVK(classifInit)

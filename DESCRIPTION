@@ -1,51 +1,58 @@
-Package: GREMLINS
 Type: Package
+Package: GREMLINS
 Title: Generalized Multipartite Networks
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(
-          person(given = "Sophie", family = "Donnet", role = c("aut", "cre"), email = "sophie.donnet@inrae.fr", comment = c(ORCID = "0000-0003-4370-7316")),
-          person(given = "Pierre", family = "Barbillon", role = c("aut"), email = "pierre.barbillon@agroparistech.fr",comment = c(ORCID = "0000-0002-7766-7693"))
-          )
-Description: We define generalized multipartite networks  as the joint observation of several networks implying some common pre-specified groups of individuals. The aim is to fit an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020) <arXiv:1807.10138>.  
+    person("Sophie", "Donnet", , "sophie.donnet@inrae.fr", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-4370-7316")),
+    person("Pierre", "Barbillon", , "pierre.barbillon@agroparistech.fr", role = "aut",
+           comment = c(ORCID = "0000-0002-7766-7693"))
+  )
+Description: We define generalized multipartite networks as the joint
+    observation of several networks implying some common pre-specified
+    groups of individuals. The aim is to fit an adapted version of the
+    popular stochastic block model to multipartite networks, as described
+    in Bar-hen, Barbillon and Donnet (2020) <arXiv:1807.10138>.
+License: GPL-3
 URL: https://GrossSBM.github.io/GREMLINS/
 BugReports: https://github.com/GrossSBM/GREMLINS/issues
-License: GPL-3
+Depends: 
+    R (>= 3.5.0)
+Imports: 
+    aricode,
+    blockmodels,
+    future,
+    future.apply,
+    igraph,
+    progress,
+    progressr,
+    R6,
+    stats,
+    utils
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 2.1.0)
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
+Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Suggests: 
-    testthat (>= 2.1.0),
-    spelling,
-    knitr,
-    rmarkdown
-Language: en-US
-Imports: 
-    R6,
-    parallel,
-    stats,
-    utils,
-    igraph,
-    blockmodels,
-    aricode,
-    progress,
-    future.apply,
-    progressr,
 Collate: 
-      'GREMLINS_package.R'
-      'BMPOO.R'
-      'defineNetwork.R'
-      'multipartiteBM.R'
-      'VEMPOOVersion.R'
-      'multipartiteBMFixedModel.R'
-      'initializeVEM.R'
-      'searchVKPOOVersion.R'
-      'utils.R'
-      'compLikICL.R'
-      'extractClustersMBM.R'
-      'rMBM.R'
-      'comparClassif.R'
-      'MPEcoNetwork.R'
-      'predictMBM.R'
-VignetteBuilder: knitr
-Depends: R (>= 3.5.0)
+    'GREMLINS_package.R'
+    'BMPOO.R'
+    'defineNetwork.R'
+    'multipartiteBM.R'
+    'VEMPOOVersion.R'
+    'multipartiteBMFixedModel.R'
+    'initializeVEM.R'
+    'searchVKPOOVersion.R'
+    'utils.R'
+    'compLikICL.R'
+    'extractClustersMBM.R'
+    'rMBM.R'
+    'comparClassif.R'
+    'MPEcoNetwork.R'
+    'predictMBM.R'

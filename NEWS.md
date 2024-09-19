@@ -9,4 +9,8 @@
 
 # GREMLINS 0.2.1 - fixing bugs
 
-* Removed the plot function and encourage users to use the `sbm` pacakge which depends on GREMLINS but is much more complete. 
+* Removed the plot function and encourage users to use the `sbm` package which depends on GREMLINS but is much more complete. 
+
+# GREMLINS 0.2.2 - changing parallelization
+
+* Now uses future for the parallelization
