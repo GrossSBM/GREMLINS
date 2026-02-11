@@ -246,16 +246,47 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
       for (e in 1:dataR6$cardE) {
         if (dataR6$typeInter[e] == "inc") {
           indFG <- dataR6$E[e, ]
+          estim <- sbm::estimateBipartiteSBM(
+            netMat = list_Net[[e]]$mat, dimLabels = dataR6$namesFG[indFG], model = v_distrib[e],
+            estimOptions = list(
+              "exploreMin" = sum(v_Kmin[indFG]),
+              "exploreMax" = sum(v_Kmax[indFG]),
+              plot = FALSE,
+              verbosity = ifelse(verbose, 1, 0),
+              nbCores = ifelse(is.null(nbCores), 1, nbCores)
+            )
+          )
         } else {
           indFG <- dataR6$E[e, 1]
+          estim <- sbm::estimateSimpleSBM(
+            netMat = list_Net[[e]]$mat, dimLabels = dataR6$namesFG[indFG], model = v_distrib[e],
+            estimOptions = list(
+              "exploreMin" = sum(v_Kmin[indFG]),
+              "exploreMax" = sum(v_Kmax[indFG]),
+              plot = FALSE,
+              verbosity = ifelse(verbose, 1, 0),
+              nbCores = ifelse(is.null(nbCores), 1, nbCores)
+            )
+          )
         }
         #------------ esim SBM ou LSB on one network
-        estim <- multipartiteBM(list(list_Net[[e]]), namesFG = dataR6$namesFG[indFG], v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG], v_Kmax = v_Kmax[indFG], v_Kinit = v_Kmin[indFG], initBM = FALSE, verbose = FALSE, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
+        # estim <- multipartiteBM(list(list_Net[[e]]), namesFG = dataR6$namesFG[indFG], v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG], v_Kmax = v_Kmax[indFG], v_Kinit = v_Kmin[indFG], initBM = FALSE, verbose = FALSE, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
+
+
         if (dataR6$typeInter[e] == "inc") {
-          list_classifInitBM[[dataR6$E[e, 1]]] <- c(list_classifInitBM[[dataR6$E[e, 1]]], list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
-          list_classifInitBM[[dataR6$E[e, 2]]] <- c(list_classifInitBM[[dataR6$E[e, 2]]], list(estim$fittedModel[[1]]$paramEstim$Z[[2]]))
+          list_classifInitBM[[dataR6$E[e, 1]]] <- c(
+            list_classifInitBM[[dataR6$E[e, 1]]],
+            list(estim$memberships[[1]])
+          )
+          list_classifInitBM[[dataR6$E[e, 2]]] <- c(
+            list_classifInitBM[[dataR6$E[e, 2]]],
+            list(estim$memberships[[2]])
+          )
         } else {
-          list_classifInitBM[[dataR6$E[e, 1]]] <- c(list_classifInitBM[[dataR6$E[e, 1]]], list(estim$fittedModel[[1]]$paramEstim$Z[[1]]))
+          list_classifInitBM[[dataR6$E[e, 1]]] <- c(
+            list_classifInitBM[[dataR6$E[e, 1]]],
+            list(estim$memberships)
+          )
         }
       }
 
