@@ -291,10 +291,10 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
       }
 
 
-      Nb_classifInitBM <- lapply(list_classifInitBM, function(l) 1:length(l))
+      Nb_classifInitBM <- lapply(list_classifInitBM, function(l) seq_along(l))
       combin_classifInitBM <- as.matrix(expand.grid(Nb_classifInitBM))
       indRef <- indInit
-      for (i in 1:nrow(combin_classifInitBM))
+      for (i in seq_len(nrow(combin_classifInitBM)))
       {
         indInit <- indInit + 1
         rowcombin <- as.vector(combin_classifInitBM[i, ])
