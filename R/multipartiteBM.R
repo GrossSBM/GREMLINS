@@ -20,6 +20,7 @@
 #' @param nbCores an optional integer specifying the number or cores used for the estimation. Not parallelized on windows. If \code{ncores = NULL}, then half of the cores are used.
 #' @param maxiterVE an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}
 #' @param maxiterVEM an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}
+#' @param givenclassif an optional list of classifications (block memberships) of size Q (the number of functional groups) to use as initialization for the multipartite fit. Defaults to NULL.
 #' @details The function \code{multipartiteBM} selects the better numbers of blocks in each FG (with a penalized likelihood criterion). The model selection is performed with a forward backward strategy and the likelihood of each model is maximized with a variational EM).
 
 #'
@@ -61,11 +62,10 @@
 
 #' @export
 
-multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 1 , v_Kmax = 10 , v_Kinit = NULL , initBM = TRUE , keep = FALSE , verbose = TRUE, nbCores = NULL, maxiterVE = NULL , maxiterVEM = NULL)
-{
-
-
-  if ( all(v_Kmin == v_Kmax)) {stop('v_Kmin = v_Kmax. Use the function "multipartiteBMFixedModel" instead')}
+multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 1, v_Kmax = 10, v_Kinit = NULL, initBM = TRUE, keep = FALSE, verbose = TRUE, nbCores = NULL, maxiterVE = NULL, maxiterVEM = NULL, givenclassif = NULL) {
+  if (all(v_Kmin == v_Kmax)) {
+    stop('v_Kmin = v_Kmax. Use the function "multipartiteBMFixedModel" instead')
+  }
 
 
   #----------------- Formatting the data ---
@@ -154,10 +154,13 @@ multipartiteBM = function(list_Net,  v_distrib = NULL ,namesFG = NULL, v_Kmin = 
 
   collectionTestedClassifInit <- list()
 
-  paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]],v_distrib = dataR6$v_distrib)
-  classifInit <- initialize(dataR6,paramInit,method = "CAH")$groups
-
-  R <- dataR6$searchNbClusters(classifInit,Kmin = v_Kmin,Kmax = v_Kmax,pastICL = c(),verbose = verbose,nbCores = nbCores, maxiterVE = maxiterVE , maxiterVEM = maxiterVEM)
+  paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]], v_distrib = dataR6$v_distrib)
+  if (!is.null(givenclassif)) {
+    classifInit <- initialize(dataR6, paramInit, method = "given", givenclassif = givenclassif)$groups
+  } else {
+    classifInit <- initialize(dataR6, paramInit, method = "CAH")$groups
+  }
+  R <- dataR6$searchNbClusters(classifInit, Kmin = v_Kmin, Kmax = v_Kmax, pastICL = c(), verbose = verbose, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
   indInit <- 1
   collectionTestedClassifInit[[indInit]] <-  classifInit
   pastICL <- sapply(R,function(e){e$ICL})
