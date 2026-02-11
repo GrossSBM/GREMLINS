@@ -2,6 +2,7 @@
 % Please edit documentation in R/GREMLINS_package.R
 \docType{package}
 \name{GREMLINS}
+\alias{GREMLINS-package}
 \alias{GREMLINS}
 \title{Adjusting an extended SBM to Multipartite networks}
 \description{
@@ -25,6 +26,14 @@ We also provide some additional functions useful to analyze the results:
 }
 \references{
 Bar-Hen, A. and Barbillon, P. & Donnet S. (2020), "Block models for multipartite networks. Applications in ecology and  ethnobiology. Journal of Statistical Modelling (to appear)
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://GrossSBM.github.io/GREMLINS/}
+  \item Report bugs at \url{https://github.com/GrossSBM/GREMLINS/issues}
+}
+
 }
 \author{
 Pierre Barbillon, Sophie Donnet
