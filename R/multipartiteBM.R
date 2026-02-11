@@ -167,6 +167,12 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
     }
   }
 
+  # Handle givenclassif
+  if (!is.null(givenclassif)) {
+    print("A given initialization has been provided. Setting the initial number of clusters accordingly.")
+    v_Kinit <- sapply(givenclassif, max)
+  }
+
   if (dataR6$Q > 1) {
     if (!is.null(v_Kinit) & (length(v_Kinit) != dataR6$Q)) {
       print("v_Kinit was not of the adequate size. The given value has not been taken into account")
