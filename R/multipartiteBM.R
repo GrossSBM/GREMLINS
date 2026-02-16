@@ -244,31 +244,43 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
       names(list_classifInitBM) <- dataR6$namesFG
 
       for (e in 1:dataR6$cardE) {
+        bm_model <- switch(dataR6$v_distrib[e],
+          "bernoulli" = blockmodels::BM_bernoulli,
+          "poisson" = blockmodels::BM_poisson,
+          "gaussian" = blockmodels::BM_gaussian,
+          stop(paste(
+            "initBM = TRUE does not currently support",
+            dataR6$v_distrib[e], "emission distribution."
+          ))
+        )
         if (dataR6$typeInter[e] == "inc") {
           indFG <- dataR6$E[e, ]
-          estim <- sbm::estimateBipartiteSBM(
-            netMat = list_Net[[e]]$mat, dimLabels = dataR6$namesFG[indFG], model = v_distrib[e],
-            estimOptions = list(
-              "exploreMin" = sum(v_Kmin[indFG]),
-              "exploreMax" = sum(v_Kmax[indFG]),
-              plot = FALSE,
-              verbosity = ifelse(verbose, 1, 0),
-              nbCores = ifelse(is.null(nbCores), 1, nbCores)
-            )
+
+
+          estim <- bm_model(
+            membership_type = "LBM",
+            adj = list_Net[[e]]$mat,
+            verbosity = ifelse(verbose, 1, 0),
+            plotting = "",
+            explore_min = sum(v_Kmin[indFG]),
+            # explore_max = sum(v_Kmax[indFG]),
+            ncores = ifelse(is.null(nbCores), 1, nbCores)
           )
         } else {
           indFG <- dataR6$E[e, 1]
-          estim <- sbm::estimateSimpleSBM(
-            netMat = list_Net[[e]]$mat, dimLabels = dataR6$namesFG[indFG], model = v_distrib[e],
-            estimOptions = list(
-              "exploreMin" = sum(v_Kmin[indFG]),
-              "exploreMax" = sum(v_Kmax[indFG]),
-              plot = FALSE,
-              verbosity = ifelse(verbose, 1, 0),
-              nbCores = ifelse(is.null(nbCores), 1, nbCores)
-            )
+          estim <- bm_model(
+            membership_type = ifelse(dataR6$typeInter[e] == "diradj",
+              "SBM_sym", "SBM"
+            ),
+            adj = list_Net[[e]]$mat,
+            verbosity = ifelse(verbose, 1, 0),
+            plotting = "",
+            explore_min = sum(v_Kmin[indFG]),
+            # explore_max = sum(v_Kmax[indFG]),
+            ncores = ifelse(is.null(nbCores), 1, nbCores)
           )
         }
+        estim$estimate()
         #------------ esim SBM ou LSB on one network
         # estim <- multipartiteBM(list(list_Net[[e]]), namesFG = dataR6$namesFG[indFG], v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG], v_Kmax = v_Kmax[indFG], v_Kinit = v_Kmin[indFG], initBM = FALSE, verbose = FALSE, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
 
@@ -276,16 +288,16 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
         if (dataR6$typeInter[e] == "inc") {
           list_classifInitBM[[dataR6$E[e, 1]]] <- c(
             list_classifInitBM[[dataR6$E[e, 1]]],
-            list(estim$memberships[[1]])
+            list(apply(estim$memberships[[which.max(estim$ICL)]]$Z1, 1, which.max))
           )
           list_classifInitBM[[dataR6$E[e, 2]]] <- c(
             list_classifInitBM[[dataR6$E[e, 2]]],
-            list(estim$memberships[[2]])
+            list(apply(estim$memberships[[which.max(estim$ICL)]]$Z2, 1, which.max))
           )
         } else {
           list_classifInitBM[[dataR6$E[e, 1]]] <- c(
             list_classifInitBM[[dataR6$E[e, 1]]],
-            list(estim$memberships)
+            list(apply(estim$memberships[[which.max(estim$ICL)]]$Z, 1, which.max))
           )
         }
       }
