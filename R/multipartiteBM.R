@@ -262,7 +262,7 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
             adj = list_Net[[e]]$mat,
             verbosity = ifelse(verbose, 1, 0),
             plotting = "",
-            explore_min = sum(v_Kmin[indFG]),
+            # explore_min = sum(v_Kmin[indFG]),
             # explore_max = sum(v_Kmax[indFG]),
             ncores = ifelse(is.null(nbCores), 1, nbCores)
           )
@@ -270,12 +270,12 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
           indFG <- dataR6$E[e, 1]
           estim <- bm_model(
             membership_type = ifelse(dataR6$typeInter[e] == "diradj",
-              "SBM_sym", "SBM"
+              "SBM", "SBM_sym"
             ),
             adj = list_Net[[e]]$mat,
             verbosity = ifelse(verbose, 1, 0),
             plotting = "",
-            explore_min = sum(v_Kmin[indFG]),
+            # explore_min = sum(v_Kmin[indFG]),
             # explore_max = sum(v_Kmax[indFG]),
             ncores = ifelse(is.null(nbCores), 1, nbCores)
           )
