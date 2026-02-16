@@ -233,6 +233,7 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
   indInit <- length(collectionTestedClassifInit)
 
 
+
   # Additional initialisation starting from a block model on each network
   if (initBM) {
     if (dataR6$cardE == 1) {
@@ -300,7 +301,7 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
             list(apply(estim$memberships[[which.max(estim$ICL)]]$Z, 1, which.max))
           )
         }
-      }
+      } #### end of the loop on the networks....
 
 
       Nb_classifInitBM <- lapply(list_classifInitBM, function(l) seq_along(l))

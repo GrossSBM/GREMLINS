@@ -453,11 +453,16 @@ testClassif <- function(classif1,classif2){
 
 cleanCollectionClassif <- function(collectionClassif,indRef){
 
+
   L <- length(collectionClassif)
   matTest <- matrix(NA,L,L)
   for (l in 2:L) {for (k in 1:(l - 1)) {matTest[l,k] <- testClassif(collectionClassif[[k]],collectionClassif[[l]])}}
   w <- which(rowSums(matTest[indRef:L,],na.rm = TRUE) > 0) - indRef +  1
-  u <- (1:L)[-w]
+  if(length(w)>0){
+    u <- (1:L)[-w]
+  }else{
+    u <- (1:L)
+  }
   res <- lapply(u,function(i){collectionClassif[[i]]})
   return(res)
 }
