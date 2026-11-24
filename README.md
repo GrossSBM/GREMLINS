@@ -23,14 +23,17 @@ Donnet (2022)](https://doi.org/10.1177/1471082X20963254).
 
 ## Installation
 
-``` r
-# Recommended: the package sbm, which uses GREMLINS
-install.packages("sbm")
+Install the package `sbm`: GREMLINS, which it imports, is installed with
+it.
 
-# GREMLINS alone, released version
-install.packages("GREMLINS")
-# GREMLINS, development version
-# remotes::install_github("GrossSBM/GREMLINS")
+``` r
+install.packages("sbm")
+```
+
+The development versions of both packages are installed with:
+
+``` r
+remotes::install_github("GrossSBM/sbm")
 ```
 
 ## Documentation
