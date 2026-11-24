@@ -453,11 +453,16 @@ testClassif <- function(classif1,classif2){
 
 cleanCollectionClassif <- function(collectionClassif,indRef){
 
+
   L <- length(collectionClassif)
   matTest <- matrix(NA,L,L)
   for (l in 2:L) {for (k in 1:(l - 1)) {matTest[l,k] <- testClassif(collectionClassif[[k]],collectionClassif[[l]])}}
   w <- which(rowSums(matTest[indRef:L,],na.rm = TRUE) > 0) - indRef +  1
-  u <- (1:L)[-w]
+  if(length(w)>0){
+    u <- (1:L)[-w]
+  }else{
+    u <- (1:L)
+  }
   res <- lapply(u,function(i){collectionClassif[[i]]})
   return(res)
 }
@@ -471,3 +476,48 @@ cleanCollectionClassif <- function(collectionClassif,indRef){
 
 
 
+
+
+##############################################################################################################
+###----------------------------------- Order of the functional groups ---------------
+##############################################################################################################
+# Inside the package, the FGs are always in the order dataR6$namesFG (order of appearance in the networks).
+# The user gives the vectors (v_Kmin, v_K...) in the order of namesFG.
+
+# Reorder x (one element per FG, in the order of namesFG) into the internal order
+toInternalOrder <- function(x, namesFG, dataR6) {
+  if (is.null(x) || is.null(namesFG) || length(x) != dataR6$Q) {return(x)}
+  x[match(dataR6$namesFG, namesFG)]
+}
+
+# Check an initial classification given by the user and put it in the internal order.
+# classif: list with one vector of labels per FG, either named by FG or in the order of namesFG.
+formatClassifInit <- function(classif, namesFG, dataR6) {
+  Q <- dataR6$Q
+  if (!is.list(classif) || length(classif) != Q) {
+    stop("The initial classification must be a list with one vector of labels per functional group")
+  }
+  nm <- names(classif)
+  if (!is.null(nm) && all(nm != "")) {
+    if (!setequal(nm, dataR6$namesFG)) {
+      stop("The names of the initial classification do not match the names of the functional groups")
+    }
+    classif <- classif[dataR6$namesFG]
+  } else {
+    if (Q > 1 && is.null(namesFG)) {
+      stop("Please name the initial classification with the names of the functional groups, or specify namesFG")
+    }
+    classif <- toInternalOrder(classif, namesFG, dataR6)
+  }
+  classif <- lapply(1:Q, function(q) {
+    z <- classif[[q]]
+    if (length(z) != dataR6$v_NQ[q]) {
+      stop(paste0("The initial classification of ", dataR6$namesFG[q], " must be of length ", dataR6$v_NQ[q]))
+    }
+    if (anyNA(z)) {stop(paste0("The initial classification of ", dataR6$namesFG[q], " contains NA"))}
+    z <- match(z, unique(sort(z)))
+    names(z) <- dataR6$namesInd[[q]]
+    z
+  })
+  return(classif)
+}

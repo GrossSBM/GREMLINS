@@ -1,0 +1,16 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Block models for generalized multipartite networks: Applications in ecology and ethnobiology",
+  author   = c(person("Avner", "Bar-Hen"), person("Pierre", "Barbillon"), person("Sophie", "Donnet")),
+  journal  = "Statistical Modelling",
+  year     = "2022",
+  volume   = "22",
+  number   = "4",
+  pages    = "273--296",
+  doi      = "10.1177/1471082X20963254",
+  textVersion = paste(
+    "Bar-Hen, A., Barbillon, P. and Donnet, S. (2022).",
+    "Block models for generalized multipartite networks: Applications in ecology and ethnobiology.",
+    "Statistical Modelling, 22(4), 273-296. doi:10.1177/1471082X20963254"
+  )
+)

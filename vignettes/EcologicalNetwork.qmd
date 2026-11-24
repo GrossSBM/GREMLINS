@@ -1,38 +1,48 @@
 ---
 title: "Analysis of a mutualistic multipartite ecological network with GREMLINS"
 author: "Sophie Donnet, Pierre Barbillon"
-date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_vignette:
+date: today
+format:
+  html:
     toc: true
-    toc_depth: 4
-bibliography: biblio.bib
-link-citations: yes
+    toc-depth: 3
+    html-math-method: mathml # rendered by the browsers, even when the vignette is self-contained
+bibliography: references.bib
+link-citations: true
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
 vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Analysis of a mutualistic multipartite ecological network with GREMLINS}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 
+::: {.callout-important}
+## Please use GREMLINS through the package `sbm`
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+GREMLINS is the inference engine of the package [`sbm`](https://CRAN.R-project.org/package=sbm).
+**We recommend not to use GREMLINS directly, but the function `estimateMultipartiteSBM()` of `sbm`**,
+which implements the same model and algorithm with a simpler interface, plot functions and more examples.
+The same analysis, with plots of the data and of the fitted model, is presented in
+`vignette("Multipartite_EcologicalNetwork", package = "sbm")`. With `sbm`, the inference of this vignette reads:
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-#  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
+```{r sbm-equivalent}
+#| eval: false
+library(sbm)
+data(multipartiteEcologicalNetwork, package = "sbm")
+Net <- multipartiteEcologicalNetwork
+PlantFlovis <- defineSBM(Net$Inc_plant_flovis, "bernoulli", "bipartite", dimLabels = c("Plants", "Flovis"))
+PlantAnt    <- defineSBM(Net$Inc_plant_ant,    "bernoulli", "bipartite", dimLabels = c("Plants", "Ants"))
+PlantBird   <- defineSBM(Net$Inc_plant_bird,   "bernoulli", "bipartite", dimLabels = c("Plants", "Birds"))
+myMSBM <- estimateMultipartiteSBM(list(PlantFlovis, PlantAnt, PlantBird))
+plot(myMSBM)
 ```
 
+The correspondence between the functions of the two packages is given in `vignette("Introduction", package = "GREMLINS")`.
+:::
 
-<!-- badges: start -->
-<!-- badges: end -->
-
-
- 
-Note that the `sbm` package is much more easy to use (but implements the same inference methods and algorithm). The same dataset is presented in a vignette. 
 
  
 
@@ -53,7 +63,7 @@ The 3 networks contain   $753$  observed interactions of which $55\%$ are   plan
  
 
 
-```{r loading dataset, eval=TRUE}
+```{r loading-dataset}
 library(GREMLINS)
 data(MPEcoNetwork, package = "GREMLINS")
 names(MPEcoNetwork)
@@ -66,7 +76,7 @@ So, here, our  3 networks are provided in 3 incidence matrices, the plants being
 We format the data to be able to use our R package GREMLINS i.e. we transform the matrices into an list containing *the matrix*, *its type* : `inc`   for incidence matrix,  `adj`    for adjacency symetric, and `diradj` for  non symetric (oriented) adjacency  matrix, the name of functional group in row and the name of functional group in column.   The three matrices are gathered in a list. 
 
 To do so, we use de the function `defineNetwork`. 
-```{r transform dataset,  eval=TRUE}
+```{r transform-dataset}
 PlantFlovis = defineNetwork(MPEcoNetwork$Inc_plant_flovis,"inc","Plants","Flovis")
 PlantAnt = defineNetwork(MPEcoNetwork$Inc_plant_ant,"inc","Plants","Ants")
 PlantBird = defineNetwork(MPEcoNetwork$Inc_plant_bird,"inc","Plants","Birds")
@@ -76,7 +86,7 @@ names(PlantFlovis)
 
 If one wants to keep a track of the names of the species, they should be used as rownames and colnames in the matrices.
 
-```{r example of dataset, eval=TRUE}
+```{r example-of-dataset}
 PlantFlovis$mat[1:2,1:2]
 
 ```
@@ -85,7 +95,8 @@ PlantFlovis$mat[1:2,1:2]
 
 The model selection and the estimation are performed with the function `multipartiteBM`.
 
-```{r MBM, echo = TRUE, eval = FALSE}
+```{r MBM}
+#| eval: false
 RES_MBM = multipartiteBM(
     list_Net = list(PlantFlovis, PlantAnt, PlantBird),
     namesFG = c('Plants','Flovis','Ants','Birds'),
@@ -95,7 +106,8 @@ RES_MBM = multipartiteBM(
     nbCores = 2)
 ```
 
-```{r MBM load, echo = FALSE, eval = TRUE}
+```{r MBM-load}
+#| echo: false
 load(file='res_EcologicalNetwork.Rda')
 ```
 
@@ -103,31 +115,29 @@ RES_MBM contains the estimated parameters of the models we run through during th
 If one sets `keep = FALSE`  in the `multipartiteBM` function then we only save the best model. 
 
 RES_MBM constains de dataset and the results.  
-```{r MBM what}
+```{r MBM-what}
 names(RES_MBM)
 ``` 
 
 The better model has the following numbers of blocks
-```{r MBM v_K }
+```{r MBM-v_K}
 RES_MBM$fittedModel[[1]]$paramEstim$v_K
 ```
 
 To see the parameters estimated for the better model we use the following command `RES_MBM$fittedModel[[1]]$paramEstim$***`
-```{r MBM param }
+```{r MBM-param}
 RES_MBM$fittedModel[[1]]$paramEstim$list_pi$Plants
 RES_MBM$fittedModel[[1]]$paramEstim$list_theta$PlantsFlovis
 ```
 
 The clustering  supplied by the better model  are in `RES_MBM$fittedModel[[1]]$paramEstim$Z$***`.
 
-```{r MBM Z }
+```{r MBM-Z}
 table(RES_MBM$fittedModel[[1]]$paramEstim$Z$Plants)
 table(RES_MBM$fittedModel[[1]]$paramEstim$Z$Ants)      
 ``` 
 
 ## Plots 
-Please use the plot functions included in the R package `sbm`. 
+The plot functions are included in the R package `sbm` (see the callout at the top of this vignette).
 
 ## References
-
- 

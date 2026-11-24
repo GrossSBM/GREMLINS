@@ -15,10 +15,13 @@ knitr::opts_chunk$set(
 # GREMLINS
 
 <!-- badges: start -->
-[![R build status](https://github.com/Demiperimetre/GREMLINS/workflows/R-CMD-check/badge.svg)](https://github.com/Demiperimetre/GREMLINS/actions)
+[![R-CMD-check](https://github.com/GrossSBM/GREMLINS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/GrossSBM/GREMLINS/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of GREMLINS is to perform statistical analysis of multipartite networks through a block model approach. Note that we encourage you to prefer using the package `sbm` which depends on GREMLINS but includes many more models, plot functions and examples... 
+The goal of GREMLINS is to perform statistical analysis of multipartite networks through a block model approach, as described in [Bar-Hen, Barbillon and Donnet (2022)](https://doi.org/10.1177/1471082X20963254).
+
+> **Please use GREMLINS through the package [`sbm`](https://CRAN.R-project.org/package=sbm).**
+> GREMLINS is the inference engine of `sbm`, whose function `estimateMultipartiteSBM()` implements the same model and algorithm with a simpler interface (shared with simple, bipartite and multiplex networks), plot functions and more examples. GREMLINS is mostly maintained as a back-end of `sbm`.
 
 Multipartite networks  consist in the joint observation of several networks implying some common individuals. The individuals (or entities represented by nodes)  at stake are partitioned into groups defined by their nature.
 In what follows, these groups will be referred to as  \emph{functional groups}.
@@ -26,11 +29,16 @@ In what follows, these groups will be referred to as  \emph{functional groups}.
 
 ## Installation
 
-You can install the released version of GREMLINS [GitHub](https://github.com/) with:
+You can install the packages from CRAN with:
 
 ``` r
-#devtools::install_github("Demiperimetre/GREMLINS")
-library(GREMLINS)
+# Recommended: the package sbm, which uses GREMLINS
+install.packages("sbm")
+
+# GREMLINS, released version
+install.packages("GREMLINS")
+# GREMLINS, development version
+# remotes::install_github("GrossSBM/GREMLINS")
 ```
 
 ## Mathematical Background

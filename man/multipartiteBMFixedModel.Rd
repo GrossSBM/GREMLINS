@@ -13,7 +13,8 @@ multipartiteBMFixedModel(
   nbCores = NULL,
   maxiterVE = NULL,
   maxiterVEM = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  initBM = TRUE
 )
 }
 \arguments{
@@ -26,7 +27,8 @@ Must give a vector whose length is the number of networks in list_Net}
 
 \item{v_K}{A vector with the numbers of blocks per functional group}
 
-\item{classifInit}{A list of initial classification for each functional group in the same order as in namesFG}
+\item{classifInit}{A list of initial classifications, one per functional group: either named with the names of the functional groups,
+or unnamed and in the same order as in namesFG}
 
 \item{nbCores}{Number or cores used for the estimation. Not parallelized on windows. By default : half of the cores}
 
@@ -35,6 +37,10 @@ Must give a vector whose length is the number of networks in list_Net}
 \item{maxiterVEM}{Maximum number of iterations of the VEM algorithm. Default value  = 1000}
 
 \item{verbose}{Set to TRUE to display the current step of the search algorithm}
+
+\item{initBM}{If \code{classifInit = NULL} and \code{initBM = TRUE} (default), the initial classification is obtained by fitting a SBM / LBM
+on each network with the package \pkg{blockmodels}, adjusted to \code{v_K} blocks (the best start in terms of ICL is kept).
+If \code{initBM = FALSE}, a hierarchical clustering is used. Missing values (NA) are allowed.}
 }
 \value{
 Estimated parameters and a classification
