@@ -16,7 +16,8 @@ multipartiteBM(
   verbose = TRUE,
   nbCores = NULL,
   maxiterVE = NULL,
-  maxiterVEM = NULL
+  maxiterVEM = NULL,
+  givenclassif = NULL
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ Default value  \code{= TRUE}}
 \item{maxiterVE}{an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}}
 
 \item{maxiterVEM}{an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}}
+
+\item{givenclassif}{an optional list of classifications (block memberships) of size Q (the number of functional groups) to use as initialization for the multipartite fit. Defaults to NULL.}
 }
 \value{
 a list of estimated parameters for the different models ordered by decreasing ICL. If keep \code{= FALSE}, the length is of length 1 (only the better model is returned).
