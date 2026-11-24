@@ -14,6 +14,9 @@
 # GREMLINS 0.2.2 - changing parallelization and initialisation
 
 * Now uses future for the parallelization
+* Vignettes converted to Quarto. They (and the README) now state that GREMLINS should be used through the package `sbm`,
+  with the correspondence between the functions of the two packages.
+* Reference to the published paper: Bar-Hen, Barbillon and Donnet (2022), Statistical Modelling <doi:10.1177/1471082X20963254> (also in `citation("GREMLINS")`).
 * Initialisation: by default (`initBM = TRUE`), the starting classifications of `multipartiteBM()` and `multipartiteBMFixedModel()`
   are obtained by fitting a SBM / LBM on each network with `blockmodels` (all combinations are tried), instead of a hierarchical clustering.
   `initBM = FALSE` gives back the hierarchical clustering initialisation.

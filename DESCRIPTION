@@ -12,7 +12,9 @@ Description: We define generalized multipartite networks as the joint
     observation of several networks implying some common pre-specified
     groups of individuals. The aim is to fit an adapted version of the
     popular stochastic block model to multipartite networks, as described
-    in Bar-hen, Barbillon and Donnet (2020) <doi:10.48550/arXiv.1807.10138>.
+    in Bar-Hen, Barbillon and Donnet (2022) <doi:10.1177/1471082X20963254>.
+    It is the inference engine of the package 'sbm', which should be
+    preferred for the analysis of multipartite networks.
 License: GPL-3
 URL: https://GrossSBM.github.io/GREMLINS/
 BugReports: https://github.com/GrossSBM/GREMLINS/issues
@@ -31,10 +33,13 @@ Imports:
     utils
 Suggests: 
     knitr,
+    quarto,
     rmarkdown,
     testthat (>= 2.1.0)
 VignetteBuilder: 
-    knitr
+    quarto
+SystemRequirements: Quarto command line tool
+    (<https://github.com/quarto-dev/quarto-cli>)
 Encoding: UTF-8
 Language: en-US
 LazyData: true

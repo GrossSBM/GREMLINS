@@ -6,7 +6,13 @@
 \alias{GREMLINS}
 \title{Adjusting an extended SBM to Multipartite networks}
 \description{
-Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. GREMLIM adjusts an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-hen, Barbillon and Donnet (2020)
+Generalized multipartite networks  consist in the joint observation of several networks implying some common pre-specified groups of individuals. GREMLINS adjusts an adapted version of  the popular stochastic block model to multipartite networks, as described in Bar-Hen, Barbillon and Donnet (2022).
+}
+\details{
+\strong{GREMLINS is the inference engine of the package \code{sbm}. We recommend using it through \code{sbm::estimateMultipartiteSBM()}},
+which implements the same model and algorithm with a simpler interface and plot functions
+(see \code{vignette("Introduction", package = "GREMLINS")} for the correspondence between the functions).
+
 The GREMLINS package provides the following top-level  major functions:
 \describe{
 \item{\code{\link{defineNetwork}}}{ a function to define carefully a single network.}
@@ -14,8 +20,7 @@ The GREMLINS package provides the following top-level  major functions:
 \item{\code{\link{multipartiteBM}}}{ a function to perform inference (model selection and estimation ) of SBM for a multipartite network.}
 \item{\code{\link{multipartiteBMFixedModel}}}{ a function to estimate the parameters of SBM for a multipartite network for fixed numbers of blocks}
 }
-}
-\details{
+
 We also provide some additional functions useful to analyze the results:
 \describe{
 \item{\code{\link{extractClustersMBM}}}{ a function to extract the clusters in each functional group}
@@ -25,7 +30,7 @@ We also provide some additional functions useful to analyze the results:
 }
 }
 \references{
-Bar-Hen, A. and Barbillon, P. & Donnet S. (2020), "Block models for multipartite networks. Applications in ecology and  ethnobiology. Journal of Statistical Modelling (to appear)
+Bar-Hen, A., Barbillon, P. and Donnet, S. (2022). Block models for generalized multipartite networks: Applications in ecology and ethnobiology. Statistical Modelling, 22(4), 273-296. \doi{10.1177/1471082X20963254}
 }
 \seealso{
 Useful links:
