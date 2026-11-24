@@ -38,7 +38,10 @@ Default value  \code{= 10}.}
 \item{v_Kinit}{an optional vector of integers specifying initial numbers of blocks per FG provided in the same order as in \code{namesFG}.
 if \code{v_Kinit} is not specified, then   \code{v_Kinit = v_Kmin}}
 
-\item{initBM}{an optional boolean. If initBM = TRUE  an aditional initialisation is done using simple LBM or SBM on each network separatly.
+\item{initBM}{an optional boolean. If \code{initBM = TRUE}, the initial classifications are obtained by fitting a SBM or LBM
+(with the package \pkg{blockmodels}) on each network separately; all the combinations of these classifications
+are used as starting points. Networks with \code{laplace} or \code{ZIgaussian} distributions are not used for the initialisation.
+If \code{initBM = FALSE}, a hierarchical clustering is used. Missing values (NA) are allowed in both cases.
 Default value  \code{= TRUE}}
 
 \item{keep}{an optional boolean. If TRUE  return the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.}
@@ -51,7 +54,10 @@ Default value  \code{= TRUE}}
 
 \item{maxiterVEM}{an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}}
 
-\item{givenclassif}{an optional list of classifications (block memberships) of size Q (the number of functional groups) to use as initialization for the multipartite fit. Defaults to NULL.}
+\item{givenclassif}{an optional list of classifications (block memberships), one per functional group, used as the (only) initialization of the search.
+Either a list named with the names of the functional groups, or an unnamed list in the same order as \code{namesFG}.
+Each element is a vector of labels of length the number of individuals of the FG (in the order of the rows/columns of the matrices).
+If provided, \code{v_Kinit} and \code{initBM} are ignored. Defaults to NULL.}
 }
 \value{
 a list of estimated parameters for the different models ordered by decreasing ICL. If keep \code{= FALSE}, the length is of length 1 (only the better model is returned).

@@ -13,14 +13,20 @@
 #'              Default value  \code{= 10}.
 #' @param v_Kinit an optional vector of integers specifying initial numbers of blocks per FG provided in the same order as in \code{namesFG}.
 #'               if \code{v_Kinit} is not specified, then   \code{v_Kinit = v_Kmin}
-#' @param initBM an optional boolean. If initBM = TRUE  an aditional initialisation is done using simple LBM or SBM on each network separatly.
+#' @param initBM an optional boolean. If \code{initBM = TRUE}, the initial classifications are obtained by fitting a SBM or LBM
+#'               (with the package \pkg{blockmodels}) on each network separately; all the combinations of these classifications
+#'               are used as starting points. Networks with \code{laplace} or \code{ZIgaussian} distributions are not used for the initialisation.
+#'               If \code{initBM = FALSE}, a hierarchical clustering is used. Missing values (NA) are allowed in both cases.
 #'               Default value  \code{= TRUE}
 #' @param keep an optional boolean. If TRUE  return the estimated parameters for intermediate visited models. Otherwise, only the better model (in ICL sense) is the ouput. Default value \code{= FALSE}.
 #' @param verbose an optional boolean. If  TRUE, display the current step of the search algorithm
 #' @param nbCores an optional integer specifying the number or cores used for the estimation. Not parallelized on windows. If \code{ncores = NULL}, then half of the cores are used.
 #' @param maxiterVE an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}
 #' @param maxiterVEM an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}
-#' @param givenclassif an optional list of classifications (block memberships) of size Q (the number of functional groups) to use as initialization for the multipartite fit. Defaults to NULL.
+#' @param givenclassif an optional list of classifications (block memberships), one per functional group, used as the (only) initialization of the search.
+#'               Either a list named with the names of the functional groups, or an unnamed list in the same order as \code{namesFG}.
+#'               Each element is a vector of labels of length the number of individuals of the FG (in the order of the rows/columns of the matrices).
+#'               If provided, \code{v_Kinit} and \code{initBM} are ignored. Defaults to NULL.
 #' @details The function \code{multipartiteBM} selects the better numbers of blocks in each FG (with a penalized likelihood criterion). The model selection is performed with a forward backward strategy and the likelihood of each model is maximized with a variational EM).
 
 #'
@@ -85,7 +91,7 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
 
   #------------------- Check the order of names_FG
   if (dataR6$Q == 1) {
-    namesFG <- dataR6$nameFG
+    namesFG <- dataR6$namesFG
   } else { # dataR6$Q > 1
     if ((length(v_Kmin) == dataR6$Q) & is.null(namesFG)) {
       stop("Please specify the names of the Functional Groups")
@@ -126,20 +132,11 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
   }
 
   #------------------- Reorder the v_Kmin, v_Kmax and v_Kinit to match the order of  dataR6$namesFG
-  v_Kmin_permut <- v_Kmin
-  v_Kmax_permut <- v_Kmax
-  v_Kinit_permut <- v_Kinit
-  for (q in 1:dataR6$Q) {
-    wq <- which(dataR6$namesFG == namesFG[q])
-    v_Kmin_permut[wq] <- v_Kmin[q]
-    v_Kmax_permut[wq] <- v_Kmax[q]
-    if ((length(v_Kinit) == dataR6$Q) & length(v_Kinit) > 1) {
-      v_Kinit_permut[q] <- v_Kinit[wq]
-    }
+  v_Kmin <- toInternalOrder(v_Kmin, namesFG, dataR6)
+  v_Kmax <- toInternalOrder(v_Kmax, namesFG, dataR6)
+  if (length(v_Kinit) == dataR6$Q) {
+    v_Kinit <- toInternalOrder(v_Kinit, namesFG, dataR6)
   }
-  v_Kinit <- v_Kinit_permut
-  v_Kmin <- v_Kmin_permut
-  v_Kmax <- v_Kmax_permut
 
 
   #------------------------  Bounds of the numer of clusters
@@ -167,10 +164,16 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
     }
   }
 
-  # Handle givenclassif
+  # Handle givenclassif: checked and put in the internal order of the FGs
   if (!is.null(givenclassif)) {
-    print("A given initialization has been provided. Setting the initial number of clusters accordingly.")
-    v_Kinit <- sapply(givenclassif, max)
+    givenclassif <- formatGivenClassif(givenclassif, namesFG, dataR6)
+    v_Kinit <- calcVK(givenclassif)
+    if (any(v_Kinit < v_Kmin | v_Kinit > v_Kmax)) {
+      warning("The number of blocks in givenclassif is outside [v_Kmin, v_Kmax] for some functional groups")
+    }
+    if (verbose) {
+      print("A given initialization has been provided. Setting the initial number of clusters accordingly.")
+    }
   }
 
   if (dataR6$Q > 1) {
@@ -200,134 +203,31 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
   }
 
 
-  #----------------------   ESTIMATION starting from one (given) or two initialisations  (v_Kmean and v_Kmin)
-
-  collectionTestedClassifInit <- list()
-
-  paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]], v_distrib = dataR6$v_distrib)
+  #----------------------   Initial classifications
+  # - givenclassif if provided
+  # - otherwise, if initBM: SBM / LBM fitted with blockmodels on each network (all combinations)
+  # - otherwise: hierarchical clustering (CAH) with v_Kinit blocks
   if (!is.null(givenclassif)) {
-    classifInit <- initialize(dataR6, paramInit, method = "given", givenclassif = givenclassif)$groups
+    paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]], v_distrib = dataR6$v_distrib)
+    collectionTestedClassifInit <- list(initialize(dataR6, paramInit, method = "given", givenclassif = givenclassif)$groups)
+  } else if (initBM) {
+    if (verbose) {print("------------ Initialisation with blockmodels on each network ------------")}
+    collectionTestedClassifInit <- initBlockmodels(dataR6, v_Kmin = v_Kmin, v_Kmax = v_Kmax, v_K = v_Kinit,
+                                                   verbose = verbose, nbCores = nbCores)
   } else {
-    classifInit <- initialize(dataR6, paramInit, method = "CAH")$groups
+    paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]], v_distrib = dataR6$v_distrib)
+    collectionTestedClassifInit <- list(initialize(dataR6, paramInit, method = "CAH")$groups)
   }
-  R <- dataR6$searchNbClusters(classifInit, Kmin = v_Kmin, Kmax = v_Kmax, pastICL = c(), verbose = verbose, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
-  indInit <- 1
-  collectionTestedClassifInit[[indInit]] <- classifInit
-  pastICL <- sapply(R, function(e) {
-    e$ICL
-  })
 
-
-  # vkinit_list[[2]] and further  :  init classif CAH + searching from that point
-  if (length(v_Kinit_list) > 1) {
-    paramInit <- MBMfit$new(v_K = v_Kinit_list[[2]], v_distrib = dataR6$v_distrib)
-    classifInit <- initialize(dataR6, paramInit, method = "CAH")$groups
-    indInit <- indInit + 1
-    collectionTestedClassifInit[[indInit]] <- classifInit
-    R <- c(R, dataR6$searchNbClusters(classifInit, Kmin = v_Kmin, Kmax = v_Kmax, pastICL = pastICL, verbose = verbose, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM))
-    pastICL <- sapply(R, function(e) {
+  #----------------------   ESTIMATION starting from each initial classification
+  R <- list()
+  pastICL <- c()
+  for (i in seq_along(collectionTestedClassifInit)) {
+    R1 <- dataR6$searchNbClusters(collectionTestedClassifInit[[i]], Kmin = v_Kmin, Kmax = v_Kmax, pastICL = pastICL, verbose = verbose, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
+    R <- c(R, R1)
+    pastICL <- c(pastICL, sapply(R1, function(e) {
       e$ICL
-    })
-  }
-
-  indInit <- length(collectionTestedClassifInit)
-
-
-
-  # Additional initialisation starting from a block model on each network
-  if (initBM) {
-    if (dataR6$cardE == 1) {
-      print("initialisation based on each network is not relevant")
-    } else {
-      list_classifInitBM <- lapply(1:dataR6$Q, function(q) {
-        list()
-      })
-      names(list_classifInitBM) <- dataR6$namesFG
-
-      for (e in 1:dataR6$cardE) {
-        bm_model <- switch(dataR6$v_distrib[e],
-          "bernoulli" = blockmodels::BM_bernoulli,
-          "poisson" = blockmodels::BM_poisson,
-          "gaussian" = blockmodels::BM_gaussian,
-          stop(paste(
-            "initBM = TRUE does not currently support",
-            dataR6$v_distrib[e], "emission distribution."
-          ))
-        )
-        if (dataR6$typeInter[e] == "inc") {
-          indFG <- dataR6$E[e, ]
-
-
-          estim <- bm_model(
-            membership_type = "LBM",
-            adj = list_Net[[e]]$mat,
-            verbosity = ifelse(verbose, 1, 0),
-            plotting = "",
-            # explore_min = sum(v_Kmin[indFG]),
-            # explore_max = sum(v_Kmax[indFG]),
-            ncores = ifelse(is.null(nbCores), 1, nbCores)
-          )
-        } else {
-          indFG <- dataR6$E[e, 1]
-          estim <- bm_model(
-            membership_type = ifelse(dataR6$typeInter[e] == "diradj",
-              "SBM", "SBM_sym"
-            ),
-            adj = list_Net[[e]]$mat,
-            verbosity = ifelse(verbose, 1, 0),
-            plotting = "",
-            # explore_min = sum(v_Kmin[indFG]),
-            # explore_max = sum(v_Kmax[indFG]),
-            ncores = ifelse(is.null(nbCores), 1, nbCores)
-          )
-        }
-        estim$estimate()
-        #------------ esim SBM ou LSB on one network
-        # estim <- multipartiteBM(list(list_Net[[e]]), namesFG = dataR6$namesFG[indFG], v_distrib = v_distrib[e], v_Kmin = v_Kmin[indFG], v_Kmax = v_Kmax[indFG], v_Kinit = v_Kmin[indFG], initBM = FALSE, verbose = FALSE, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
-
-
-        if (dataR6$typeInter[e] == "inc") {
-          list_classifInitBM[[dataR6$E[e, 1]]] <- c(
-            list_classifInitBM[[dataR6$E[e, 1]]],
-            list(apply(estim$memberships[[which.max(estim$ICL)]]$Z1, 1, which.max))
-          )
-          list_classifInitBM[[dataR6$E[e, 2]]] <- c(
-            list_classifInitBM[[dataR6$E[e, 2]]],
-            list(apply(estim$memberships[[which.max(estim$ICL)]]$Z2, 1, which.max))
-          )
-        } else {
-          list_classifInitBM[[dataR6$E[e, 1]]] <- c(
-            list_classifInitBM[[dataR6$E[e, 1]]],
-            list(apply(estim$memberships[[which.max(estim$ICL)]]$Z, 1, which.max))
-          )
-        }
-      } #### end of the loop on the networks....
-
-
-      Nb_classifInitBM <- lapply(list_classifInitBM, function(l) seq_along(l))
-      combin_classifInitBM <- as.matrix(expand.grid(Nb_classifInitBM))
-      indRef <- indInit
-      for (i in seq_len(nrow(combin_classifInitBM)))
-      {
-        indInit <- indInit + 1
-        rowcombin <- as.vector(combin_classifInitBM[i, ])
-        classifInit <- lapply(1:dataR6$Q, function(q) list_classifInitBM[[q]][[rowcombin[q]]])
-        collectionTestedClassifInit[[indInit]] <- classifInit
-      }
-
-      collectionTestedClassifInit <- cleanCollectionClassif(collectionTestedClassifInit, indRef)
-      if (length(collectionTestedClassifInit) > indRef) {
-        for (i in (indRef + 1):length(collectionTestedClassifInit))
-        {
-          # browser()
-          R1 <- dataR6$searchNbClusters(collectionTestedClassifInit[[i]], Kmin = v_Kmin, Kmax = v_Kmax, pastICL = pastICL, verbose = verbose, nbCores = nbCores, maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
-          R <- c(R, R1)
-          pastICL <- c(pastICL, sapply(R1, function(e) {
-            e$ICL
-          }))
-        }
-      }
-    }
+    }))
   }
 
 
@@ -340,7 +240,9 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
     stop("Convergence was not reached. Increase the number of iterations of the VEM or of the VE")
   }
   for (k in 1:length(res)) {
-    names(res[[k]]$paramEstim$v_K) <- namesFG
+    # results are given in the internal order of the FGs (as list_pi and tau): label them accordingly
+    names(res[[k]]$paramEstim$v_K) <- dataR6$namesFG
+    names(res[[k]]$paramEstim$Z) <- dataR6$namesFG
   }
 
 

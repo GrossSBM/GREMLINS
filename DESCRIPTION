@@ -39,7 +39,6 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 Collate: 
     'GREMLINS_package.R'
     'BMPOO.R'
@@ -56,3 +55,4 @@ Collate:
     'comparClassif.R'
     'MPEcoNetwork.R'
     'predictMBM.R'
+Config/roxygen2/version: 8.1.1

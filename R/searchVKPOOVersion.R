@@ -66,15 +66,15 @@ searchKQ <- function(dataR6, classifInit, pastICL = c(), Kmin=NULL, Kmax=NULL, n
     if (verbose) {
       progressr::handlers("progress")
        allEstim <- progressr::with_progress({
-          p <- progressr::progressor(along = 1:L)
-          future.apply::future_lapply(1:L, function(l) {
+          p <- progressr::progressor(steps = L)
+          future.apply::future_lapply(seq_len(L), function(l) {
             p(sprintf("init=%g", l))  # Update progress
             estim.c.l <- dataR6$estime(list_classif_init[[l]], maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
             return(estim.c.l)
           })
         })
       } else {
-        allEstim <- future.apply::future_lapply(1:L, function(l) {
+        allEstim <- future.apply::future_lapply(seq_len(L), function(l) {
           estim.c.l <- dataR6$estime(list_classif_init[[l]], maxiterVE = maxiterVE, maxiterVEM = maxiterVEM)
           return(estim.c.l)
         })
