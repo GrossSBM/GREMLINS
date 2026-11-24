@@ -1,123 +1,88 @@
 ---
-title: "GREMLINS. Quick Mathematical Background"
+title: "GREMLINS: use it through the package sbm"
 author: "Sophie Donnet, Pierre Barbillon"
 date: today
 format:
   html:
     toc: true
-    toc-depth: 3
-    html-math-method: mathml # rendered by the browsers, even when the vignette is self-contained
-bibliography: references.bib
-link-citations: true
+    toc-depth: 2
 knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
 vignette: >
-  %\VignetteIndexEntry{GREMLINS. Quick Mathematical Background}
+  %\VignetteIndexEntry{GREMLINS: use it through the package sbm}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 
+GREMLINS fits block models to **multipartite networks**: collections of simple and bipartite networks
+involving common groups of nodes (the functional groups), possibly with different types of weights
+and with missing values. The model and its inference are described in
+Bar-Hen, Barbillon and Donnet (2022), *Block models for generalized multipartite networks: Applications
+in ecology and ethnobiology*, Statistical Modelling, 22(4), 273–296,
+[doi:10.1177/1471082X20963254](https://doi.org/10.1177/1471082X20963254).
+
 ::: {.callout-important}
 ## Please use GREMLINS through the package `sbm`
 
-GREMLINS is the inference engine of the package
-[`sbm`](https://CRAN.R-project.org/package=sbm), which calls it to fit multipartite block models.
-**We recommend not to use GREMLINS directly, but the function `estimateMultipartiteSBM()` of `sbm`.**
-`sbm` implements the same model and the same algorithm, with a simpler and unified interface
-(shared with simple, bipartite and multiplex networks), plot functions and more examples.
-GREMLINS is mostly maintained as a back-end of `sbm`.
-
-| GREMLINS                       | `sbm`                                                            |
-|--------------------------------|------------------------------------------------------------------|
-| `defineNetwork()`              | `defineSBM()`                                                    |
-| `rMBM()`                       | `sampleMultipartiteSBM()`                                        |
-| `multipartiteBM()`             | `estimateMultipartiteSBM()`                                      |
-| `multipartiteBMFixedModel()`   | `estimateMultipartiteSBM()` with equal bounds in `nbBlocksRange` |
-| `extractClustersMBM()`         | `$memberships`                                                   |
-| `predictMBM()`                 | `predict()`                                                      |
-| (none)                         | `plot()`, `plotMyMultipartiteMatrix()`                           |
-
-See the vignette *Multipartite Stochastic Block Models* of `sbm`:
-`vignette("Multipartite_EcologicalNetwork", package = "sbm")`.
+GREMLINS is the inference engine of the package [`sbm`](https://CRAN.R-project.org/package=sbm).
+**We recommend not to use GREMLINS directly, but the function `estimateMultipartiteSBM()` of `sbm`**,
+which implements the same model and the same algorithm, with a simpler interface (shared with simple,
+bipartite and multiplex networks), plot functions and examples. GREMLINS is maintained as a back-end of `sbm`.
 :::
 
-The goal of GREMLINS is to perform statistical analysis of multipartite networks through a block model approach.
+## Documentation
 
-Multipartite networks consist in the joint observation of several networks implying some common individuals.
-The individuals (or entities represented by nodes) at stake are partitioned into groups defined by their nature.
-In what follows, these groups will be referred to as **functional groups**.
+The documentation of multipartite block models is in the vignettes of `sbm`:
 
-```{r packages}
+- *Stochastic Block Models for Multipartite networks: principle*: the model, its inference and an illustration
+  on simulated data (selection of the numbers of blocks, fixed numbers of blocks, initial clustering,
+  missing data and prediction, parallel computing),
+  `vignette("MultipartiteNetwork_principle", package = "sbm")`;
+- *Multipartite Stochastic Block Models*: the analysis of a mutualistic ecological network,
+  `vignette("Multipartite_EcologicalNetwork", package = "sbm")`.
+
+## From GREMLINS to sbm
+
+| GREMLINS                         | `sbm`                                                                    |
+|----------------------------------|--------------------------------------------------------------------------|
+| `defineNetwork()`                | `defineSBM()`                                                            |
+| `rMBM()`                         | `sampleMultipartiteSBM()`                                                |
+| `multipartiteBM()`               | `estimateMultipartiteSBM()`                                              |
+| `multipartiteBMFixedModel()`     | `estimateMultipartiteSBM()` with equal bounds in `nbBlocksRange`         |
+| options `v_Kmin`, `v_Kmax`       | `estimOptions$nbBlocksRange`                                             |
+| options `initBM`, `classifInit`  | `estimOptions$initBM`, `estimOptions$classifInit`                        |
+| `$fittedModel` (`keep = TRUE`)   | `$storedModels`, `$setModel()`                                           |
+| `extractClustersMBM()`           | `$memberships`                                                           |
+| `predictMBM()`                   | `predict()`                                                              |
+| (none)                           | `plot()`, `plotMyMultipartiteMatrix()`                                   |
+
+For instance, the analysis of the ecological network `MPEcoNetwork` (also available in `sbm` as
+`multipartiteEcologicalNetwork`) reads, with GREMLINS:
+
+```{r gremlins, eval = FALSE}
 library(GREMLINS)
+data(MPEcoNetwork)
+PlantFlovis <- defineNetwork(MPEcoNetwork$Inc_plant_flovis, "inc", "Plants", "Flovis")
+PlantAnt    <- defineNetwork(MPEcoNetwork$Inc_plant_ant,    "inc", "Plants", "Ants")
+PlantBird   <- defineNetwork(MPEcoNetwork$Inc_plant_bird,   "inc", "Plants", "Birds")
+res <- multipartiteBM(list(PlantFlovis, PlantAnt, PlantBird),
+                      v_distrib = c("bernoulli", "bernoulli", "bernoulli"),
+                      namesFG = c("Plants", "Flovis", "Ants", "Birds"))
+res$fittedModel[[1]]$paramEstim$v_K
 ```
 
-## Mathematical Background
+and with `sbm`:
 
-The model is introduced and described in @multipartite.
-
-### A collection of networks
-
-Assume that $Q$ functional groups of individuals are at stake.
-**A multipartite network is a collection of networks**, each of them implying one or two functional groups.
-Thus, each network may be
-
-- *simple* if it represents the relations inside a functional group,
-- *bipartite* if it represents the relations between individuals of two functional groups.
-
-We index the collection of networks by pairs of functional groups $(q,q')$.
-The set $E$ denotes the list of pairs of functional groups for which we observe an interaction network.
-
-For any pair $(q,q') \in E$, **the interaction network is encoded in a matrix $X^{qq'}$** such that
-$X^{qq'}_{ii'} \neq 0$ if there is an edge from unit $i$ of functional group $q$ to unit $i'$ of functional group $q'$,
-$X^{qq'}_{ii'} = 0$ otherwise.
-
-For any $(q,q')$, $X^{qq'}_{ii'}$ may be in $\{0,1\}$ or a numeric for weighted networks.
-
-Note that, if $q \neq q'$, $X^{qq'}$ is said to be an **incidence matrix** (corresponding to a bipartite network).
-If $q = q'$, $X^{qq}$ is an **adjacency matrix**.
-Moreover, if the relation inside the functional group $q$ is non-oriented, $X^{qq}$ is symmetric.
-
-### A probabilistic latent variables model
-
-Let $n_q$ be the number of individuals in the $q$-th functional group.
-Assume that each functional group $q$ is divided into $K_q$ **blocks, or equivalently clusters**.
-$\forall q$ and $\forall i$, let $Z^{q}_i$ be the latent random variable such that $Z^q_i = k$ if individual $i$ of functional group $q$ belongs to cluster $k$.
-The random variables $Z^{q}_i$'s are assumed to be independent and such that:
-$\forall (i,k,q) \in \{1,\dots,n_q\} \times \{1,\dots,K_q\} \times \{1,\dots,Q\}$,
-
-$$
-\mathbb{P}(Z^{q}_i=k) = \pi^{q}_k,
-$$ {#eq-mod2}
-
-with $\sum_{k=1}^{K_q}\pi^{q}_k=1$, $\forall q=1,\dots, Q$.
-
-Conditionally on the clustering, the entries of the matrices $\left(X^{qq'}_{ii'}\right)$ are assumed to be independent and distributed as follows:
-$\forall (i,i') \in \{1,\dots,n_q\} \times \{1,\dots,n_{q'}\}$,
-
-$$
-X^{qq'}_{ii'} \; | \; Z^{q}_i=k, Z^{q'}_{i'}=k' \sim_{i.i.d.} \mathcal{F}_{qq'}(\theta^{qq'}_{kk'}),
-$$ {#eq-mod1}
-
-meaning that the probability of connection from $i$ of functional group $q$ to $i'$ of functional group $q'$ only depends on the clusters to which they belong.
-
-For any pair $(q,q')$, $\mathcal{F}_{qq'}(\cdot)$ is either:
-
-- Bernoulli, resulting into binary interactions,
-- Poisson for weighted networks of counts,
-- Gaussian, zero-inflated Gaussian or Laplace for continuous weighted networks.
-
-As a consequence, the collection of networks may contain weighted and/or binary networks.
-
-### Statistical inference
-
-The inference of the model consists in the selection of the numbers of clusters $(K_q)_{q=1,\dots,Q}$ and the estimation of the parameters $(\theta^{qq'})$.
-The model selection is performed with the ICL, a penalized likelihood criterion.
-The parameters are estimated with a variational version of the EM algorithm.
-The estimation procedure also provides a clustering of the entities at stake.
-
-The algorithm is initialised with stochastic block models (or latent block models) fitted on each network separately with the package `blockmodels` [@blockmodels].
-Missing data (`NA`) are allowed in the matrices.
-
-## References
+```{r sbm, eval = FALSE}
+library(sbm)
+data(multipartiteEcologicalNetwork)
+Net <- multipartiteEcologicalNetwork
+PlantFlovis <- defineSBM(Net$Inc_plant_flovis, "bernoulli", "bipartite", dimLabels = c("Plants", "Flovis"))
+PlantAnt    <- defineSBM(Net$Inc_plant_ant,    "bernoulli", "bipartite", dimLabels = c("Plants", "Ants"))
+PlantBird   <- defineSBM(Net$Inc_plant_bird,   "bernoulli", "bipartite", dimLabels = c("Plants", "Birds"))
+myMSBM <- estimateMultipartiteSBM(list(PlantFlovis, PlantAnt, PlantBird))
+myMSBM$nbBlocks
+plot(myMSBM)
+```
