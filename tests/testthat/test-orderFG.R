@@ -27,14 +27,14 @@ test_that("outputs are correctly labelled", {
   expectGoodLabels(multipartiteBMFixedModel(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), v_K = c(1, 2, 3), verbose = FALSE, initBM = FALSE))
 })
 
-test_that("givenclassif / classifInit follow namesFG or their names", {
+test_that("classifInit follows namesFG or their names", {
   s <- simuOrder()
   gc <- unname(s$z)                       # order of namesFG
   gcNamed <- s$z[c("C", "A", "B")]        # named, any order
   for (g in list(gc, gcNamed)) {
-    expectGoodLabels(multipartiteBM(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), v_Kmax = 5, givenclassif = g, verbose = FALSE))
+    expectGoodLabels(multipartiteBM(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), v_Kmax = 5, classifInit = g, verbose = FALSE))
     expectGoodLabels(multipartiteBMFixedModel(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), v_K = NULL, classifInit = g, verbose = FALSE))
   }
-  expect_error(multipartiteBM(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), givenclassif = list(s$z$B, s$z$A, s$z$C), verbose = FALSE), "must be of length")
-  expect_error(multipartiteBM(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), givenclassif = list(X = 1, Y = 1, Z = 1), verbose = FALSE), "do not match")
+  expect_error(multipartiteBM(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), classifInit = list(s$z$B, s$z$A, s$z$C), verbose = FALSE), "must be of length")
+  expect_error(multipartiteBM(s$list_Net, c("bernoulli", "bernoulli"), namesFG = c("A", "B", "C"), classifInit = list(X = 1, Y = 1, Z = 1), verbose = FALSE), "do not match")
 })

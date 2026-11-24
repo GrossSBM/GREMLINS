@@ -23,7 +23,7 @@
 #' @param nbCores an optional integer specifying the number or cores used for the estimation. Not parallelized on windows. If \code{ncores = NULL}, then half of the cores are used.
 #' @param maxiterVE an optional integer  specifying the maximum number of iterations in the VE step of the VEM algorithm. If NULL then default value  \code{= 1000}
 #' @param maxiterVEM an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}
-#' @param givenclassif an optional list of classifications (block memberships), one per functional group, used as the (only) initialization of the search.
+#' @param classifInit an optional list of classifications (block memberships), one per functional group, used as the (only) initialization of the search.
 #'               Either a list named with the names of the functional groups, or an unnamed list in the same order as \code{namesFG}.
 #'               Each element is a vector of labels of length the number of individuals of the FG (in the order of the rows/columns of the matrices).
 #'               If provided, \code{v_Kinit} and \code{initBM} are ignored. Defaults to NULL.
@@ -68,7 +68,7 @@
 
 #' @export
 
-multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 1, v_Kmax = 10, v_Kinit = NULL, initBM = TRUE, keep = FALSE, verbose = TRUE, nbCores = NULL, maxiterVE = NULL, maxiterVEM = NULL, givenclassif = NULL) {
+multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 1, v_Kmax = 10, v_Kinit = NULL, initBM = TRUE, keep = FALSE, verbose = TRUE, nbCores = NULL, maxiterVE = NULL, maxiterVEM = NULL, classifInit = NULL) {
   if (all(v_Kmin == v_Kmax)) {
     stop('v_Kmin = v_Kmax. Use the function "multipartiteBMFixedModel" instead')
   }
@@ -164,12 +164,12 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
     }
   }
 
-  # Handle givenclassif: checked and put in the internal order of the FGs
-  if (!is.null(givenclassif)) {
-    givenclassif <- formatGivenClassif(givenclassif, namesFG, dataR6)
-    v_Kinit <- calcVK(givenclassif)
+  # Handle classifInit: checked and put in the internal order of the FGs
+  if (!is.null(classifInit)) {
+    classifInit <- formatClassifInit(classifInit, namesFG, dataR6)
+    v_Kinit <- calcVK(classifInit)
     if (any(v_Kinit < v_Kmin | v_Kinit > v_Kmax)) {
-      warning("The number of blocks in givenclassif is outside [v_Kmin, v_Kmax] for some functional groups")
+      warning("The number of blocks in classifInit is outside [v_Kmin, v_Kmax] for some functional groups")
     }
     if (verbose) {
       print("A given initialization has been provided. Setting the initial number of clusters accordingly.")
@@ -204,12 +204,12 @@ multipartiteBM <- function(list_Net, v_distrib = NULL, namesFG = NULL, v_Kmin = 
 
 
   #----------------------   Initial classifications
-  # - givenclassif if provided
+  # - classifInit if provided
   # - otherwise, if initBM: SBM / LBM fitted with blockmodels on each network (all combinations)
   # - otherwise: hierarchical clustering (CAH) with v_Kinit blocks
-  if (!is.null(givenclassif)) {
+  if (!is.null(classifInit)) {
     paramInit <- MBMfit$new(v_K = v_Kinit_list[[1]], v_distrib = dataR6$v_distrib)
-    collectionTestedClassifInit <- list(initialize(dataR6, paramInit, method = "given", givenclassif = givenclassif)$groups)
+    collectionTestedClassifInit <- list(initialize(dataR6, paramInit, method = "given", classifInit = classifInit)$groups)
   } else if (initBM) {
     if (verbose) {print("------------ Initialisation with blockmodels on each network ------------")}
     collectionTestedClassifInit <- initBlockmodels(dataR6, v_Kmin = v_Kmin, v_Kmax = v_Kmax, v_K = v_Kinit,

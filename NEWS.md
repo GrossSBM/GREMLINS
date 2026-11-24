@@ -21,8 +21,8 @@
   are obtained by fitting a SBM / LBM on each network with `blockmodels` (all combinations are tried), instead of a hierarchical clustering.
   `initBM = FALSE` gives back the hierarchical clustering initialisation.
 * Missing values (NA) are now handled in the initialisation (blockmodels and NA-safe distances in the hierarchical clustering).
-* New argument `givenclassif` in `multipartiteBM()` to provide an initial classification. `givenclassif` (and `classifInit` in
-  `multipartiteBMFixedModel()`) can be a list named with the functional groups, or an unnamed list in the order of `namesFG`; it is checked.
+* New argument `classifInit` in `multipartiteBM()` to provide an initial classification (same name as in `multipartiteBMFixedModel()`).
+  In both functions, `classifInit` can be a list named with the functional groups, or an unnamed list in the order of `namesFG`; it is checked.
 * Order of the functional groups (bugs appearing only when the internal order of the FGs is not a simple swap of `namesFG`, i.e. 3 FGs or more):
   `v_Kinit` in `multipartiteBM()` and `v_K` / `classifInit` in `multipartiteBMFixedModel()` were wrongly reordered.
 * The results (`v_K`, `Z`, `list_pi`, `tau`) are given in the internal order of the FGs; `v_K` and `Z` are now always named accordingly

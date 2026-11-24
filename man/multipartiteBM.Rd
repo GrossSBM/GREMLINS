@@ -17,7 +17,7 @@ multipartiteBM(
   nbCores = NULL,
   maxiterVE = NULL,
   maxiterVEM = NULL,
-  givenclassif = NULL
+  classifInit = NULL
 )
 }
 \arguments{
@@ -54,7 +54,7 @@ Default value  \code{= TRUE}}
 
 \item{maxiterVEM}{an optional integer  specifying the maximum number of iterations of the VEM algorithm. If NULL then default value Default value  \code{= 1000}}
 
-\item{givenclassif}{an optional list of classifications (block memberships), one per functional group, used as the (only) initialization of the search.
+\item{classifInit}{an optional list of classifications (block memberships), one per functional group, used as the (only) initialization of the search.
 Either a list named with the names of the functional groups, or an unnamed list in the same order as \code{namesFG}.
 Each element is a vector of labels of length the number of individuals of the FG (in the order of the rows/columns of the matrices).
 If provided, \code{v_Kinit} and \code{initBM} are ignored. Defaults to NULL.}

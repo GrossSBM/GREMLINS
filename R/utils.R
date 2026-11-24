@@ -492,7 +492,7 @@ toInternalOrder <- function(x, namesFG, dataR6) {
 
 # Check an initial classification given by the user and put it in the internal order.
 # classif: list with one vector of labels per FG, either named by FG or in the order of namesFG.
-formatGivenClassif <- function(classif, namesFG, dataR6) {
+formatClassifInit <- function(classif, namesFG, dataR6) {
   Q <- dataR6$Q
   if (!is.list(classif) || length(classif) != Q) {
     stop("The initial classification must be a list with one vector of labels per functional group")

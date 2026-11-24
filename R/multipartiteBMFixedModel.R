@@ -60,7 +60,7 @@ multipartiteBMFixedModel <- function(list_Net,v_distrib ,namesFG , v_K,  classif
     v_K <- toInternalOrder(v_K, namesFG, dataR6)
   }
   if (!is.null(classifInit)) {
-    classifInit <- formatGivenClassif(classifInit, namesFG, dataR6)
+    classifInit <- formatClassifInit(classifInit, namesFG, dataR6)
     v_Kprov <- calcVK(classifInit)
     if (is.null(v_K)) {v_K <- v_Kprov}
     else {if (any(v_K != v_Kprov)) {stop("unconsistent initial classification and v_K")}}

@@ -1,4 +1,4 @@
-initialize = function(dataR6 , param , method = "CAH", givenclassif = NULL)
+initialize = function(dataR6 , param , method = "CAH", classifInit = NULL)
   #method can be pure random or classical clustering CAH or given classif
 {
 
@@ -16,7 +16,7 @@ initialize = function(dataR6 , param , method = "CAH", givenclassif = NULL)
     groups <- lapply(1:Q,function(q){cahClassif(dataR6, q, v_K[q])})
     }
 
-  if (method == "given") { groups <- givenclassif}
+  if (method == "given") { groups <- classifInit}
 
 
   tau <-  lapply(1:Q,function(j){
