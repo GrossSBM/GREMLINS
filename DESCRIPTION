@@ -12,7 +12,7 @@ Description: We define generalized multipartite networks as the joint
     observation of several networks implying some common pre-specified
     groups of individuals. The aim is to fit an adapted version of the
     popular stochastic block model to multipartite networks, as described
-    in Bar-hen, Barbillon and Donnet (2020) <arXiv:1807.10138>.
+    in Bar-hen, Barbillon and Donnet (2020) <doi:10.48550/arXiv.1807.10138>.
 License: GPL-3
 URL: https://GrossSBM.github.io/GREMLINS/
 BugReports: https://github.com/GrossSBM/GREMLINS/issues
