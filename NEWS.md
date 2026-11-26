@@ -29,3 +29,7 @@
 * The results (`v_K`, `Z`, `list_pi`, `tau`) are given in the internal order of the FGs; `v_K` and `Z` are now always named accordingly
   (`v_K` was previously labelled with `namesFG`, which could be wrong).
 * `multipartiteBMFixedModel()`: fixed a crash when some functional groups have only one block, and explicit error when no model converged.
+* Self-loops: by default the diagonal of adjacency matrices (`adj`, `diradj`) is set to `NA` and is not
+  used in the inference (consistent with the `blockmodels` initialisation and the `sbm` package). The new
+  argument `selfLoops = TRUE` in `defineNetwork()` keeps the diagonal. `rMBM()` now simulates networks without
+  self-loops (diagonal `NA`) for all distributions, and no longer sets to 0 the entries (i,i) of incidence matrices.

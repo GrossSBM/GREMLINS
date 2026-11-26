@@ -134,7 +134,7 @@ MBMfit$set("public",'sim',
                         bernoulli = {
                           if (!is.null(seed)) {set.seed(seed + e)}
                           X_e <- matrix(rbinom(self$v_NQ[fg1] * self$v_NQ[fg2],1,list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
-                          diag(X_e) <- 0;                              },
+                          },
                         poisson = {
                           if (!is.null(seed)) {set.seed(seed + e)}
                           X_e <- matrix(rpois(self$v_NQ[fg1] * self$v_NQ[fg2],list_theta_e[Z_fg1,Z_fg2]),self$v_NQ[fg1],self$v_NQ[fg2])
@@ -155,6 +155,8 @@ MBMfit$set("public",'sim',
                           },
                       stop("Enter a valid distribution (poisson or bernoulli or laplace or gaussian)!"))
                  if (self$typeInter[e] == "adj") {X_e[lower.tri(X_e)] = t(X_e)[lower.tri(X_e)]}
+                 # no self-loops in the model: the diagonal of adjacency matrices is not observed
+                 if (self$typeInter[e] != "inc") {diag(X_e) <- NA}
                  return(X_e)}
                )
                dataSim <- CollInteraction$new(mats = mats,self$E,self$typeInter,self$v_distrib)

@@ -130,7 +130,11 @@ transfoE <- function(E, typeInter){
 
 formattingData <- function(list_Net,v_distrib = NULL)
 {
-  mats = lapply(list_Net,function(net){return(net$mat)})
+  # self-loops are not modelled (diagonal set to NA) unless selfLoops = TRUE in defineNetwork
+  mats = lapply(list_Net,function(net){
+    m <- net$mat
+    if (net$typeInter != "inc" && !isTRUE(net$selfLoops)) {diag(m) <- NA}
+    return(m)})
   intFG = lapply(list_Net,function(net){return(c(net$rowFG,net$colFG))})
   intFG = do.call(rbind,intFG)
   types = sapply(list_Net,function(net){return(net$typeInter)})

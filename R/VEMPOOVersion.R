@@ -124,9 +124,7 @@ varEMMBM <- function(dataR6,classifInit,tauInit = NULL, maxiterVE = NULL,maxiter
         list_theta_e$p0 <- 1 - crossprod(crossprod(NonZeros_e, tau[[gr]]), tau[[gc]]) / Denom
       }
       if (v_distrib[e] == 'laplace') {
-          Omega <- list_Mat[[e]]
-          diag(Omega) <- 0
-          list_theta_e <- crossprod(crossprod(abs(Omega), tau[[gr]]), tau[[gc]]) / Denom
+          list_theta_e <- crossprod(crossprod(abs(list_Mat[[e]]), tau[[gr]]), tau[[gc]]) / Denom
       }
       return(list_theta_e)})
 

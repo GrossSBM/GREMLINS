@@ -4,7 +4,7 @@
 \alias{defineNetwork}
 \title{Define a network providing its matrix of interactions and specifying the functions groups in row and col.}
 \usage{
-defineNetwork(mat, typeInter, rowFG, colFG)
+defineNetwork(mat, typeInter, rowFG, colFG, selfLoops = FALSE)
 }
 \arguments{
 \item{mat}{An adjacency matrix (symmetric or not) or an incidence matrix}
@@ -14,6 +14,11 @@ defineNetwork(mat, typeInter, rowFG, colFG)
 \item{rowFG}{Name of the functional group in row}
 
 \item{colFG}{Name of the function group in column}
+
+\item{selfLoops}{Only used for adjacency matrices ("adj" or "diradj"). If \code{FALSE} (default),
+the diagonal of \code{mat} is set to \code{NA}: self-loops are considered as non observed and
+do not contribute to the inference (as in the packages \pkg{blockmodels} and \pkg{sbm}).
+If \code{TRUE}, the diagonal is kept and modelled as any other entry.}
 }
 \value{
 a list object formatted for the GREMLINS package
